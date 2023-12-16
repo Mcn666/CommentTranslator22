@@ -107,12 +107,13 @@ namespace CommentTranslator22.Translate
 
         public static void Load()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            //ThreadHelper.ThrowIfNotOnUIThread();
+            //var dte2 = Package.GetGlobalService(typeof(DTE)) as DTE2;
+            //var solution = dte2.Solution;
+            //SolutionName = Path.GetFileName(solution.FullName);     //解决方案名称
+            //SolutionPath = Path.GetDirectoryName(solution.FullName);//解决方案路径
             RootPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/CommentTranslator22";
-            var dte2 = Package.GetGlobalService(typeof(DTE)) as DTE2;
-            var solution = dte2.Solution;
-            SolutionName = Path.GetFileName(solution.FullName);     //解决方案名称
-            SolutionPath = Path.GetDirectoryName(solution.FullName);//解决方案路径
+            SolutionPath = Directory.GetCurrentDirectory();
             SoltuionDataPath = RootPath + "/TranslateData";
             
 
@@ -139,8 +140,11 @@ namespace CommentTranslator22.Translate
         private static void AffirmLocalDataStruct()
         {
             // 确认路径是否存在，如果没有就重建它
-            if (Directory.Exists(RootPath) == false) Directory.CreateDirectory(RootPath);
-            if (Directory.Exists(SolutionName) == false) Directory.CreateDirectory(SoltuionDataPath);
+            if (Directory.Exists(RootPath) == false)
+            {
+                //Directory.CreateDirectory(RootPath);
+                Directory.CreateDirectory(SoltuionDataPath);
+            }
 
             // 确认文件是否存在，如果没有就创建它
             if (File.Exists(RootPath + "/SolutionInfo") == false) File.Create(RootPath + "/SolutionInfo").Close();
