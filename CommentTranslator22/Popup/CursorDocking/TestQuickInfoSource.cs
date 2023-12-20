@@ -24,24 +24,35 @@ namespace CommentTranslator22.Popup.CursorDocking
 
         public async Task<QuickInfoItem> GetQuickInfoItemAsync(IAsyncQuickInfoSession session, CancellationToken cancellationToken)
         {
-            SnapshotPoint? subjectTriggerPoint = session.GetTriggerPoint(m_subjectBuffer.CurrentSnapshot);
+            var beginTime = DateTime.UtcNow;
+            var subjectTriggerPoint = session.GetTriggerPoint(m_subjectBuffer.CurrentSnapshot);
             if (subjectTriggerPoint.HasValue == false)
             {
                 return null;
             }
 
-            ITextSnapshot currentSnapshot = subjectTriggerPoint.Value.Snapshot;
-            SnapshotSpan querySpan = new SnapshotSpan(subjectTriggerPoint.Value, 0);
+            var currentSnapshot = subjectTriggerPoint.Value.Snapshot;
+            var querySpan = new SnapshotSpan(subjectTriggerPoint.Value, 0);
             var applicableToSpan = currentSnapshot.CreateTrackingSpan(querySpan, SpanTrackingMode.EdgeInclusive);
 
             // 检查光标所指向的行
-            ITextStructureNavigator navigator = m_provider.NavigatorService.GetTextStructureNavigator(m_subjectBuffer);
-            TextExtent extent = navigator.GetExtentOfWord(subjectTriggerPoint.Value);
+            var navigator = m_provider.NavigatorService.GetTextStructureNavigator(m_subjectBuffer);
+            var extent = navigator.GetExtentOfWord(subjectTriggerPoint.Value);
 
             // 最终显示的信息
-            string str = await CommentTranslate.TranslateAsync(extent.Span);
+            var str = await CommentTranslate.TranslateAsync(extent.Span);
 
-            ContainerElement element = new ContainerElement(ContainerElementStyle.Stacked,
+            if (string.IsNullOrEmpty(str))
+            {
+                return null;
+            }
+
+            // 计算这次使用的时间
+            var endTime = DateTime.UtcNow;
+            var deltaTime = endTime - beginTime;
+            str = $"{deltaTime.TotalSeconds}\n{str}";
+
+            var element = new ContainerElement(ContainerElementStyle.Stacked,
                 new ClassifiedTextElement(
                     new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, str)));
 
