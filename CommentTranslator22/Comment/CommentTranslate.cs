@@ -14,34 +14,24 @@ namespace CommentTranslator22.Comment
     {
         public static async Task<string> TranslateAsync(SnapshotSpan snapshot)
         {
-            var text = SearchComment(snapshot.Start);
-            if (text == null)
+            var str = SearchComment(snapshot.Start);
+            if (str == null)
             {
                 // 获取鼠标指向的文本
-                text = snapshot.GetText().Trim();
-
-                // 如果找不到可以翻译的文本，就检查一下是不是使用了字典，以及字典支持的翻译目标语言，现在还无法确定源文本的语言
-                if (CommentTranslator22Package.ConfigB.UseDictionary &&
-                    CommentTranslator22Package.ConfigA.LanguageTo == Translate.Enum.LanguageEnum.简体中文)
-                {
-                    if (Regex.IsMatch(text, @"[\u4e00-\u9fff]"))
-                    {
-                        return "";
-                    }
-                    //Dictionary.Dictionary.Query(awaitTranslateText);
-                }
+                str = snapshot.GetText().Trim();
+                return QueryDictionary(str);
             }
             else
             {
-                if (text.Length > CommentTranslator22Package.TranslateClient.MaxTranslateLength)
+                if (str.Length > CommentTranslator22Package.TranslateClient.MaxTranslateLength)
                 {
-                    return text;
+                    return str;
                 }
 
                 if (CommentTranslator22Package.ConfigA.MergeCommentBlock == false)
                 {
                     var res = string.Empty;
-                    var splitResult = text.Split('\n');
+                    var splitResult = str.Split('\n');
                     foreach (var item in splitResult)
                     {
                         var recv = await CommentTranslator22Package.TranslateClient.TranslateAsync(item);
@@ -56,14 +46,11 @@ namespace CommentTranslator22.Comment
                         }
                     }
 
-                    var index = res.LastIndexOf("\n");
-                    if (index != -1)
-                        res = res.Remove(index);
-                    return res;
+                    return res.Trim('\n');
                 }
                 else
                 {
-                    var res = await CommentTranslator22Package.TranslateClient.TranslateAsync(text);
+                    var res = await CommentTranslator22Package.TranslateClient.TranslateAsync(str);
                     if (res.Success)
                     {
                         LocalTranslateData.Add(res);
@@ -71,7 +58,39 @@ namespace CommentTranslator22.Comment
                     }
                 }
             }
-            return await Task.FromResult(text);
+            return await Task.FromResult(str);
+        }
+
+        /// <summary>
+        /// 查询字典
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private static string QueryDictionary(string str)
+        {
+            // 如果找不到可以翻译的文本，就检查一下是不是使用了字典，以及字典支持的翻译目标语言，现在还无法确定源文本的语言
+            if (CommentTranslator22Package.ConfigB.UseDictionary &&
+                CommentTranslator22Package.ConfigA.LanguageTo == Translate.Enum.LanguageEnum.简体中文)
+            {
+                if (Regex.IsMatch(str, "[\u4e00-\u9fff]") == false)
+                {
+                    var result = string.Empty;
+                    var words = Dictionary.ParseString.GetWordArray(str);
+                    if (words != null)
+                    {
+                        foreach (var word in words)
+                        {
+                            var temp = Dictionary.Dictionary.Query(word);
+                            if (temp != null)
+                            {
+                                result += $"{word}   {temp.zh}\n";
+                            }
+                        }
+                        return result.Trim('\n');
+                    }
+                }
+            }
+            return string.Empty;
         }
 
         private static string SearchComment(SnapshotPoint snapshot)

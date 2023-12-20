@@ -4,6 +4,7 @@ using CommentTranslator22.Translate.Format;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -258,6 +259,8 @@ namespace CommentTranslator22.Translate
                     temp + LocalData[i].Data;
                 sw.WriteLine(res);
             }
+
+            //var jsonStr = JsonConvert.SerializeObject(formats, Formatting.Indented);
         }
     }
 }
