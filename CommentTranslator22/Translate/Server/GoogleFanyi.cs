@@ -12,13 +12,13 @@ namespace CommentTranslator22.Translate.Server
         public async Task<ApiRecvFormat> FanyiAsync(ApiSendFormat format)
         {
             var client = new HttpClient();
-            string from = LanguageCode.Code[ServerEnum.Google.GetHashCode()][format.FromLanguage.GetHashCode()];
-            string to = LanguageCode.Code[ServerEnum.Google.GetHashCode()][format.ToLanguage.GetHashCode()];
+            string from = LanguageCode.Code[ServerEnum.Google.GetHashCode()][format.SourceLanguage.GetHashCode()];
+            string to = LanguageCode.Code[ServerEnum.Google.GetHashCode()][format.TargetLanguage.GetHashCode()];
             string r = "";
             string url = "https://translate.google.com/_/TranslateWebserverUi/data/batchexecute";
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
             IDictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("f.req", $"[[[\"MkEWBc\",\"[[\\\"{format.Body}\\\",\\\"{from}\\\",\\\"{to}\\\",true],[null]]\", null, \"generic\"]]]");
+            dic.Add("f.req", $"[[[\"MkEWBc\",\"[[\\\"{format.SourceText}\\\",\\\"{from}\\\",\\\"{to}\\\",true],[null]]\", null, \"generic\"]]]");
             var data = new FormUrlEncodedContent(dic);
             request.Content = data;
             HttpResponseMessage response = await client.SendAsync(request);
@@ -39,8 +39,8 @@ namespace CommentTranslator22.Translate.Server
                 Success = true,
                 Code = (int)response.StatusCode,
                 Message = response.StatusCode.ToString(),
-                Body = format.Body,
-                Data = r
+                SourceText = format.SourceText,
+                ResultText = r
             };
         }
     }

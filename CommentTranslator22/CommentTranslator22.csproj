@@ -72,10 +72,11 @@
     <Compile Include="Translate\Format\ApiRecvFormat.cs" />
     <Compile Include="Translate\Format\ApiSendFormat.cs" />
     <Compile Include="Translate\Format\LocalSaveFormat.cs" />
-    <Compile Include="Translate\LocalTranslateData.cs" />
     <Compile Include="Translate\Server\BingFanyi.cs" />
     <Compile Include="Translate\Server\GoogleFanyi.cs" />
     <Compile Include="Translate\TranslateClient.cs" />
+    <Compile Include="Translate\TranslateData\LocalTranslateDataProcessing.cs" />
+    <Compile Include="Translate\TranslateData\LocalTranslateData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">

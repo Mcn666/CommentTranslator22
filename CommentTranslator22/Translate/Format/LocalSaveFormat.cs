@@ -7,26 +7,26 @@ namespace CommentTranslator22.Translate.Format
         /// <summary>
         /// 访问次数
         /// </summary>
-        public int ReadCount { get; set; }
+        public int Visits { get; set; }
         /// <summary>
         /// 翻译服务器
         /// </summary>
-        public ServerEnum Server { get; set; }
+        public ServerEnum TranslationServer { get; set; }
         /// <summary>
         /// 翻译前的语言
         /// </summary>
-        public LanguageEnum FromLanguage { get; set; }
+        public LanguageEnum SourceLanguage { get; set; }
         /// <summary>
         /// 翻译后的语言
         /// </summary>
-        public LanguageEnum ToLanguage { get; set; }
+        public LanguageEnum TargetLanguage { get; set; }
         /// <summary>
         /// 翻译前的字段
         /// </summary>
-        public string Body { get; set; }
+        public string Source { get; set; }
         /// <summary>
         /// 翻译后的字段
         /// </summary>
-        public string Data { get; set; }
+        public string Result { get; set; }
     }
 }

@@ -7,14 +7,14 @@ namespace CommentTranslator22.Translate.Format
         /// <summary>
         /// 请求语言
         /// </summary>
-        public LanguageEnum FromLanguage { get; set; }
+        public LanguageEnum SourceLanguage { get; set; }
         /// <summary>
         /// 目标语言
         /// </summary>
-        public LanguageEnum ToLanguage { get; set; }
+        public LanguageEnum TargetLanguage { get; set; }
         /// <summary>
         /// 翻译内容
         /// </summary>
-        public string Body { get; set; }
+        public string SourceText { get; set; }
     }
 }

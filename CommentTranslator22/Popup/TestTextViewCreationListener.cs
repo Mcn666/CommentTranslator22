@@ -1,7 +1,5 @@
-﻿using CommentTranslator22.Config;
-using Microsoft.VisualStudio.Text.Editor;
+﻿using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 
 namespace CommentTranslator22.Popup

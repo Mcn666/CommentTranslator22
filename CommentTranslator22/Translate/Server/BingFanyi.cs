@@ -26,15 +26,15 @@ namespace CommentTranslator22.Translate.Server
             regex = new Regex("\"ig\":\"(.+?)\",");
             match = regex.Match(html);
             string ig = match.Groups[1].Value;
-            string from = LanguageCode.Code[ServerEnum.Bing.GetHashCode()][format.FromLanguage.GetHashCode()];
-            string to = LanguageCode.Code[ServerEnum.Bing.GetHashCode()][format.ToLanguage.GetHashCode()];
+            string from = LanguageCode.Code[ServerEnum.Bing.GetHashCode()][format.SourceLanguage.GetHashCode()];
+            string to = LanguageCode.Code[ServerEnum.Bing.GetHashCode()][format.TargetLanguage.GetHashCode()];
 
             url = $"https://cn.bing.com/ttranslatev3?IG={ig}&IID=translator.5028";
             request = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
             IDictionary<string, string> dic = new Dictionary<string, string>
             {
                 { "fromLang", from },
-                { "text", format.Body },
+                { "text", format.SourceText },
                 { "to", to },
                 { "token", token },
                 { "key", key }
@@ -58,8 +58,8 @@ namespace CommentTranslator22.Translate.Server
                 Success = true,
                 Code = (int)response.StatusCode,
                 Message = response.StatusCode.ToString(),
-                Body = format.Body,
-                Data = r
+                SourceText = format.SourceText,
+                ResultText = r
             };
         }
     }

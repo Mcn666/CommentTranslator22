@@ -2,6 +2,7 @@
 using CommentTranslator22.Translate.Enum;
 using CommentTranslator22.Translate.Format;
 using CommentTranslator22.Translate.Server;
+using CommentTranslator22.Translate.TranslateData;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -23,8 +24,8 @@ namespace CommentTranslator22.Translate
                 {
                     Success = true,
                     Code = -1,
-                    Body = text,
-                    Data = res,
+                    SourceText = text,
+                    ResultText = res,
                 };
             }
 
@@ -35,9 +36,9 @@ namespace CommentTranslator22.Translate
 
             var request = new ApiSendFormat()
             {
-                FromLanguage = CommentTranslator22Package.ConfigA.LanguageFrom,
-                ToLanguage = CommentTranslator22Package.ConfigA.LanguageTo,
-                Body = text,
+                SourceLanguage = CommentTranslator22Package.ConfigA.SourceLanguage,
+                TargetLanguage = CommentTranslator22Package.ConfigA.TargetLanguage,
+                SourceText = text,
             };
 
             return await ExecuteAsync(request);
@@ -45,10 +46,10 @@ namespace CommentTranslator22.Translate
 
         public async Task<ApiRecvFormat> ExecuteAsync(ApiSendFormat apiRequest)
         {
-            apiRequest.Body = apiRequest.Body.Replace("\r\n", "\n");
-            apiRequest.Body = HumpUnfold(apiRequest.Body);
+            apiRequest.SourceText = apiRequest.SourceText.Replace("\r\n", "\n");
+            apiRequest.SourceText = HumpUnfold(apiRequest.SourceText);
 
-            switch (CommentTranslator22Package.ConfigA.Servers)
+            switch (CommentTranslator22Package.ConfigA.TranslationServer)
             {
                 case ServerEnum.Bing:
                     BingFanyi bingFanyi = new BingFanyi();
@@ -63,8 +64,8 @@ namespace CommentTranslator22.Translate
 
         private bool Preprocessing(string text)
         {
-            if (CommentTranslator22Package.ConfigA.LanguageFrom == CommentTranslator22Package.ConfigA.LanguageTo ||
-                CommentTranslator22Package.ConfigA.LanguageTo == LanguageEnum.Auto)
+            if (CommentTranslator22Package.ConfigA.SourceLanguage == CommentTranslator22Package.ConfigA.TargetLanguage ||
+                CommentTranslator22Package.ConfigA.TargetLanguage == LanguageEnum.Auto)
             {
                 return true;
             }
@@ -75,7 +76,7 @@ namespace CommentTranslator22.Translate
                 return true;
             }
 
-            switch (CommentTranslator22Package.ConfigA.LanguageTo)
+            switch (CommentTranslator22Package.ConfigA.TargetLanguage)
             {
                 case LanguageEnum.English:
                     if (LanguageProportion.English(text) > 0.7f)

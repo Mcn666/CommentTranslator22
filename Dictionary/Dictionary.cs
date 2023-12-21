@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Xml.Linq;
 
 namespace Dictionary
 {
@@ -42,7 +40,7 @@ namespace Dictionary
                     }
                 }
 
-                foreach ( var format in FormatList)
+                foreach (var format in FormatList)
                 {
                     if (Equals(format.en, word))
                     {

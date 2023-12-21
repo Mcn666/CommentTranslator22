@@ -1,5 +1,4 @@
-﻿using CommentTranslator22.Popup;
-using CommentTranslator22.Translate.Enum;
+﻿using CommentTranslator22.Translate.Enum;
 using Microsoft.VisualStudio.Shell;
 using System.ComponentModel;
 
@@ -9,15 +8,15 @@ namespace CommentTranslator22.Config
     {
         [Category("翻译设置")]
         [DisplayName("翻译服务器")]
-        public ServerEnum Servers { get; set; } = ServerEnum.Bing;
+        public ServerEnum TranslationServer { get; set; } = ServerEnum.Bing;
 
         [Category("翻译设置")]
         [DisplayName("翻译源语言")]
-        public LanguageEnum LanguageFrom { get; set; } = LanguageEnum.Auto;
+        public LanguageEnum SourceLanguage { get; set; } = LanguageEnum.Auto;
 
         [Category("翻译设置")]
         [DisplayName("翻译目标语言")]
-        public LanguageEnum LanguageTo { get; set; } = GetCurrentCulture();
+        public LanguageEnum TargetLanguage { get; set; } = GetCurrentCulture();
 
         [Category("翻译设置")]
         [DisplayName("多行合并")]
@@ -25,8 +24,8 @@ namespace CommentTranslator22.Config
 
 
         [Category("保存设置")]
-        [DisplayName("翻译结果保存数量")]
-        public int TranslateResultMaximumSave { get; set; } = 1000;
+        [DisplayName("保存的翻译数量")]
+        public int NumberOfTranslationsSaved { get; set; } = 1000;
 
 
 
@@ -41,12 +40,12 @@ namespace CommentTranslator22.Config
 
         public void SaveToSetting()
         {
-            CommentTranslator22Package.ConfigA.Servers = Servers;
-            CommentTranslator22Package.ConfigA.LanguageFrom = LanguageFrom;
-            CommentTranslator22Package.ConfigA.LanguageTo = LanguageTo;
+            CommentTranslator22Package.ConfigA.TranslationServer = TranslationServer;
+            CommentTranslator22Package.ConfigA.SourceLanguage = SourceLanguage;
+            CommentTranslator22Package.ConfigA.TargetLanguage = TargetLanguage;
             CommentTranslator22Package.ConfigA.MergeCommentBlock = MergeCommentBlock;
 
-            CommentTranslator22Package.ConfigA.TranslateResultMaximumSave = TranslateResultMaximumSave;
+            CommentTranslator22Package.ConfigA.NumberOfTranslationsSaved = NumberOfTranslationsSaved;
         }
 
         private static LanguageEnum GetCurrentCulture()

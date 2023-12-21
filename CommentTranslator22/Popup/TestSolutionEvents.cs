@@ -1,4 +1,4 @@
-﻿using CommentTranslator22.Translate;
+﻿using CommentTranslator22.Translate.TranslateData;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -48,7 +48,7 @@ namespace CommentTranslator22.Popup
         public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
         {
             // 通知侦听客户端解决方案已打开
-            LocalTranslateData.Load();
+            LocalTranslateDataProcessing.Load();
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
 
@@ -61,7 +61,7 @@ namespace CommentTranslator22.Popup
         public int OnAfterCloseSolution(object pUnkReserved)
         {
             // 通知侦听客户端解决方案已关闭
-            LocalTranslateData.Unload();
+            LocalTranslateDataProcessing.Unload();
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
     }

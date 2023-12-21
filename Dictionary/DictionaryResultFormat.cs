@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dictionary
+﻿namespace Dictionary
 {
     /// <summary>
     /// 这些字段对应json中的值

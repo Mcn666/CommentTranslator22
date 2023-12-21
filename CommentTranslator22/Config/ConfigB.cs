@@ -34,7 +34,7 @@ namespace CommentTranslator22.Config
 
 
         [DisplayName("使用字典")]
-        [Description("如果是支持的语言则会自动翻译，暂未完成")]
+        [Description("如果是支持的语言则会自动翻译，目前只支持【英文->中文】")]
         public bool UseDictionary { get; set; } = false;
 
         [DisplayName("使用相似度算法")]

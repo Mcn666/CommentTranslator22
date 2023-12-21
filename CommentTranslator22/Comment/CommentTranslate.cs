@@ -1,9 +1,5 @@
 ﻿using CommentTranslator22.Comment.Support;
-using CommentTranslator22.Translate;
-using CommentTranslator22.Translate.Format;
-using EnvDTE;
-using EnvDTE80;
-using Microsoft.VisualStudio.Shell;
+using CommentTranslator22.Translate.TranslateData;
 using Microsoft.VisualStudio.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -38,7 +34,7 @@ namespace CommentTranslator22.Comment
                         if (recv.Success)
                         {
                             LocalTranslateData.Add(recv);
-                            res += recv.Data + "\n";
+                            res += recv.ResultText + "\n";
                         }
                         else
                         {
@@ -54,7 +50,7 @@ namespace CommentTranslator22.Comment
                     if (res.Success)
                     {
                         LocalTranslateData.Add(res);
-                        return res.Data;
+                        return res.ResultText;
                     }
                 }
             }
@@ -70,7 +66,7 @@ namespace CommentTranslator22.Comment
         {
             // 如果找不到可以翻译的文本，就检查一下是不是使用了字典，以及字典支持的翻译目标语言，现在还无法确定源文本的语言
             if (CommentTranslator22Package.ConfigB.UseDictionary &&
-                CommentTranslator22Package.ConfigA.LanguageTo == Translate.Enum.LanguageEnum.简体中文)
+                CommentTranslator22Package.ConfigA.TargetLanguage == Translate.Enum.LanguageEnum.简体中文)
             {
                 if (Regex.IsMatch(str, "[\u4e00-\u9fff]") == false)
                 {
