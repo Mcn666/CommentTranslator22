@@ -8,7 +8,7 @@ namespace Dictionary
 {
     public class Dictionary
     {
-        public static List<DictionaryResultFormat> FormatList { get; private set; }
+        public static List<List<DictionaryResultFormat>> FormatLists { get; private set; }
 
         /// <summary>
         /// 获取字典，并且查找其翻译
@@ -24,23 +24,15 @@ namespace Dictionary
                     return null;
                 }
 
-                if (FormatList == null)
+                if (FormatLists == null)
                 {
-                    string dir = ReadEmbeddedResource($"Dictionary.DataTable.SimpleComparisonTable.json");
-                    if (string.IsNullOrEmpty(dir) || dir is null)
-                    {
-                        return null;
-                    }
-
-                    // 反序列化
-                    FormatList = JsonConvert.DeserializeObject<List<DictionaryResultFormat>>(dir);
-                    if (FormatList == null)
+                    if (LoadResource() == false)
                     {
                         return null;
                     }
                 }
 
-                foreach (var format in FormatList)
+                foreach (var format in FormatLists[word[0] - 'a'])
                 {
                     if (Equals(format.en, word))
                     {
@@ -56,37 +48,26 @@ namespace Dictionary
             }
         }
 
-        /// <summary>
-        /// 获取程序集的嵌入资源
-        /// </summary>
-        /// <param name="resourceName"></param>
-        /// <returns></returns>
-        private static string ReadEmbeddedResource(string resourceName)
+        private static bool LoadResource()
         {
-            try
+            FormatLists = new List<List<DictionaryResultFormat>>();
+            for (int i = 0; i < 26; i++)
             {
-                // 获取当前程序集
-                Assembly assembly = Assembly.GetExecutingAssembly();
+                var resourceName = $"Dictionary.DataTable.words-{(char)('a' + i)}.json";
+                var str = AssemblyResource.GetResource(resourceName);
+                if (string.IsNullOrEmpty(str))
+                    break;
 
-                // 获取资源流
-                using (Stream resourceStream = assembly.GetManifestResourceStream(resourceName))
-                {
-                    if (resourceStream == null)
-                    {
-                        return null;
-                    }
+                var formats = JsonConvert.DeserializeObject<List<DictionaryResultFormat>>(str);
+                if (formats == null)
+                    break;
 
-                    // 使用资源流进行操作
-                    using (StreamReader reader = new StreamReader(resourceStream))
-                    {
-                        return reader.ReadToEnd();
-                    }
-                }
+                FormatLists.Add(formats);
+                if (i == 25 && FormatLists.Count == i + 1)
+                    return true;
             }
-            catch (Exception)
-            {
-                return null;
-            }
+            FormatLists = null;
+            return false;
         }
     }
 }

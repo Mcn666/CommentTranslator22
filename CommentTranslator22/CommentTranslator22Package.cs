@@ -45,6 +45,7 @@ namespace CommentTranslator22
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
+            // 加载配置信息
             ConfigA.ReloadSetting((ConfigA)GetDialogPage(typeof(ConfigA)));
             ConfigB.ReloadSetting((ConfigB)GetDialogPage(typeof(ConfigB)));
 

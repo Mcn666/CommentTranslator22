@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System.Text.RegularExpressions;
+using Test;
 
 var word = Console.ReadLine();
 var words = Dictionary.ParseString.GetWordArray(word);
@@ -17,3 +19,7 @@ foreach (var item in words)
     var oTime = endTime.Subtract(beginTime);
     Console.WriteLine(oTime.TotalSeconds);
 }
+
+
+//FileHandling.Func();
+

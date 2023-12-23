@@ -592,6 +592,32 @@
     <None Remove="DataTable\wm.json" />
     <None Remove="DataTable\wn.json" />
     <None Remove="DataTable\wo.json" />
+    <None Remove="DataTable\words-a.json" />
+    <None Remove="DataTable\words-b.json" />
+    <None Remove="DataTable\words-c.json" />
+    <None Remove="DataTable\words-d.json" />
+    <None Remove="DataTable\words-e.json" />
+    <None Remove="DataTable\words-f.json" />
+    <None Remove="DataTable\words-g.json" />
+    <None Remove="DataTable\words-h.json" />
+    <None Remove="DataTable\words-i.json" />
+    <None Remove="DataTable\words-j.json" />
+    <None Remove="DataTable\words-k.json" />
+    <None Remove="DataTable\words-l.json" />
+    <None Remove="DataTable\words-m.json" />
+    <None Remove="DataTable\words-n.json" />
+    <None Remove="DataTable\words-o.json" />
+    <None Remove="DataTable\words-p.json" />
+    <None Remove="DataTable\words-q.json" />
+    <None Remove="DataTable\words-r.json" />
+    <None Remove="DataTable\words-s.json" />
+    <None Remove="DataTable\words-t.json" />
+    <None Remove="DataTable\words-u.json" />
+    <None Remove="DataTable\words-v.json" />
+    <None Remove="DataTable\words-w.json" />
+    <None Remove="DataTable\words-x.json" />
+    <None Remove="DataTable\words-y.json" />
+    <None Remove="DataTable\words-z.json" />
     <None Remove="DataTable\wp.json" />
     <None Remove="DataTable\wq.json" />
     <None Remove="DataTable\wr.json" />
@@ -683,7 +709,32 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="DataTable\SimpleComparisonTable.json" />
+    <EmbeddedResource Include="DataTable\words-a.json" />
+    <EmbeddedResource Include="DataTable\words-b.json" />
+    <EmbeddedResource Include="DataTable\words-c.json" />
+    <EmbeddedResource Include="DataTable\words-d.json" />
+    <EmbeddedResource Include="DataTable\words-e.json" />
+    <EmbeddedResource Include="DataTable\words-f.json" />
+    <EmbeddedResource Include="DataTable\words-g.json" />
+    <EmbeddedResource Include="DataTable\words-h.json" />
+    <EmbeddedResource Include="DataTable\words-i.json" />
+    <EmbeddedResource Include="DataTable\words-j.json" />
+    <EmbeddedResource Include="DataTable\words-k.json" />
+    <EmbeddedResource Include="DataTable\words-l.json" />
+    <EmbeddedResource Include="DataTable\words-m.json" />
+    <EmbeddedResource Include="DataTable\words-n.json" />
+    <EmbeddedResource Include="DataTable\words-o.json" />
+    <EmbeddedResource Include="DataTable\words-p.json" />
+    <EmbeddedResource Include="DataTable\words-q.json" />
+    <EmbeddedResource Include="DataTable\words-r.json" />
+    <EmbeddedResource Include="DataTable\words-s.json" />
+    <EmbeddedResource Include="DataTable\words-t.json" />
+    <EmbeddedResource Include="DataTable\words-u.json" />
+    <EmbeddedResource Include="DataTable\words-v.json" />
+    <EmbeddedResource Include="DataTable\words-w.json" />
+    <EmbeddedResource Include="DataTable\words-x.json" />
+    <EmbeddedResource Include="DataTable\words-y.json" />
+    <EmbeddedResource Include="DataTable\words-z.json" />
   </ItemGroup>
 
   <ItemGroup>
