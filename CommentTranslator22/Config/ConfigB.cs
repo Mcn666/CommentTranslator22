@@ -15,7 +15,7 @@ namespace CommentTranslator22.Config
         [Category("屏蔽设置")]
         [DisplayName("屏蔽类型")]
         [Editor("System.Windows.Forms.Design.StringCollectionEditor, System.Design", typeof(System.Drawing.Design.UITypeEditor))]
-        public List<string> MaskType { get; set; } = new List<string>
+        public List<string> UseMaskType { get; set; } = new List<string>
         {
             "*<*>",
             "*<*>*<*>",
@@ -41,28 +41,26 @@ namespace CommentTranslator22.Config
         [Description("相似度大于85%的注释使用相同的结果")]
         public bool UseLevenshteinDistance { get; set; } = true;
 
-        [DisplayName("覆盖代码完成提示信息")]
-        [Description("暂未完成")]
-        public bool UseCoverCodeCompletionPrompt { get; set; } = false;
+        //[DisplayName("覆盖代码完成提示信息")]
+        //[Description("暂未完成")]
+        //public bool UseCoverCodeCompletionPrompt { get; set; } = false;
 
 
+        public void ReloadSetting(ConfigB config)
+        {
+            this.UseMask = config.UseMask;
+            this.UseMaskType = config.UseMaskType;
+            this.UseDictionary = config.UseDictionary;
+            this.UseLevenshteinDistance = config.UseLevenshteinDistance;
+        }
 
         protected override void OnApply(PageApplyEventArgs e)
         {
             base.OnApply(e);
             if (e.ApplyBehavior == ApplyKind.Apply)
             {
-                SaveToSetting();
+                CommentTranslator22Package.ConfigB = this;
             }
-        }
-
-        public void SaveToSetting()
-        {
-            CommentTranslator22Package.ConfigB.UseMask = UseMask;
-            CommentTranslator22Package.ConfigB.MaskType = MaskType;
-            CommentTranslator22Package.ConfigB.UseDictionary = UseDictionary;
-            CommentTranslator22Package.ConfigB.UseLevenshteinDistance = UseLevenshteinDistance;
-            CommentTranslator22Package.ConfigB.UseCoverCodeCompletionPrompt = UseCoverCodeCompletionPrompt;
         }
     }
 }

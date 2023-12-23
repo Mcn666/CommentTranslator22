@@ -1,6 +1,9 @@
 ﻿using CommentTranslator22.Translate.Enum;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using System;
 using System.ComponentModel;
+using static Microsoft.VisualStudio.VSConstants;
 
 namespace CommentTranslator22.Config
 {
@@ -22,30 +25,32 @@ namespace CommentTranslator22.Config
         [DisplayName("多行合并")]
         public bool MergeCommentBlock { get; set; } = false;
 
-
         [Category("保存设置")]
         [DisplayName("保存的翻译数量")]
         public int NumberOfTranslationsSaved { get; set; } = 1000;
 
 
 
+        /// <summary>
+        /// 重新加载配置，用于VS重启后能够正确的加载设置
+        /// </summary>
+        /// <param name="config"></param>
+        public void ReloadSetting(ConfigA config)
+        {
+            this.TranslationServer = config.TranslationServer;
+            this.SourceLanguage = config.SourceLanguage;
+            this.TargetLanguage = config.TargetLanguage;
+            this.MergeCommentBlock = config.MergeCommentBlock;
+            this.NumberOfTranslationsSaved = config.NumberOfTranslationsSaved;
+        }
+
         protected override void OnApply(PageApplyEventArgs e)
         {
             base.OnApply(e);
             if (e.ApplyBehavior == ApplyKind.Apply)
             {
-                SaveToSetting();
+                CommentTranslator22Package.ConfigA = this;
             }
-        }
-
-        public void SaveToSetting()
-        {
-            CommentTranslator22Package.ConfigA.TranslationServer = TranslationServer;
-            CommentTranslator22Package.ConfigA.SourceLanguage = SourceLanguage;
-            CommentTranslator22Package.ConfigA.TargetLanguage = TargetLanguage;
-            CommentTranslator22Package.ConfigA.MergeCommentBlock = MergeCommentBlock;
-
-            CommentTranslator22Package.ConfigA.NumberOfTranslationsSaved = NumberOfTranslationsSaved;
         }
 
         private static LanguageEnum GetCurrentCulture()

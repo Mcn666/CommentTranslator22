@@ -13,7 +13,7 @@ namespace CommentTranslator22.Comment
         {
             if (CommentTranslator22Package.ConfigB.UseMask)
             {
-                foreach (var str in CommentTranslator22Package.ConfigB.MaskType)
+                foreach (var str in CommentTranslator22Package.ConfigB.UseMaskType)
                 {
                     if (Regex.IsMatch(text, WildCardToRegular(str)))
                         return true;

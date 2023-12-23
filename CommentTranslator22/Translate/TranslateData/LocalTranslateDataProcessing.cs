@@ -14,6 +14,9 @@ namespace CommentTranslator22.Translate.TranslateData
         public static string SoltuionDataPath { get; private set; }
         public static string SolutionDataName { get; private set; }
 
+        public static List<LocalSaveFormat> DataList { get; set; }
+        public static List<string> AwaitTranslateList { get; set; }
+
         public static void Load()
         {
             //ThreadHelper.ThrowIfNotOnUIThread();
@@ -26,8 +29,8 @@ namespace CommentTranslator22.Translate.TranslateData
             SoltuionDataPath = RootPath + "/TranslateData";
 
 
-            LocalTranslateData.DataList = new List<LocalSaveFormat> { };
-            LocalTranslateData.AwaitTranslateList = new List<string> { };
+            DataList = new List<LocalSaveFormat> { };
+            AwaitTranslateList = new List<string> { };
 
             AffirmLocalDataStruct();
             LoadSolutionInfo(RootPath + "/SolutionInfo");
@@ -35,15 +38,15 @@ namespace CommentTranslator22.Translate.TranslateData
 
         public static void Unload()
         {
-            if (LocalTranslateData.DataList.Count > 0)
+            if (DataList.Count > 0)
             {
                 AffirmLocalDataStruct();
                 SaveTranslateInfo(RootPath + "/SolutionInfo");
             }
 
 
-            LocalTranslateData.DataList = null;
-            LocalTranslateData.AwaitTranslateList = null;
+            DataList = null;
+            AwaitTranslateList = null;
         }
 
         private static void AffirmLocalDataStruct()
@@ -100,7 +103,7 @@ namespace CommentTranslator22.Translate.TranslateData
         private static void LoadSolutionData(StreamReader sr)
         {
             var str = sr.ReadToEnd();
-            LocalTranslateData.DataList = JsonConvert.DeserializeObject<List<LocalSaveFormat>>(str);
+            DataList = JsonConvert.DeserializeObject<List<LocalSaveFormat>>(str);
             //    var lineSplitResult = line.Split(new string[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries);
             //    LocalTranslateData.DataList.Add(new LocalSaveFormat
             //    {
@@ -144,7 +147,7 @@ namespace CommentTranslator22.Translate.TranslateData
 
         private static void SaveTranslateData(StreamWriter sw)
         {
-            LocalTranslateData.DataList.Sort(delegate (LocalSaveFormat x, LocalSaveFormat y)
+            DataList.Sort(delegate (LocalSaveFormat x, LocalSaveFormat y)
             {
                 if (x.Visits > y.Visits)
                     return -1;
@@ -152,14 +155,14 @@ namespace CommentTranslator22.Translate.TranslateData
                     return 1;
             });
 
-            if (CommentTranslator22Package.ConfigA.NumberOfTranslationsSaved < LocalTranslateData.DataList.Count)
+            if (CommentTranslator22Package.ConfigA.NumberOfTranslationsSaved < DataList.Count)
             {
                 var index = CommentTranslator22Package.ConfigA.NumberOfTranslationsSaved;
-                var count = LocalTranslateData.DataList.Count - index;
-                LocalTranslateData.DataList.RemoveRange(index, count);
+                var count = DataList.Count - index;
+                DataList.RemoveRange(index, count);
             }
 
-            var jsonStr = JsonConvert.SerializeObject(LocalTranslateData.DataList, Formatting.Indented);
+            var jsonStr = JsonConvert.SerializeObject(DataList, Formatting.Indented);
             sw.Write(jsonStr);
         }
     }

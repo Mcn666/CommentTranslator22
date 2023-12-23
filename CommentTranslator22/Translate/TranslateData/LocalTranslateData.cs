@@ -1,15 +1,10 @@
 ﻿using CommentTranslator22.Arithmetic;
 using CommentTranslator22.Translate.Format;
-using System.Collections.Generic;
 
 namespace CommentTranslator22.Translate.TranslateData
 {
-    internal class LocalTranslateData
+    internal class LocalTranslateData : LocalTranslateDataProcessing
     {
-        public static List<LocalSaveFormat> DataList { get; set; }
-        public static List<string> AwaitTranslateList { get; set; }
-
-
         /// <summary>
         /// 寻找翻译结果，如果存在则返回翻译结果，否则为null
         /// </summary>

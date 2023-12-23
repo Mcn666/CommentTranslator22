@@ -42,7 +42,7 @@ namespace CommentTranslator22.Comment
                         }
                     }
 
-                    return res.Trim('\n');
+                    return res.TrimEnd('\n');
                 }
                 else
                 {
@@ -82,7 +82,7 @@ namespace CommentTranslator22.Comment
                                 result += $"{word}   {temp.zh}\n";
                             }
                         }
-                        return result.Trim('\n');
+                        return result.TrimEnd('\n');
                     }
                 }
             }
