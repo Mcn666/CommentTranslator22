@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.Shell;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
 
 namespace CommentTranslator22.Config
 {
@@ -14,13 +15,12 @@ namespace CommentTranslator22.Config
 
         [Category("屏蔽设置")]
         [DisplayName("屏蔽类型")]
-        [Editor("System.Windows.Forms.Design.StringCollectionEditor, System.Design", typeof(System.Drawing.Design.UITypeEditor))]
+        // UITypeEditor => System.Drawing.Design.UITypeEditor
+        [Editor("System.Windows.Forms.Design.StringCollectionEditor, System.Design", typeof(UITypeEditor))]
         public List<string> UseMaskType { get; set; } = new List<string>
         {
-            "*<*>",
-            "*<*>*<*>",
-            "*?param *",
-            "*http*://*",
+            "<*>",
+            "<*>*<*>",
             "?* ?* = ?*(*);",
             "?* ?* = ?*(*,",
             "?* ?*(*);",
@@ -29,6 +29,10 @@ namespace CommentTranslator22.Config
             "?*.?*(*,",
             "?* (?*)?*;",
             "?*<?*> ?*;",
+            "*?param *",
+            "*http*://*",
+            "?*/?*/?*",
+            "?*\\?*\\?*",
         };
         #endregion
 
@@ -41,9 +45,9 @@ namespace CommentTranslator22.Config
         [Description("相似度大于85%的注释使用相同的结果")]
         public bool UseLevenshteinDistance { get; set; } = true;
 
-        //[DisplayName("覆盖代码完成提示信息")]
-        //[Description("暂未完成")]
-        //public bool UseCoverCodeCompletionPrompt { get; set; } = false;
+        [DisplayName("覆盖代码完成提示信息")]
+        [Description("暂未完成")]
+        public bool UseCoverCodeCompletionPrompt { get; set; } = false;
 
 
         public void ReloadSetting(ConfigB config)

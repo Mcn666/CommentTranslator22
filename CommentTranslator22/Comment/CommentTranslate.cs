@@ -1,6 +1,10 @@
 ﻿using CommentTranslator22.Comment.Support;
 using CommentTranslator22.Translate.TranslateData;
+using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Adornments;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -8,53 +12,52 @@ namespace CommentTranslator22.Comment
 {
     internal class CommentTranslate
     {
-        public static async Task<string> TranslateAsync(SnapshotSpan snapshot)
+        public static async Task<IEnumerable<ClassifiedTextRun>> TranslateAsync(SnapshotSpan snapshot)
         {
-            var str = SearchComment(snapshot.Start);
-            if (str == null)
+            List<ClassifiedTextRun> classifieds = new List<ClassifiedTextRun>();
+            var strList = SearchComment(snapshot.Start);
+            if (strList != null)
             {
-                // 获取鼠标指向的文本
-                str = snapshot.GetText().Trim();
-                return QueryDictionary(str);
-            }
-            else
-            {
-                if (str.Length > CommentTranslator22Package.TranslateClient.MaxTranslateLength)
+                var strLen = 0;
+                foreach (var item in strList)
                 {
-                    return str;
+                    strLen += item.Length;
+                }
+                if (strLen > CommentTranslator22Package.TranslateClient.MaxTranslateLength)
+                {
+                    return classifieds;
                 }
 
-                if (CommentTranslator22Package.ConfigA.MergeCommentBlock == false)
+                var index = 1;
+                var count = strList.Count();
+                foreach (var item in strList)
                 {
-                    var res = string.Empty;
-                    var splitResult = str.Split('\n');
-                    foreach (var item in splitResult)
+                    var lineBreak = index++ == count ? "" : "\n";
+                    var recv = await CommentTranslator22Package.TranslateClient.TranslateAsync(item);
+                    if (recv.Success)
                     {
-                        var recv = await CommentTranslator22Package.TranslateClient.TranslateAsync(item);
-                        if (recv.Success)
-                        {
-                            LocalTranslateData.Add(recv);
-                            res += recv.ResultText + "\n";
-                        }
-                        else
-                        {
-                            res += item + "\n";
-                        }
+                        LocalTranslateData.Add(recv);
+                        var temp = new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.Comment, recv.ResultText + lineBreak);
+                        classifieds.Add(temp);
                     }
-
-                    return res.TrimEnd('\n');
-                }
-                else
-                {
-                    var res = await CommentTranslator22Package.TranslateClient.TranslateAsync(str);
-                    if (res.Success)
+                    else if (string.IsNullOrEmpty(recv.ResultText) == false)
                     {
-                        LocalTranslateData.Add(res);
-                        return res.ResultText;
+                        classifieds.Add(new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.Keyword, $"[{recv.Message}]"));
+                        classifieds.Add(new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.Comment, recv.ResultText + lineBreak));
+                    }
+                    else
+                    {
+                        classifieds.Add(new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.String, $"[{recv.Message}]"));
+                        classifieds.Add(new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.Comment, item + lineBreak));
                     }
                 }
             }
-            return await Task.FromResult(str);
+            return await Task.FromResult(classifieds);
         }
 
         /// <summary>
@@ -62,7 +65,7 @@ namespace CommentTranslator22.Comment
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        private static string QueryDictionary(string str)
+        public static string QueryDictionary(string str)
         {
             // 如果找不到可以翻译的文本，就检查一下是不是使用了字典，以及字典支持的翻译目标语言，现在还无法确定源文本的语言
             if (CommentTranslator22Package.ConfigB.UseDictionary &&
@@ -89,15 +92,14 @@ namespace CommentTranslator22.Comment
             return string.Empty;
         }
 
-        private static string SearchComment(SnapshotPoint snapshot)
+        private static IEnumerable<string> SearchComment(SnapshotPoint snapshot)
         {
-            var contentType = snapshot.Snapshot.TextBuffer.ContentType.TypeName.ToLower();
+            var contentType = snapshot.Snapshot.TextBuffer.ContentType.ToString();
             switch (contentType)
             {
-                case "c/c++":
-                    return Cpp.SearechComment(snapshot);
-                case "csharp":
-                    return Csharp.SearechComment(snapshot);
+                case "C/C++":
+                case "CSharp":
+                    return CSharp.SearechComment(snapshot);
             }
             return null;
         }

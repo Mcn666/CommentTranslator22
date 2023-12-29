@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace CommentTranslator22.Popup.StatementCompletion
 {
@@ -9,7 +10,6 @@ namespace CommentTranslator22.Popup.StatementCompletion
     {
         private ITextBuffer m_textBuffer;
         private bool disposedValue;
-        private List<ISignature> SignaturesList = new List<ISignature>();
 
         public TestSignatureHelpSource(ITextBuffer textBuffer)
         {
@@ -18,17 +18,48 @@ namespace CommentTranslator22.Popup.StatementCompletion
 
         public void AugmentSignatureHelpSession(ISignatureHelpSession session, IList<ISignature> signatures)
         {
-            //if (CommentTranslator22Package.ConfigB.UseCoverCodeCompletionPrompt == false) return;
+            if (CommentTranslator22Package.ConfigB.UseCoverCodeCompletionPrompt == false) return;
             return;
 
-            foreach (var item in signatures)
+            var contentType = m_textBuffer.ContentType.ToString();
+            if (contentType == "C/C++")
             {
-                SignaturesList.Add(item);
+                var signatureList = new List<ISignature>();
+                foreach (var item in signatures)
+                {
+                    var temp = new TestSignature(m_textBuffer, item);
+                    signatureList.Add(temp);
+                }
+                signatures.Clear();
+                foreach (var item in signatureList)
+                {
+                    signatures.Add(item);
+                }
             }
+
         }
 
         public ISignature GetBestMatch(ISignatureHelpSession session)
         {
+            if (CommentTranslator22Package.ConfigB.UseCoverCodeCompletionPrompt == false) return null;
+            return null;
+
+            if (session.Signatures.Count > 0)
+            {
+                // 现在还不能匹配数据类型
+                // 这种方法如果存在字符串类型的参数就不能正确的匹配
+                foreach (var signature in session.Signatures)
+                {
+                    var strText = signature.ApplicableToSpan.GetText(m_textBuffer.CurrentSnapshot);
+                    var strTextNum = Regex.Matches(strText, ",").Count;
+                    var sigTextNum = Regex.Matches(signature.Content, ",").Count;
+                    if (strTextNum == sigTextNum)
+                    {
+                        return signature;
+                    }
+                }
+                return session.SelectedSignature;
+            }
             return null;
         }
 

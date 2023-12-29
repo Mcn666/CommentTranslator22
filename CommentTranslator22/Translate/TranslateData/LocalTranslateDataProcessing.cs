@@ -15,7 +15,6 @@ namespace CommentTranslator22.Translate.TranslateData
         public static string SolutionDataName { get; private set; }
 
         public static List<LocalSaveFormat> DataList { get; set; }
-        public static List<string> AwaitTranslateList { get; set; }
 
         public static void Load()
         {
@@ -30,7 +29,6 @@ namespace CommentTranslator22.Translate.TranslateData
 
 
             DataList = new List<LocalSaveFormat> { };
-            AwaitTranslateList = new List<string> { };
 
             AffirmLocalDataStruct();
             LoadSolutionInfo(RootPath + "/SolutionInfo");
@@ -44,9 +42,7 @@ namespace CommentTranslator22.Translate.TranslateData
                 SaveTranslateInfo(RootPath + "/SolutionInfo");
             }
 
-
             DataList = null;
-            AwaitTranslateList = null;
         }
 
         private static void AffirmLocalDataStruct()

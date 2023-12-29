@@ -1,5 +1,4 @@
-﻿using CommentTranslator22.Arithmetic;
-using CommentTranslator22.Translate.Enum;
+﻿using CommentTranslator22.Translate.Enum;
 using CommentTranslator22.Translate.Format;
 using CommentTranslator22.Translate.Server;
 using CommentTranslator22.Translate.TranslateData;
@@ -15,30 +14,32 @@ namespace CommentTranslator22.Translate
 
         public int MinTranslateLength { get; private set; } = 15;
 
-        public async Task<ApiRecvFormat> TranslateAsync(string text)
+        public async Task<ApiRecvFormat> TranslateAsync(string str)
         {
-            var res = LocalTranslateData.SeekTranslateResult(text);
+            var res = LocalTranslateData.SeekTranslateResult(str);
             if (res != null)
             {
                 return new ApiRecvFormat
                 {
-                    Success = true,
-                    Code = -1,
-                    SourceText = text,
-                    ResultText = res,
+                    Message = "buf",
+                    ResultText = res
                 };
             }
 
-            if (Preprocessing(text) == true)
+            res = Preprocessing(str);
+            if (res != null)
             {
-                return new ApiRecvFormat();
+                return new ApiRecvFormat
+                {
+                    Message = res
+                };
             }
 
             var request = new ApiSendFormat()
             {
                 SourceLanguage = CommentTranslator22Package.ConfigA.SourceLanguage,
                 TargetLanguage = CommentTranslator22Package.ConfigA.TargetLanguage,
-                SourceText = text,
+                SourceText = str
             };
 
             return await ExecuteAsync(request);
@@ -62,37 +63,35 @@ namespace CommentTranslator22.Translate
             }
         }
 
-        private bool Preprocessing(string text)
+        private string Preprocessing(string text)
         {
             if (CommentTranslator22Package.ConfigA.SourceLanguage == CommentTranslator22Package.ConfigA.TargetLanguage ||
                 CommentTranslator22Package.ConfigA.TargetLanguage == LanguageEnum.Auto)
             {
-                return true;
+                return "?>?";
             }
 
-            if (text.Length < MinTranslateLength ||
-                text.Length > MaxTranslateLength)
+            if (text.Length < MinTranslateLength || text.Length > MaxTranslateLength)
             {
-                return true;
+                return "Len";
             }
 
             switch (CommentTranslator22Package.ConfigA.TargetLanguage)
             {
                 case LanguageEnum.English:
-                    if (LanguageProportion.English(text) > 0.7f)
-                        return true;
+                    if (LanguageProportion.English(text) > 0.6f)
+                        return "EN?";
                     break;
                 case LanguageEnum.简体中文:
-                    if (LanguageProportion.Chinese(text) > 0.7f)
-                        return true;
+                    if (LanguageProportion.Chinese(text) > 0.6f)
+                        return "CN?";
+                    break;
+                case LanguageEnum.日本語:
+                    if (LanguageProportion.Japanese(text) > 0.6f)
+                        return "JA?";
                     break;
             }
-
-            if (LocalTranslateData.SeekAwaitTranslateText(text))
-            {
-                return true;
-            }
-            return false;
+            return null;
         }
 
         private string HumpUnfold(string humpString)

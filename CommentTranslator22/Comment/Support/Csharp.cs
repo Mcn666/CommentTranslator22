@@ -3,73 +3,80 @@ using System.Collections.Generic;
 
 namespace CommentTranslator22.Comment.Support
 {
-    internal class Csharp
+    internal class CSharp
     {
-        public static string SearechComment(SnapshotPoint snapshot)
+        public static IEnumerable<string> SearechComment(SnapshotPoint snapshot)
         {
             return SearchCommentScopeOne(snapshot)
                 ?? SearchCommentScopeTwo(snapshot);
         }
 
-        public static string MergeSearchResultOne(in List<string> lines)
+        public static void StringPretreatment(ref string str)
         {
-            string s = CommentTranslator22Package.ConfigA.MergeCommentBlock ? " " : "\n";
-            string res = null;
-            foreach (var item in lines)
+            var count = 0;
+            var temp = str.TrimStart();
+            foreach (var s in str)
             {
-                int count = 0;
-                var str = item.TrimStart();
-                foreach (var i in str)
+                if (char.IsPunctuation(s))
                 {
-                    if (char.IsPunctuation(i))
-                    {
-                        count++;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    count++;
                 }
-                res += str.Substring(count).TrimStart() + s;
+                else
+                {
+                    break;
+                }
             }
-
-            return res.Trim();
+            str = temp.Substring(count).Trim();
         }
 
-        public static string SearchCommentScopeOne(SnapshotPoint snapshot)
+        public static IEnumerable<string> MergeSearchResult(in List<string> lines)
+        {
+            if (CommentTranslator22Package.ConfigA.MergeCommentBlock)
+            {
+                var str = string.Empty;
+                foreach (var line in lines)
+                {
+                    str += line + ' ';
+                }
+                return new List<string> { str };
+            }
+            return lines;
+        }
+
+        public static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
         {
             // 检查鼠标所指向的这一行是否使用了第一种注释
             var lineText = snapshot.GetContainingLine().Extent.GetText();
-            var index = lineText.IndexOf("//");
+            var index = lineText.LastIndexOf("//");
             if (index == -1) return null;
 
-            // 获取鼠标所指向的行号，然后分割快照
+            // 获取鼠标所指向的行号，然后按行分割快照文本
             int lineNumber = snapshot.GetContainingLineNumber();
-            var splitResult = snapshot.Snapshot.GetText().Replace("\r", "").Split('\n');
+            var splitResult = snapshot.Snapshot.GetText().Replace("\r\n", "\n").Split('\n');
             if (splitResult.Length < 1 || splitResult.Length < lineNumber) return null;
+
+            // 检查鼠标所指向的这一行是否属于不执行翻译的类型
             lineText = splitResult[lineNumber].Substring(index + 2);
+            StringPretreatment(ref lineText);
             if (CommentTranslateInterrupt.Check(lineText)) return null;
 
             bool addPreviousLine = true, addNextLine = true;
-            List<string> lines = new List<string>
-            {
-                lineText
-            };
+            List<string> lines = new List<string> { lineText };
 
             for (int i = 1; i < 10; i++)
             {
                 if (addPreviousLine && lineNumber - i > -1)
                 {
-                    index = splitResult[lineNumber - i].IndexOf("//");
-                    if (index == -1 ||
-                        CommentTranslateInterrupt.Check(splitResult[lineNumber - i]))
+                    index = splitResult[lineNumber - i].LastIndexOf("//");
+                    if (index == -1)
                     {
                         addPreviousLine = false;
                     }
                     else
                     {
                         var temp = splitResult[lineNumber - i].Substring(index + 2).TrimEnd();
-                        if (temp == "" || temp.Length < 3)
+                        StringPretreatment(ref temp);
+                        if (temp == string.Empty || CommentTranslateInterrupt.Check(temp))
                         {
                             addPreviousLine = false;
                         }
@@ -81,16 +88,16 @@ namespace CommentTranslator22.Comment.Support
                 }
                 if (addNextLine && lineNumber + i < splitResult.Length)
                 {
-                    index = splitResult[lineNumber + i].IndexOf("//");
-                    if (index == -1 ||
-                        CommentTranslateInterrupt.Check(splitResult[lineNumber + i]))
+                    index = splitResult[lineNumber + i].LastIndexOf("//");
+                    if (index == -1)
                     {
                         addNextLine = false;
                     }
                     else
                     {
                         var temp = splitResult[lineNumber + i].Substring(index + 2).TrimEnd();
-                        if (temp == "" || temp.Length < 3)
+                        StringPretreatment(ref temp);
+                        if (temp == "" || CommentTranslateInterrupt.Check(temp))
                         {
                             addNextLine = false;
                         }
@@ -101,42 +108,18 @@ namespace CommentTranslator22.Comment.Support
                     }
                 }
             }
-            return MergeSearchResultOne(lines);
+            return MergeSearchResult(lines);
         }
 
-        public static string MergeSearchResultTwo(in string[] lines)
-        {
-            string s = CommentTranslator22Package.ConfigA.MergeCommentBlock ? " " : "\n";
-            string res = null;
-            foreach (var item in lines)
-            {
-                int count = 0;
-                var str = item.TrimStart();
-                foreach (var i in str)
-                {
-                    if (char.IsPunctuation(i))
-                    {
-                        count++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                res += str.Substring(count).TrimStart() + s;
-            }
-            return res.Trim();
-        }
-
-        public static string SearchCommentScopeTwo(SnapshotPoint snapshot)
+        public static IEnumerable<string> SearchCommentScopeTwo(SnapshotPoint snapshot)
         {
             var pos = snapshot.Position;
-            var res = snapshot.Snapshot.GetText();
+            var str = snapshot.Snapshot.GetText();
 
-            var index1 = res.LastIndexOf("/*", pos);
+            var index1 = str.LastIndexOf("/*", pos);
             if (index1 != -1)
             {
-                var temp = res.LastIndexOf("*/", pos); ;
+                var temp = str.LastIndexOf("*/", pos); ;
                 if (temp != -1 && temp > index1)
                 {
                     return null;
@@ -147,10 +130,10 @@ namespace CommentTranslator22.Comment.Support
                 return null;
             }
 
-            var index2 = res.IndexOf("*/", pos);
+            var index2 = str.IndexOf("*/", pos);
             if (index2 != -1)
             {
-                var temp = res.IndexOf("/*", pos);
+                var temp = str.IndexOf("/*", pos);
                 if (temp != -1 && temp < index2)
                 {
                     return null;
@@ -161,9 +144,16 @@ namespace CommentTranslator22.Comment.Support
                 return null;
             }
 
-            var strSplitResult = res.Substring(index1, index2 - index1 + 2).Replace("\r", "").Split('\n');
+            var splitResult = str.Substring(index1, index2 - index1 - 2).Replace("\r\n", "\n").Split('\n');
+            var lines = new List<string>();
+            foreach (var line in splitResult)
+            {
+                var temp = line;
+                StringPretreatment(ref temp);
+                lines.Add(temp);
+            }
 
-            return MergeSearchResultTwo(strSplitResult);
+            return MergeSearchResult(lines);
         }
     }
 }

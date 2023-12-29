@@ -1,9 +1,6 @@
 ﻿using CommentTranslator22.Translate.Enum;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using System;
 using System.ComponentModel;
-using static Microsoft.VisualStudio.VSConstants;
 
 namespace CommentTranslator22.Config
 {

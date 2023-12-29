@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace CommentTranslator22.Arithmetic
+namespace CommentTranslator22
 {
     internal class LanguageProportion
     {
@@ -9,7 +9,9 @@ namespace CommentTranslator22.Arithmetic
             float res = 0;
             for (int i = 0; i < str.Length; i++)
             {
-                if (Regex.IsMatch(str[i].ToString(), "[\u4e00-\u9fff]") || char.IsPunctuation(str[i]))
+                if (Regex.IsMatch(str[i].ToString(), "[\u4e00-\u9fff]")
+                    || char.IsPunctuation(str[i])
+                    || char.IsDigit(str[i]))
                 {
                     res++;
                 }
@@ -23,7 +25,9 @@ namespace CommentTranslator22.Arithmetic
             float res = 0;
             for (int i = 0; i < str.Length; i++)
             {
-                if (Regex.IsMatch(str[i].ToString(), "[a-zA-Z]") || char.IsPunctuation(str[i]))
+                if (Regex.IsMatch(str[i].ToString(), "[a-zA-Z]")
+                    || char.IsPunctuation(str[i])
+                    || char.IsDigit(str[i]))
                 {
                     res++;
                 }
@@ -37,7 +41,9 @@ namespace CommentTranslator22.Arithmetic
             float res = 0;
             for (int i = 0; i < str.Length; i++)
             {
-                if (Regex.IsMatch(str[i].ToString(), "[\u3040-\u30ff\u31f0-\u31ff]") || char.IsPunctuation(str[i]))
+                if (Regex.IsMatch(str[i].ToString(), "[\u3040-\u30ff\u31f0-\u31ff]")
+                    || char.IsPunctuation(str[i])
+                    || char.IsDigit(str[i]))
                 {
                     res++;
                 }

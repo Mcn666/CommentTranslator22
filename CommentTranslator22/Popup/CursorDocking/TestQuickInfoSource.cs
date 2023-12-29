@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,17 +40,27 @@ namespace CommentTranslator22.Popup.CursorDocking
             var extent = navigator.GetExtentOfWord(subjectTriggerPoint.Value);
 
             // 最终显示的信息
-            var str = await CommentTranslate.TranslateAsync(extent.Span);
+            var scres = await CommentTranslate.TranslateAsync(extent.Span);
+            if (scres.Any() == true)
+            {
+                var tempTime = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
+                var tempElement = new ContainerElement(ContainerElementStyle.Stacked,
+                    new ClassifiedTextElement(
+                        new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, tempTime)),
+                    new ClassifiedTextElement(scres));
+                return new QuickInfoItem(applicableToSpan, tempElement);
+            }
 
-            if (string.IsNullOrEmpty(str))
+            // 执行到这里，只能获取光标所指向的文本进行字典查询了
+            var dres = CommentTranslate.QueryDictionary(extent.Span.GetText().Trim());
+            if (dres == string.Empty)
             {
                 return null;
             }
 
             // 计算这次使用的时间
-            var endTime = DateTime.UtcNow;
-            var deltaTime = endTime - beginTime;
-            str = $"{deltaTime.TotalSeconds}\n{str}";
+            var deltaTime = DateTime.UtcNow - beginTime;
+            var str = $"{deltaTime.TotalSeconds}\n{dres}";
 
             var element = new ContainerElement(ContainerElementStyle.Stacked,
                 new ClassifiedTextElement(

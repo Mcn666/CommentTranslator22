@@ -45,12 +45,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Comment\Arithmetic\LanguageProportion.cs" />
-    <Compile Include="Comment\Arithmetic\LevenshteinDistance.cs" />
+    <Compile Include="Comment\LanguageProportion.cs" />
+    <Compile Include="Comment\LevenshteinDistance.cs" />
     <Compile Include="Comment\CommentTranslate.cs" />
     <Compile Include="Comment\CommentTranslateInterrupt.cs" />
-    <Compile Include="Comment\Support\Cpp.cs" />
-    <Compile Include="Comment\Support\Csharp.cs" />
+    <Compile Include="Comment\Support\CSharp.cs" />
     <Compile Include="Config\ConfigA.cs">
       <SubType>Component</SubType>
     </Compile>

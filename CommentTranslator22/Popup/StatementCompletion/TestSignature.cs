@@ -20,9 +20,9 @@ namespace CommentTranslator22.Popup.StatementCompletion
         internal TestSignature(ITextBuffer subjectBuffer, ISignature signature)
         {
             this.m_applicableToSpan = signature.ApplicableToSpan;
-            this.m_content = signature.Content + "\nTest";
+            this.m_content = signature.Content;
             this.m_prettyPrintedContent = signature.PrettyPrintedContent;
-            this.m_documentation = signature.Documentation;
+            this.m_documentation = (signature.Documentation == null) ? "" : $"{signature.Documentation}\nTest";
             this.m_parameters = signature.Parameters;
             this.m_currentParameter = signature.CurrentParameter;
 
