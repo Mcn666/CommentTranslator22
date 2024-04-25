@@ -11,12 +11,12 @@ namespace CommentTranslator22.Translate.TranslateData
         {
             if (DataList == null) return null;
 
-            if (CommentTranslator22Package.ConfigB.UseLevenshteinDistance)
+            if (CommentTranslator22Package.Config.UseLevenshteinDistance)
             {
                 foreach (var item in DataList)
                 {
                     if (LevenshteinDistance.LevenshteinDistancePercent(item.Source, text) > 0.85f
-                        && item.TargetLanguage == CommentTranslator22Package.ConfigA.TargetLanguage)
+                        && item.TargetLanguage == CommentTranslator22Package.Config.TargetLanguage)
                     {
                         item.Visits++;
                         return item.Result;
@@ -28,7 +28,7 @@ namespace CommentTranslator22.Translate.TranslateData
                 foreach (var item in DataList)
                 {
                     if (Equals(item.Source, text)
-                        && item.TargetLanguage == CommentTranslator22Package.ConfigA.TargetLanguage)
+                        && item.TargetLanguage == CommentTranslator22Package.Config.TargetLanguage)
                     {
                         item.Visits++;
                         return item.Result;
@@ -43,9 +43,9 @@ namespace CommentTranslator22.Translate.TranslateData
         {
             DataList.Add(new LocalSaveFormat
             {
-                TranslationServer = CommentTranslator22Package.ConfigA.TranslationServer,
-                SourceLanguage = CommentTranslator22Package.ConfigA.SourceLanguage,
-                TargetLanguage = CommentTranslator22Package.ConfigA.TargetLanguage,
+                TranslationServer = CommentTranslator22Package.Config.TranslationServer,
+                SourceLanguage = CommentTranslator22Package.Config.SourceLanguage,
+                TargetLanguage = CommentTranslator22Package.Config.TargetLanguage,
                 Source = recvFormat.SourceText,
                 Result = recvFormat.ResultText,
                 Visits = 1,

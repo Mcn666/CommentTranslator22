@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace CommentTranslator22
+namespace CommentTranslator22.Translate
 {
     internal class LanguageProportion
     {

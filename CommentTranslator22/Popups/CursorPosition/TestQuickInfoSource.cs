@@ -1,4 +1,4 @@
-﻿using CommentTranslator22.Comment;
+﻿using CommentTranslator22.Popups.CursorPosition.Comment;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;

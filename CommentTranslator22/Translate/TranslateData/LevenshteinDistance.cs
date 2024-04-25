@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CommentTranslator22
+namespace CommentTranslator22.Translate.TranslateData
 {
     /// <summary>
     /// 计算字符串相似度的算法

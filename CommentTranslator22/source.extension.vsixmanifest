@@ -3,7 +3,7 @@
     <Metadata>
         <Identity Id="CommentTranslator22.f33792df-6136-403f-aee2-7e70b3657187" Version="1.1.4" Language="en-US" Publisher="McnF" />
         <DisplayName>CommentTranslator22</DisplayName>
-        <Description xml:space="preserve">简单的翻译扩展</Description>
+        <Description xml:space="preserve">Empty descriptionEmpty description</Description>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">

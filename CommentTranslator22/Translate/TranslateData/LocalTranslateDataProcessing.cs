@@ -151,9 +151,9 @@ namespace CommentTranslator22.Translate.TranslateData
                     return 1;
             });
 
-            if (CommentTranslator22Package.ConfigA.NumberOfTranslationsSaved < DataList.Count)
+            if (CommentTranslator22Package.Config.NumberOfTranslationsSaved < DataList.Count)
             {
-                var index = CommentTranslator22Package.ConfigA.NumberOfTranslationsSaved;
+                var index = CommentTranslator22Package.Config.NumberOfTranslationsSaved;
                 var count = DataList.Count - index;
                 DataList.RemoveRange(index, count);
             }

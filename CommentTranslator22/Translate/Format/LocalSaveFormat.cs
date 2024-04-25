@@ -1,6 +1,4 @@
-﻿using CommentTranslator22.Translate.Enum;
-
-namespace CommentTranslator22.Translate.Format
+﻿namespace CommentTranslator22.Translate.Format
 {
     public class LocalSaveFormat
     {

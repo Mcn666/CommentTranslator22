@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.Text;
 using System.Collections.Generic;
 
-namespace CommentTranslator22.Comment.Support
+namespace CommentTranslator22.Popups.CursorPosition.Comment.Support
 {
     internal class CSharp
     {
@@ -31,7 +31,7 @@ namespace CommentTranslator22.Comment.Support
 
         public static IEnumerable<string> MergeSearchResult(in List<string> lines)
         {
-            if (CommentTranslator22Package.ConfigA.MergeCommentBlock)
+            if (CommentTranslator22Package.Config.MergeCommentBlock)
             {
                 var str = string.Empty;
                 foreach (var line in lines)

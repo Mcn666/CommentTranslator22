@@ -1,5 +1,4 @@
-﻿using CommentTranslator22.Translate.Enum;
-using CommentTranslator22.Translate.Format;
+﻿using CommentTranslator22.Translate.Format;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -58,7 +57,6 @@ namespace CommentTranslator22.Translate.Server
                 Success = true,
                 Code = (int)response.StatusCode,
                 Message = response.StatusCode.ToString(),
-                SourceText = format.SourceText,
                 ResultText = r
             };
         }

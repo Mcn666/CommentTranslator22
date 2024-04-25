@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace CommentTranslator22.Comment
+namespace CommentTranslator22.Popups.CursorPosition.Comment
 {
     internal class CommentTranslateInterrupt
     {
@@ -11,9 +11,9 @@ namespace CommentTranslator22.Comment
         /// <returns>如果为true表示不属于标签信息或代码，否则为false</returns>
         public static bool Check(string text)
         {
-            if (CommentTranslator22Package.ConfigB.UseMask)
+            if (CommentTranslator22Package.Config.UseMask)
             {
-                foreach (var str in CommentTranslator22Package.ConfigB.UseMaskType)
+                foreach (var str in CommentTranslator22Package.Config.UseMaskType)
                 {
                     if (Regex.IsMatch(text, WildCardToRegular(str)))
                         return true;

@@ -1,5 +1,4 @@
-﻿using CommentTranslator22.Translate.Enum;
-using CommentTranslator22.Translate.Format;
+﻿using CommentTranslator22.Translate.Format;
 using CommentTranslator22.Translate.Server;
 using CommentTranslator22.Translate.TranslateData;
 using System.Text;
@@ -37,8 +36,8 @@ namespace CommentTranslator22.Translate
 
             var request = new ApiSendFormat()
             {
-                SourceLanguage = CommentTranslator22Package.ConfigA.SourceLanguage,
-                TargetLanguage = CommentTranslator22Package.ConfigA.TargetLanguage,
+                SourceLanguage = CommentTranslator22Package.Config.SourceLanguage,
+                TargetLanguage = CommentTranslator22Package.Config.TargetLanguage,
                 SourceText = str
             };
 
@@ -50,7 +49,7 @@ namespace CommentTranslator22.Translate
             apiRequest.SourceText = apiRequest.SourceText.Replace("\r\n", "\n");
             apiRequest.SourceText = HumpUnfold(apiRequest.SourceText);
 
-            switch (CommentTranslator22Package.ConfigA.TranslationServer)
+            switch (CommentTranslator22Package.Config.TranslationServer)
             {
                 case ServerEnum.Bing:
                     BingFanyi bingFanyi = new BingFanyi();
@@ -65,8 +64,8 @@ namespace CommentTranslator22.Translate
 
         private string Preprocessing(string text)
         {
-            if (CommentTranslator22Package.ConfigA.SourceLanguage == CommentTranslator22Package.ConfigA.TargetLanguage ||
-                CommentTranslator22Package.ConfigA.TargetLanguage == LanguageEnum.Auto)
+            if (CommentTranslator22Package.Config.SourceLanguage == CommentTranslator22Package.Config.TargetLanguage ||
+                CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.Auto)
             {
                 return "?>?";
             }
@@ -76,7 +75,7 @@ namespace CommentTranslator22.Translate
                 return "Len";
             }
 
-            switch (CommentTranslator22Package.ConfigA.TargetLanguage)
+            switch (CommentTranslator22Package.Config.TargetLanguage)
             {
                 case LanguageEnum.English:
                     if (LanguageProportion.English(text) > 0.6f)

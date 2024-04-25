@@ -1,4 +1,6 @@
-﻿using CommentTranslator22.Comment.Support;
+﻿using CommentTranslator22.Dictionary;
+using CommentTranslator22.Popups.CursorPosition.Comment.Support;
+using CommentTranslator22.Translate;
 using CommentTranslator22.Translate.TranslateData;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;
@@ -8,7 +10,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommentTranslator22.Comment
+namespace CommentTranslator22.Popups.CursorPosition.Comment
 {
     internal class CommentTranslate
     {
@@ -36,6 +38,7 @@ namespace CommentTranslator22.Comment
                     var recv = await CommentTranslator22Package.TranslateClient.TranslateAsync(item);
                     if (recv.Success)
                     {
+                        recv.SourceText = item;
                         LocalTranslateData.Add(recv);
                         var temp = new ClassifiedTextRun(
                             PredefinedClassificationTypeNames.Comment, recv.ResultText + lineBreak);
@@ -60,6 +63,17 @@ namespace CommentTranslator22.Comment
             return await Task.FromResult(classifieds);
         }
 
+        public static async Task<ClassifiedTextRun> TranslateSignatureAsync(string str)
+        {
+            var recv = await CommentTranslator22Package.TranslateClient.TranslateAsync(str);
+            if (recv.Success)
+            {
+                return new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, recv.ResultText + "\n");
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// 查询字典
         /// </summary>
@@ -68,23 +82,49 @@ namespace CommentTranslator22.Comment
         public static string QueryDictionary(string str)
         {
             // 如果找不到可以翻译的文本，就检查一下是不是使用了字典，以及字典支持的翻译目标语言，现在还无法确定源文本的语言
-            if (CommentTranslator22Package.ConfigB.UseDictionary &&
-                CommentTranslator22Package.ConfigA.TargetLanguage == Translate.Enum.LanguageEnum.简体中文)
+            if (CommentTranslator22Package.Config.UseDictionary &&
+                CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.简体中文)
             {
                 if (Regex.IsMatch(str, "[\u4e00-\u9fff]") == false)
                 {
                     var result = string.Empty;
-                    var words = Dictionary.ParseString.GetWordArray(str);
+                    var words = ParseString.GetWordArray(str);
                     if (words != null)
                     {
                         foreach (var word in words)
                         {
+                            if (string.IsNullOrEmpty(word))
+                            {
+                                continue;
+                            }
+
                             var temp = Dictionary.Dictionary.Query(word);
                             if (temp != null)
                             {
                                 result += $"{word}   {temp.zh}\n";
+
+                                if (CommentTranslator22Package.Config.UseCharacterStatistics)
+                                {
+                                    // 将结果保留到临时字符集中
+                                    LocalDictionary.AddTempLocalDictionarie(temp);
+                                }
+                                continue;
+                            }
+                            else
+                            {
+                                result += $"{word}\n";
+                            }
+
+                            if (CommentTranslator22Package.Config.UseCharacterStatistics && word.Length > 2)
+                            {
+                                // 将这个字符串保留到另一个字符集中
+                                LocalDictionary.AddNoResultCharacter(new Dictionary.DictionaryResultFormat
+                                {
+                                    en = word,
+                                });
                             }
                         }
+
                         return result.TrimEnd('\n');
                     }
                 }
