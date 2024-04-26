@@ -88,7 +88,7 @@ namespace CommentTranslator22.Popups.CursorPosition.Comment
                 if (Regex.IsMatch(str, "[\u4e00-\u9fff]") == false)
                 {
                     var result = string.Empty;
-                    var words = ParseString.GetWordArray(str);
+                    var words = GetWordArray(str);
                     if (words != null)
                     {
                         foreach (var word in words)
@@ -130,6 +130,40 @@ namespace CommentTranslator22.Popups.CursorPosition.Comment
                 }
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// 获取词组列表
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetWordArray(string str)
+        {
+            if (string.IsNullOrEmpty(str) || str.Length < 2 || str.Length > 50)
+            {
+                return null;
+            }
+
+            // 删除所有十进制数字和非字母字符
+            str = Regex.Replace(str, @"\d+", "");
+            str = Regex.Replace(str, "[^A-Za-z]", "");
+
+            // 找到所有的大写字母，然后按大写字母分割字符串
+            var chars = Regex.Matches(str, "[A-Z]");
+            var strList = Regex.Split(str, "[A-Z]").ToList();
+            strList.RemoveAt(0);
+
+            // 将大写字母和分割后的字符串拼接
+            for (int i = 0; i < strList.Count; i++)
+            {
+                if (strList[i] == string.Empty)
+                {
+                    continue;
+                }
+                strList[i] = chars[i].Value.ToLower() + strList[i];
+            }
+
+            return strList;
         }
 
         private static IEnumerable<string> SearchComment(SnapshotPoint snapshot)

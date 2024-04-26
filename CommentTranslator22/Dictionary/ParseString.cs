@@ -16,11 +16,6 @@ namespace CommentTranslator22.Dictionary
         /// <returns></returns>
         public static IEnumerable<string> GetWordArray(string character)
         {
-            if (string.IsNullOrEmpty(character) && character.Length < 2)
-            {
-                return null;
-            }
-            List<string> Words = new List<string>();
             var RegexValue = Regex.Matches(character, @"[A-Z\s]{2,}").Cast<Match>();
             if (RegexValue.Count() > 0)
             {
@@ -39,11 +34,13 @@ namespace CommentTranslator22.Dictionary
             // 判断是否是字母并且全部大写
             if (Regex.IsMatch(character, @"^[A-Z]+$"))
             {
-                Words.Add(character.ToLower());
-                return Words;
+                return new List<string>()
+                {
+                    character.ToLower(),
+                };
             }
-            var getWords = Decamelize(character).Split(SplitValue).ToList<string>();
-            return Words.Concat(getWords).Distinct();
+            var getWords = Decamelize(character).Split(SplitValue).ToList();
+            return new List<string>(getWords).Distinct();
         }
 
         private static string Decamelize(string input, string separator = "_")
