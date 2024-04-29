@@ -26,7 +26,7 @@ namespace CommentTranslator22.Dictionary
         class LocalDictionaryDataFormat
         {
             public int VisitsCount;
-            public DictionaryFormat DictionaryResult;
+            public DictionaryFormat DictionaryFormat;
         }
 
         class LocalDictionaryDataFileFormat
@@ -147,9 +147,9 @@ namespace CommentTranslator22.Dictionary
                 return;
             }
 
-            if (FileFormats[index].DataFormats.Any(f => f.DictionaryResult == format))
+            if (FileFormats[index].DataFormats.Any(f => f.DictionaryFormat == format))
             {
-                var existingItem = FileFormats[index].DataFormats.First(f => f.DictionaryResult == format);
+                var existingItem = FileFormats[index].DataFormats.First(f => f.DictionaryFormat == format);
                 existingItem.VisitsCount++;
             }
             else
@@ -157,7 +157,7 @@ namespace CommentTranslator22.Dictionary
                 FileFormats[index].DataFormats.Add(new LocalDictionaryDataFormat()
                 {
                     VisitsCount = 1,
-                    DictionaryResult = format
+                    DictionaryFormat = format
                 });
             }
         }

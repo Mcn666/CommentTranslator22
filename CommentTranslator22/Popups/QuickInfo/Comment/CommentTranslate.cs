@@ -35,7 +35,8 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                     // 在这里将翻译后的方法注释保存到 ?? 方法中
                     MethodAnnotationData.Instance.Add(recv);
 
-                    CreateClassifiedTextRun(recv, out var runs);
+                    var temp = new List<ApiRecvFormat> { recv };
+                    CreateClassifiedTextRun(temp, out var runs);
                     return runs;
                 }
                 else
@@ -45,7 +46,9 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                         Message = "buf",
                         TargetText = r,
                     };
-                    CreateClassifiedTextRun(recv, out var runs);
+
+                    var temp = new List<ApiRecvFormat> { recv };
+                    CreateClassifiedTextRun(temp, out var runs);
                     return runs;
                 }
             }
@@ -94,17 +97,16 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             var strList = SearchComment(snapshot.Start);
             if (strList != null)
             {
-                foreach (var item in strList)
+                foreach (var i in strList)
                 {
-                    var s = TranslateClient.Instance.HumpUnfold(item);
+                    var s = TranslateClient.Instance.HumpUnfold(i);
                     var r = GeneralAnnotationData.Instance.IndexOf(s);
+                    var f = new List<ApiRecvFormat>();
                     if (r == null)
                     {
                         var recv = await TranslateClient.Instance.TranslateAsync(s);
+                        f.Add(recv);
                         GeneralAnnotationData.Instance.Add(recv);
-
-                        CreateClassifiedTextRun(recv, out var runs);
-                        classifieds.AddRange(runs);
                     }
                     else
                     {
@@ -113,9 +115,13 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                             Message = "buf",
                             TargetText = r,
                         };
-                        CreateClassifiedTextRun(recv, out var runs);
-                        classifieds.AddRange(runs);
+                        f.Add(recv);
                     }
+                    var count = f.Count - 1;
+                    var temp = f[count].TargetText.TrimEnd('\n');
+                    f[count].TargetText = temp;
+                    CreateClassifiedTextRun(f, out var runs);
+                    classifieds.AddRange(runs);
                 }
             }
             return await Task.FromResult(classifieds);
@@ -138,28 +144,31 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             return null;
         }
 
-        static void CreateClassifiedTextRun(ApiRecvFormat recv, out List<ClassifiedTextRun> runs)
+        static void CreateClassifiedTextRun(List<ApiRecvFormat> formats, out List<ClassifiedTextRun> runs)
         {
             runs = new List<ClassifiedTextRun>();
 
-            if (recv.IsSuccess)
+            foreach (var i in formats)
             {
-                runs.Add(new ClassifiedTextRun(
-                    PredefinedClassificationTypeNames.Comment, $"{recv.TargetText}\n"));
-            }
-            else if (string.IsNullOrEmpty(recv.TargetText))
-            {
-                runs.Add(new ClassifiedTextRun(
-                    PredefinedClassificationTypeNames.String, $"[{recv.Message}]"));
-                runs.Add(new ClassifiedTextRun(
-                    PredefinedClassificationTypeNames.Comment, $"{recv.SourceText}\n"));
-            }
-            else
-            {
-                runs.Add(new ClassifiedTextRun(
-                    PredefinedClassificationTypeNames.Keyword, $"[{recv.Message}]"));
-                runs.Add(new ClassifiedTextRun(
-                    PredefinedClassificationTypeNames.Comment, $"{recv.TargetText}\n"));
+                if (i.IsSuccess)
+                {
+                    runs.Add(new ClassifiedTextRun(
+                        PredefinedClassificationTypeNames.Comment, $"{i.TargetText}"));
+                }
+                else if (string.IsNullOrEmpty(i.TargetText))
+                {
+                    runs.Add(new ClassifiedTextRun(
+                        PredefinedClassificationTypeNames.String, $"[{i.Message}]"));
+                    runs.Add(new ClassifiedTextRun(
+                        PredefinedClassificationTypeNames.Comment, $"{i.SourceText}"));
+                }
+                else
+                {
+                    runs.Add(new ClassifiedTextRun(
+                        PredefinedClassificationTypeNames.Keyword, $"[{i.Message}]"));
+                    runs.Add(new ClassifiedTextRun(
+                        PredefinedClassificationTypeNames.Comment, $"{i.TargetText}"));
+                }
             }
         }
 
