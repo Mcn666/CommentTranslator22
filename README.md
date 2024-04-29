@@ -5,11 +5,3 @@
 ## 参考扩展源：
 - [CommentTranslator64](https://github.com/LoveHikari/comment-translator)
 - [EnTranslate](https://github.com/Entity-Now/EnTranslate)
-
-## 功能
-适用于 Visual Studio 2022 的翻译扩展，自动翻译光标所指向的注释行/块
-
-## 支持语言文件
-- C/C++
-- C#
-
