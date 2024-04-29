@@ -48,20 +48,19 @@
     <Compile Include="CommentTranslator22Config.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Popups\QuickInfo\TestQuickInfoSource.cs" />
+    <Compile Include="Popups\QuickInfo\TestQuickInfoSourceProvider.cs" />
     <Compile Include="Translate\LanguageProportion.cs" />
-    <Compile Include="Translate\TranslateData\LevenshteinDistance.cs" />
-    <Compile Include="Popups\CursorPosition\Comment\CommentTranslate.cs" />
-    <Compile Include="Popups\CursorPosition\Comment\CommentTranslateInterrupt.cs" />
-    <Compile Include="Popups\CursorPosition\Comment\Support\CSharp.cs" />
-    <Compile Include="Dictionary\DictionaryResultFormat.cs" />
+    <Compile Include="Translate\LevenshteinDistance.cs" />
+    <Compile Include="Popups\QuickInfo\Comment\CommentTranslate.cs" />
+    <Compile Include="Popups\QuickInfo\Comment\CommentTranslateInterrupt.cs" />
+    <Compile Include="Popups\QuickInfo\Comment\Support\CSharp.cs" />
+    <Compile Include="Dictionary\DictionaryFormat.cs" />
     <Compile Include="Dictionary\Dictionary.cs" />
-    <Compile Include="Dictionary\LocalDictionary.cs" />
-    <Compile Include="Dictionary\ParseString.cs" />
-    <Compile Include="Popups\CursorPosition\TestQuickInfoSource.cs" />
-    <Compile Include="Popups\CursorPosition\TestQuickInfoSourceProvider.cs" />
-    <Compile Include="CodeCompletion\TestSignature.cs" />
-    <Compile Include="CodeCompletion\TestSignatureHelpSource.cs" />
-    <Compile Include="CodeCompletion\TestSignatureHelpSourceProvider.cs" />
+    <Compile Include="Dictionary\LocalDictionaryData.cs" />
+    <Compile Include="Popups\SignatureHelp\TestSignature.cs" />
+    <Compile Include="Popups\SignatureHelp\TestSignatureHelpSource.cs" />
+    <Compile Include="Popups\SignatureHelp\TestSignatureHelpSourceProvider.cs" />
     <Compile Include="Popups\TestSolutionEvents.cs" />
     <Compile Include="Popups\TestTextViewCreationListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -69,12 +68,10 @@
     <Compile Include="Translate\LanguageEnum.cs" />
     <Compile Include="Translate\Format\ApiRecvFormat.cs" />
     <Compile Include="Translate\Format\ApiSendFormat.cs" />
-    <Compile Include="Translate\Format\LocalSaveFormat.cs" />
-    <Compile Include="Translate\Server\BingFanyi.cs" />
-    <Compile Include="Translate\Server\GoogleFanyi.cs" />
     <Compile Include="Translate\TranslateClient.cs" />
-    <Compile Include="Translate\TranslateData\LocalTranslateDataProcessing.cs" />
-    <Compile Include="Translate\TranslateData\LocalTranslateData.cs" />
+    <Compile Include="Translate\TranslateData\GeneralAnnotationData.cs" />
+    <Compile Include="Translate\TranslateData\MethodAnnotationData.cs" />
+    <Compile Include="Translate\TranslateServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Dictionary\Data\words-a.json" />
@@ -119,6 +116,7 @@
       <Version>13.0.1</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

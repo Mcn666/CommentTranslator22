@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace CommentTranslator22.Popups.CursorPosition.Comment
+namespace CommentTranslator22.Popups.QuickInfo.Comment
 {
-    internal class CommentTranslateInterrupt
+    internal static class CommentTranslateInterrupt
     {
         /// <summary>
         /// 检查这段注释文本是不是标签信息或者代码

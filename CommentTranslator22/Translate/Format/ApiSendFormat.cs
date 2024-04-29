@@ -11,7 +11,7 @@
         /// </summary>
         public LanguageEnum TargetLanguage { get; set; }
         /// <summary>
-        /// 翻译内容
+        /// 待翻译文本
         /// </summary>
         public string SourceText { get; set; }
     }

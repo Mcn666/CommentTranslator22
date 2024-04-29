@@ -1,5 +1,4 @@
-﻿using CommentTranslator22.Translate;
-using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Runtime.InteropServices;
@@ -23,8 +22,6 @@ namespace CommentTranslator22
         public const string PackageGuidString = "3ce0a949-a32a-4108-9dd1-9103ff35e40c";
 
         public static CommentTranslator22Config Config { get; set; } = new CommentTranslator22Config();
-
-        public static TranslateClient TranslateClient { get; set; } = new TranslateClient();
 
         #region Package Members
 

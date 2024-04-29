@@ -6,11 +6,11 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommentTranslator22.Translate.Server
+namespace CommentTranslator22.Translate
 {
-    internal class BingFanyi
+    internal static class TranslateServer
     {
-        public async Task<ApiRecvFormat> FanyiAsync(ApiSendFormat format)
+        public static async Task<ApiRecvFormat> BingAsync(ApiSendFormat format)
         {
             var client = new HttpClient();
             string r = "";
@@ -54,11 +54,52 @@ namespace CommentTranslator22.Translate.Server
 
             return new ApiRecvFormat()
             {
-                Success = true,
+                IsSuccess = true,
                 Code = (int)response.StatusCode,
                 Message = response.StatusCode.ToString(),
-                ResultText = r
+                SourceText = format.SourceText,
+                TargetText = r
             };
         }
+
+        public static async Task<ApiRecvFormat> GoogleAsync(ApiSendFormat format)
+        {
+            var client = new HttpClient();
+            string from = LanguageCode.Code[ServerEnum.Google.GetHashCode()][format.SourceLanguage.GetHashCode()];
+            string to = LanguageCode.Code[ServerEnum.Google.GetHashCode()][format.TargetLanguage.GetHashCode()];
+            string r = "";
+            string url = "https://translate.google.com/_/TranslateWebserverUi/data/batchexecute";
+            var request = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
+            IDictionary<string, string> dic = new Dictionary<string, string>();
+            dic.Add("f.req", $"[[[\"MkEWBc\",\"[[\\\"{format.SourceText}\\\",\\\"{from}\\\",\\\"{to}\\\",true],[null]]\", null, \"generic\"]]]");
+            var data = new FormUrlEncodedContent(dic);
+            request.Content = data;
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var bytes = await response.Content.ReadAsByteArrayAsync();
+                string html = System.Text.Encoding.UTF8.GetString(bytes);
+                html = html.Replace("\\n", "").Replace(")]}'", "");
+                var jo = Newtonsoft.Json.Linq.JArray.Parse(html);
+                jo = Newtonsoft.Json.Linq.JArray.Parse(jo[0][2].ToString());
+
+                r = jo[1][0][0][5][0][0].ToString();
+            }
+
+            return new ApiRecvFormat()
+            {
+                IsSuccess = true,
+                Code = (int)response.StatusCode,
+                Message = response.StatusCode.ToString(),
+                SourceText = format.SourceText,
+                TargetText = r
+            };
+        }
+
+        //public static async Task<ApiRecvFormat> BaiduAsync(ApiSendFormat format)
+        //{
+        //    return null;
+        //}
     }
 }

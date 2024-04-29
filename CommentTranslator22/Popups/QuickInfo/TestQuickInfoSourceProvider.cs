@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 
-namespace CommentTranslator22.Popups.CursorPosition
+namespace CommentTranslator22.Popups.QuickInfo
 {
     [Export(typeof(IAsyncQuickInfoSourceProvider))]
     [Name("ToolTip QuickInfo Source")]

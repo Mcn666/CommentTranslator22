@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace CommentTranslator22.Translate.TranslateData
+namespace CommentTranslator22.Translate
 {
     /// <summary>
     /// 计算字符串相似度的算法
     /// 此算法原地址：https://zhuanlan.zhihu.com/p/352503879
     /// </summary>
-    internal class LevenshteinDistance
+    internal static class LevenshteinDistance
     {
         /// <summary>
         /// 取最小的一位数

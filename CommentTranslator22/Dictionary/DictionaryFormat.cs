@@ -3,7 +3,7 @@
     /// <summary>
     /// 这些字段对应json中的值
     /// </summary>
-    public class DictionaryResultFormat
+    public class DictionaryFormat
     {
         public string en { get; set; } = string.Empty;
 

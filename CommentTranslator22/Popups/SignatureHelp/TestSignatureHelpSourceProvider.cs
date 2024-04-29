@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
 
-namespace CommentTranslator22.CodeCompletion
+namespace CommentTranslator22.Popups.SignatureHelp
 {
     [Export(typeof(ISignatureHelpSourceProvider))]
     [Name("Signature Help source")]

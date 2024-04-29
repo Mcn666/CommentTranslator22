@@ -1,6 +1,4 @@
 ﻿using CommentTranslator22.Translate.Format;
-using CommentTranslator22.Translate.Server;
-using CommentTranslator22.Translate.TranslateData;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,28 +7,39 @@ namespace CommentTranslator22.Translate
 {
     public class TranslateClient
     {
+        public static TranslateClient Instance
+        {
+            get
+            {
+                return Nested.instance;
+            }
+        }
+
+        class Nested
+        {
+            internal static TranslateClient instance = new TranslateClient();
+
+            static Nested() { }
+        }
+
+        TranslateClient()
+        {
+
+        }
+
         public int MaxTranslateLength { get; private set; } = 300;
 
         public int MinTranslateLength { get; private set; } = 15;
 
         public async Task<ApiRecvFormat> TranslateAsync(string str)
         {
-            var res = LocalTranslateData.SeekTranslateResult(str);
+            var res = Preprocessing(str);
             if (res != null)
             {
                 return new ApiRecvFormat
                 {
-                    Message = "buf",
-                    ResultText = res
-                };
-            }
-
-            res = Preprocessing(str);
-            if (res != null)
-            {
-                return new ApiRecvFormat
-                {
-                    Message = res
+                    Message = res,
+                    SourceText = str
                 };
             }
 
@@ -46,23 +55,18 @@ namespace CommentTranslator22.Translate
 
         public async Task<ApiRecvFormat> ExecuteAsync(ApiSendFormat apiRequest)
         {
-            apiRequest.SourceText = apiRequest.SourceText.Replace("\r\n", "\n");
-            apiRequest.SourceText = HumpUnfold(apiRequest.SourceText);
-
             switch (CommentTranslator22Package.Config.TranslationServer)
             {
                 case ServerEnum.Bing:
-                    BingFanyi bingFanyi = new BingFanyi();
-                    return await bingFanyi.FanyiAsync(apiRequest);
+                    return await TranslateServer.BingAsync(apiRequest);
                 case ServerEnum.Google:
-                    GoogleFanyi googleFanyi = new GoogleFanyi();
-                    return await googleFanyi.FanyiAsync(apiRequest);
+                    return await TranslateServer.GoogleAsync(apiRequest);
                 default:
                     return new ApiRecvFormat();
             }
         }
 
-        private string Preprocessing(string text)
+        public string Preprocessing(string text)
         {
             if (CommentTranslator22Package.Config.SourceLanguage == CommentTranslator22Package.Config.TargetLanguage ||
                 CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.Auto)
@@ -78,29 +82,29 @@ namespace CommentTranslator22.Translate
             switch (CommentTranslator22Package.Config.TargetLanguage)
             {
                 case LanguageEnum.English:
-                    if (LanguageProportion.English(text) > 0.6f)
+                    if (LanguageProportion.English(text) > 0.5f)
                         return "EN?";
                     break;
                 case LanguageEnum.简体中文:
-                    if (LanguageProportion.Chinese(text) > 0.6f)
+                    if (LanguageProportion.Chinese(text) > 0.5f)
                         return "CN?";
                     break;
                 case LanguageEnum.日本語:
-                    if (LanguageProportion.Japanese(text) > 0.6f)
+                    if (LanguageProportion.Japanese(text) > 0.5f)
                         return "JA?";
                     break;
             }
             return null;
         }
 
-        private string HumpUnfold(string humpString)
+        public string HumpUnfold(string humpString)
         {
-            string[] ss = humpString.Split(' ');
-            string res = "";
+            humpString = humpString.Replace("\r\n", "\n");
+            var ss = humpString.Split(' ');
+            var result = "";
             foreach (var s in ss)
             {
-                Regex regex = new Regex("([A-Z]|^)[a-z]+");
-                var matcher = regex.Matches(s);
+                var matcher = Regex.Matches(s, "([A-Z]|^)[a-z]+");
                 if (matcher.Count > 0)
                 {
                     StringBuilder sb = new StringBuilder();
@@ -110,14 +114,14 @@ namespace CommentTranslator22.Translate
                         sb.Append(g + " ");
                     }
 
-                    res += sb.ToString().TrimEnd() + " ";
+                    result += sb.ToString().TrimEnd() + " ";
                 }
                 else
                 {
-                    res += s + " ";
+                    result += s + " ";
                 }
             }
-            return res;
+            return result;
         }
     }
 }

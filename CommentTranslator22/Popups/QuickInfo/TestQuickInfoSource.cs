@@ -1,4 +1,4 @@
-﻿using CommentTranslator22.Popups.CursorPosition.Comment;
+﻿using CommentTranslator22.Popups.QuickInfo.Comment;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CommentTranslator22.Popups.CursorPosition
+namespace CommentTranslator22.Popups.QuickInfo
 {
     internal class TestQuickInfoSource : IAsyncQuickInfoSource
     {
@@ -31,42 +31,56 @@ namespace CommentTranslator22.Popups.CursorPosition
                 return null;
             }
 
-            var currentSnapshot = subjectTriggerPoint.Value.Snapshot;
             var querySpan = new SnapshotSpan(subjectTriggerPoint.Value, 0);
+            var currentSnapshot = subjectTriggerPoint.Value.Snapshot;
             var applicableToSpan = currentSnapshot.CreateTrackingSpan(querySpan, SpanTrackingMode.EdgeInclusive);
 
             // 检查光标所指向的行
             var navigator = m_provider.NavigatorService.GetTextStructureNavigator(m_subjectBuffer);
-            var extent = navigator.GetExtentOfWord(subjectTriggerPoint.Value);
+            var span = navigator.GetExtentOfWord(subjectTriggerPoint.Value).Span;
 
-            // 最终显示的信息
-            var scres = await CommentTranslate.TranslateAsync(extent.Span);
-            if (scres.Any() == true)
+            if (CommentTranslator22Package.Config.TranslateQuickInfoCommentText)
             {
-                var tempTime = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
-                var tempElement = new ContainerElement(ContainerElementStyle.Stacked,
-                    new ClassifiedTextElement(
-                        new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, tempTime)),
-                    new ClassifiedTextElement(scres));
-                return new QuickInfoItem(applicableToSpan, tempElement);
+                var temp = await CommentTranslate.TryTranslateMethodInformationAsync(session);
+                if (temp != null && temp.Any() == true)
+                {
+                    var time = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
+                    var element = new ContainerElement(ContainerElementStyle.Stacked,
+                        new ClassifiedTextElement(
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, time)),
+                        new ClassifiedTextElement(temp));
+                    return new QuickInfoItem(applicableToSpan, element);
+                }
             }
 
-            // 执行到这里，只能获取光标所指向的文本进行字典查询了
-            var dres = CommentTranslate.QueryDictionary(extent.Span.GetText().Trim());
-            if (dres == string.Empty)
+            if (CommentTranslator22Package.Config.TranslateGeneralCommentText)
             {
-                return null;
+                var temp = await CommentTranslate.TranslateAsync(span);
+                if (temp != null && temp.Any() == true)
+                {
+                    var time = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
+                    var element = new ContainerElement(ContainerElementStyle.Stacked,
+                        new ClassifiedTextElement(
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, time)),
+                        new ClassifiedTextElement(temp));
+                    return new QuickInfoItem(applicableToSpan, element);
+                }
             }
 
-            // 计算这次使用的时间
-            var deltaTime = DateTime.UtcNow - beginTime;
-            var str = $"{deltaTime.TotalSeconds}\n{dres}";
-
-            var element = new ContainerElement(ContainerElementStyle.Stacked,
-                new ClassifiedTextElement(
-                    new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, str)));
-
-            return new QuickInfoItem(applicableToSpan, element);
+            if (CommentTranslator22Package.Config.UseDictionary)
+            {
+                var temp = CommentTranslate.QueryDictionary(span.GetText().Trim());
+                if (temp != null)
+                {
+                    var time = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
+                    var element = new ContainerElement(ContainerElementStyle.Stacked,
+                        new ClassifiedTextElement(
+                            new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, time)),
+                        new ClassifiedTextElement(temp));
+                    return new QuickInfoItem(applicableToSpan, element);
+                }
+            }
+            return null;
         }
 
         protected virtual void Dispose(bool disposing)

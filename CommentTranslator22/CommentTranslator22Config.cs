@@ -20,14 +20,30 @@ namespace CommentTranslator22
         [Category("翻译设置")]
         [DisplayName("翻译目标语言")]
         public LanguageEnum TargetLanguage { get; set; } = GetCurrentCulture();
+        #endregion
 
-        [Category("翻译设置")]
-        [DisplayName("多行合并")]
-        public bool MergeCommentBlock { get; set; } = false;
+        #region 翻译内容
 
-        [Category("翻译设置")]
+        [Category("翻译内容")]
         [DisplayName("保存的翻译数量")]
-        public int NumberOfTranslationsSaved { get; set; } = 1000;
+        [Description("单个解决方案保存在本地的翻译量")]
+        public int MaximumStorageTranslateData { get; set; } = 1000;
+
+        [Category("翻译内容")]
+        [DisplayName("翻译快速信息文本")]
+        [Description("鼠标指向函数、方法、变量、类、枚举等文本时，翻译弹出时的部分快速信息文本")]
+        public bool TranslateQuickInfoCommentText { get; set; } = false;
+
+        [Category("翻译内容")]
+        [DisplayName("翻译普通注释文本")]
+        [Description("翻译鼠标所指向的注释文本及其附近的注释文本")]
+        public bool TranslateGeneralCommentText { get; set; } = false;
+
+        [Category("翻译内容")]
+        [DisplayName("使用字典")]
+        [Description("如果是支持的语言则会自动翻译，目前只支持【英文->中文】")]
+        public bool UseDictionary { get; set; } = false;
+
         #endregion
 
         #region 屏蔽设置
@@ -56,24 +72,18 @@ namespace CommentTranslator22
             "?*/?*/?*",
             "?*\\?*\\?*",
             "?*:*;",
+            "?* ?*}",
+            "?* ?*;",
+            "?*?*)",
         };
         #endregion
-
-        [DisplayName("使用字典")]
-        [Description("如果是支持的语言则会自动翻译，目前只支持【英文->中文】")]
-        public bool UseDictionary { get; set; } = false;
 
         [DisplayName("使用相似度算法")]
         [Description("相似度大于85%的注释使用相同的结果")]
         public bool UseLevenshteinDistance { get; set; } = true;
 
-        [DisplayName("使用字符统计")]
+        [DisplayName("使用词组统计")]
         public bool UseCharacterStatistics { get; set; } = true;
-
-        [DisplayName("覆盖代码完成提示信息")]
-        [Description("暂未完成")]
-        public bool UseCoverCodeCompletionPrompt { get; set; } = false;
-
 
 
 
@@ -87,15 +97,18 @@ namespace CommentTranslator22
             this.TranslationServer = config.TranslationServer;
             this.SourceLanguage = config.SourceLanguage;
             this.TargetLanguage = config.TargetLanguage;
-            this.MergeCommentBlock = config.MergeCommentBlock;
-            this.NumberOfTranslationsSaved = config.NumberOfTranslationsSaved;
+
+            // 翻译内容
+            this.MaximumStorageTranslateData = config.MaximumStorageTranslateData;
+            this.TranslateQuickInfoCommentText = config.TranslateQuickInfoCommentText;
+            this.TranslateGeneralCommentText = config.TranslateGeneralCommentText;
+            this.UseDictionary = config.UseDictionary;
 
             // 屏蔽设置
             this.UseMask = config.UseMask;
             this.UseMaskType = config.UseMaskType;
 
 
-            this.UseDictionary = config.UseDictionary;
             this.UseCharacterStatistics = config.UseCharacterStatistics;
             this.UseLevenshteinDistance = config.UseLevenshteinDistance;
         }

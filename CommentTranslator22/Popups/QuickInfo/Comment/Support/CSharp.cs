@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.Text;
+﻿using CommentTranslator22.Translate;
+using Microsoft.VisualStudio.Text;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace CommentTranslator22.Popups.CursorPosition.Comment.Support
+namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 {
     internal class CSharp
     {
@@ -29,20 +31,6 @@ namespace CommentTranslator22.Popups.CursorPosition.Comment.Support
             str = temp.Substring(count).Trim();
         }
 
-        public static IEnumerable<string> MergeSearchResult(in List<string> lines)
-        {
-            if (CommentTranslator22Package.Config.MergeCommentBlock)
-            {
-                var str = string.Empty;
-                foreach (var line in lines)
-                {
-                    str += line + ' ';
-                }
-                return new List<string> { str };
-            }
-            return lines;
-        }
-
         public static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
         {
             // 检查鼠标所指向的这一行是否使用了第一种注释
@@ -60,8 +48,10 @@ namespace CommentTranslator22.Popups.CursorPosition.Comment.Support
             StringPretreatment(ref lineText);
             if (CommentTranslateInterrupt.Check(lineText)) return null;
 
-            bool addPreviousLine = true, addNextLine = true;
-            List<string> lines = new List<string> { lineText };
+            var addNextLine = true;
+            var addPreviousLine = true;
+            var linesTextLength = lineText.Length;
+            var lines = new List<string> { lineText };
 
             for (int i = 1; i < 10; i++)
             {
@@ -82,6 +72,7 @@ namespace CommentTranslator22.Popups.CursorPosition.Comment.Support
                         }
                         else
                         {
+                            linesTextLength += temp.Length;
                             lines.Insert(0, temp);
                         }
                     }
@@ -103,12 +94,27 @@ namespace CommentTranslator22.Popups.CursorPosition.Comment.Support
                         }
                         else
                         {
+                            linesTextLength += temp.Length;
                             lines.Add(temp);
                         }
                     }
                 }
             }
-            return MergeSearchResult(lines);
+            if (linesTextLength > TranslateClient.Instance.MaxTranslateLength)
+            {
+                return null;
+            }
+            if (lines.Count > 1)
+            {
+                if (lines.Last().Length < TranslateClient.Instance.MinTranslateLength)
+                {
+                    var last = lines.Last();
+                    var temp = lines.Count - 2;
+                    lines[temp] = lines[temp] + " " + last;
+                    lines.RemoveAt(temp + 1);
+                }
+            }
+            return lines;
         }
 
         public static IEnumerable<string> SearchCommentScopeTwo(SnapshotPoint snapshot)
@@ -146,14 +152,29 @@ namespace CommentTranslator22.Popups.CursorPosition.Comment.Support
 
             var splitResult = str.Substring(index1, index2 - index1 - 2).Replace("\r\n", "\n").Split('\n');
             var lines = new List<string>();
+            var linesTextLength = 0;
             foreach (var line in splitResult)
             {
                 var temp = line;
                 StringPretreatment(ref temp);
+                linesTextLength += temp.Length;
                 lines.Add(temp);
             }
-
-            return MergeSearchResult(lines);
+            if (linesTextLength > TranslateClient.Instance.MaxTranslateLength)
+            {
+                return null;
+            }
+            if (lines.Count > 1)
+            {
+                if (lines.Last().Length < TranslateClient.Instance.MinTranslateLength)
+                {
+                    var last = lines.Last();
+                    var temp = lines.Count - 2;
+                    lines[temp] = lines[temp] + " " + last;
+                    lines.RemoveAt(temp + 1);
+                }
+            }
+            return lines;
         }
     }
 }

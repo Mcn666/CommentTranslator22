@@ -7,14 +7,14 @@ namespace CommentTranslator22.Popups
 {
     public class TestSolutionEvents : IVsSolutionEvents
     {
-        private static TestSolutionEvents SolutionEvents;
-        private IVsSolution _solution;
+        private static TestSolutionEvents solutionEvents;
+        private IVsSolution solution;
 
         public TestSolutionEvents()
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-            this._solution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
-            this._solution.AdviseSolutionEvents(this, out uint solutionCookie);
+            this.solution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
+            this.solution.AdviseSolutionEvents(this, out uint solutionCookie);
 
             // 现在是在解决方案打开后完成的实例化，需要执行一次OnAfterOpenSolution的代码
             OnAfterOpenSolution(null, 0);
@@ -22,9 +22,9 @@ namespace CommentTranslator22.Popups
 
         public static void Create()
         {
-            if (SolutionEvents == null)
+            if (solutionEvents == null)
             {
-                SolutionEvents = new TestSolutionEvents();
+                solutionEvents = new TestSolutionEvents();
             }
         }
 
@@ -49,8 +49,7 @@ namespace CommentTranslator22.Popups
         public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
         {
             // 通知侦听客户端解决方案已打开
-            LocalTranslateDataProcessing.Load();
-            LocalDictionary.ReadAllData();
+            GeneralAnnotationData.Instance.ReadAllData();
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
 
@@ -63,8 +62,9 @@ namespace CommentTranslator22.Popups
         public int OnAfterCloseSolution(object pUnkReserved)
         {
             // 通知侦听客户端解决方案已关闭
-            LocalTranslateDataProcessing.Unload();
-            LocalDictionary.SaveAllData();
+            LocalDictionaryData.Instance.SaveAllData();
+            GeneralAnnotationData.Instance.SaveAllData();
+            MethodAnnotationData.Instance.SaveAllData();
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
     }

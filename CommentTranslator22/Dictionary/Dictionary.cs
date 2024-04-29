@@ -8,14 +8,29 @@ namespace CommentTranslator22.Dictionary
 {
     internal class Dictionary
     {
-        public static List<List<DictionaryResultFormat>> FormatLists { get; private set; }
+        public static Dictionary Instance
+        {
+            get
+            {
+                return Nested.instance;
+            }
+        }
+
+        class Nested
+        {
+            internal static Dictionary instance = new Dictionary();
+
+            static Nested() { }
+        }
+
+        List<List<DictionaryFormat>> FormatLists { get; set; }
 
         /// <summary>
         /// 获取字典，并且查找其翻译
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
-        public static DictionaryResultFormat Query(string word)
+        public DictionaryFormat Query(string word)
         {
             try
             {
@@ -48,9 +63,9 @@ namespace CommentTranslator22.Dictionary
             }
         }
 
-        private static bool LoadResource()
+        bool LoadResource()
         {
-            FormatLists = new List<List<DictionaryResultFormat>>();
+            FormatLists = new List<List<DictionaryFormat>>();
             for (int i = 0; i < 26; i++)
             {
                 var resourceName = $"CommentTranslator22.Dictionary.Data.words-{(char)('a' + i)}.json";
@@ -58,7 +73,7 @@ namespace CommentTranslator22.Dictionary
                 if (string.IsNullOrEmpty(str))
                     break;
 
-                var formats = JsonConvert.DeserializeObject<List<DictionaryResultFormat>>(str);
+                var formats = JsonConvert.DeserializeObject<List<DictionaryFormat>>(str);
                 if (formats == null)
                     break;
 
@@ -75,7 +90,7 @@ namespace CommentTranslator22.Dictionary
         /// </summary>
         /// <param name="resourceName"></param>
         /// <returns></returns>
-        private static string GetResource(string resourceName)
+        string GetResource(string resourceName)
         {
             try
             {

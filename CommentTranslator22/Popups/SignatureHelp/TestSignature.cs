@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.ObjectModel;
 
-namespace CommentTranslator22.CodeCompletion
+namespace CommentTranslator22.Popups.SignatureHelp
 {
     internal class TestSignature : ISignature
     {
@@ -19,15 +19,15 @@ namespace CommentTranslator22.CodeCompletion
 
         internal TestSignature(ITextBuffer subjectBuffer, ISignature signature)
         {
-            this.m_applicableToSpan = signature.ApplicableToSpan;
-            this.m_content = signature.Content;
-            this.m_prettyPrintedContent = signature.PrettyPrintedContent;
-            this.m_documentation = (signature.Documentation == null) ? "" : $"{signature.Documentation}\nTest";
-            this.m_parameters = signature.Parameters;
-            this.m_currentParameter = signature.CurrentParameter;
+            m_applicableToSpan = signature.ApplicableToSpan;
+            m_content = signature.Content;
+            m_prettyPrintedContent = signature.PrettyPrintedContent;
+            m_documentation = signature.Documentation == null ? "" : $"{signature.Documentation}\nTest";
+            m_parameters = signature.Parameters;
+            m_currentParameter = signature.CurrentParameter;
 
-            this.m_subjectBuffer = subjectBuffer;
-            this.m_subjectBuffer.Changed += new EventHandler<TextContentChangedEventArgs>(OnSubjectBufferChanged);
+            m_subjectBuffer = subjectBuffer;
+            m_subjectBuffer.Changed += new EventHandler<TextContentChangedEventArgs>(OnSubjectBufferChanged);
         }
 
         public IParameter CurrentParameter
@@ -39,14 +39,14 @@ namespace CommentTranslator22.CodeCompletion
                 {
                     IParameter prevCurrentParameter = m_currentParameter;
                     m_currentParameter = value;
-                    this.RaiseCurrentParameterChanged(prevCurrentParameter, m_currentParameter);
+                    RaiseCurrentParameterChanged(prevCurrentParameter, m_currentParameter);
                 }
             }
         }
 
         private void RaiseCurrentParameterChanged(IParameter prevCurrentParameter, IParameter newCurrentParameter)
         {
-            this.CurrentParameterChanged?.Invoke(this,
+            CurrentParameterChanged?.Invoke(this,
                 new CurrentParameterChangedEventArgs(prevCurrentParameter, newCurrentParameter));
         }
 
@@ -54,7 +54,7 @@ namespace CommentTranslator22.CodeCompletion
         {
             if (Parameters.Count == 0)
             {
-                this.CurrentParameter = null;
+                CurrentParameter = null;
                 return;
             }
 
@@ -76,47 +76,47 @@ namespace CommentTranslator22.CodeCompletion
 
             if (commaCount < Parameters.Count)
             {
-                this.CurrentParameter = Parameters[commaCount];
+                CurrentParameter = Parameters[commaCount];
             }
             else
             {
                 // 逗号太多，所以使用最后一个参数作为当前参数。
-                this.CurrentParameter = Parameters[Parameters.Count - 1];
+                CurrentParameter = Parameters[Parameters.Count - 1];
             }
         }
 
         internal void OnSubjectBufferChanged(object sender, TextContentChangedEventArgs e)
         {
-            this.ComputeCurrentParameter();
+            ComputeCurrentParameter();
         }
 
         public ITrackingSpan ApplicableToSpan
         {
-            get { return (m_applicableToSpan); }
+            get { return m_applicableToSpan; }
             internal set { m_applicableToSpan = value; }
         }
 
         public string Content
         {
-            get { return (m_content); }
+            get { return m_content; }
             internal set { m_content = value; }
         }
 
         public string Documentation
         {
-            get { return (m_documentation); }
+            get { return m_documentation; }
             internal set { m_documentation = value; }
         }
 
         public ReadOnlyCollection<IParameter> Parameters
         {
-            get { return (m_parameters); }
+            get { return m_parameters; }
             internal set { m_parameters = value; }
         }
 
         public string PrettyPrintedContent
         {
-            get { return (m_prettyPrintedContent); }
+            get { return m_prettyPrintedContent; }
             internal set { m_prettyPrintedContent = value; }
         }
     }

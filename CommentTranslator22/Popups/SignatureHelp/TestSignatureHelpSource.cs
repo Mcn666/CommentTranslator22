@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace CommentTranslator22.CodeCompletion
+namespace CommentTranslator22.Popups.SignatureHelp
 {
     internal class TestSignatureHelpSource : ISignatureHelpSource
     {
@@ -18,7 +18,6 @@ namespace CommentTranslator22.CodeCompletion
 
         public void AugmentSignatureHelpSession(ISignatureHelpSession session, IList<ISignature> signatures)
         {
-            if (CommentTranslator22Package.Config.UseCoverCodeCompletionPrompt == false) return;
             return;
 
             var contentType = m_textBuffer.ContentType.ToString();
@@ -41,7 +40,6 @@ namespace CommentTranslator22.CodeCompletion
 
         public ISignature GetBestMatch(ISignatureHelpSession session)
         {
-            if (CommentTranslator22Package.Config.UseCoverCodeCompletionPrompt == false) return null;
             return null;
 
             if (session.Signatures.Count > 0)
