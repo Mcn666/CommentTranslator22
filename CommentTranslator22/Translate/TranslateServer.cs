@@ -70,8 +70,10 @@ namespace CommentTranslator22.Translate
             string r = "";
             string url = "https://translate.google.com/_/TranslateWebserverUi/data/batchexecute";
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
-            IDictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("f.req", $"[[[\"MkEWBc\",\"[[\\\"{format.SourceText}\\\",\\\"{from}\\\",\\\"{to}\\\",true],[null]]\", null, \"generic\"]]]");
+            IDictionary<string, string> dic = new Dictionary<string, string>
+            {
+                { "f.req", $"[[[\"MkEWBc\",\"[[\\\"{format.SourceText}\\\",\\\"{from}\\\",\\\"{to}\\\",true],[null]]\", null, \"generic\"]]]" }
+            };
             var data = new FormUrlEncodedContent(dic);
             request.Content = data;
             HttpResponseMessage response = await client.SendAsync(request);

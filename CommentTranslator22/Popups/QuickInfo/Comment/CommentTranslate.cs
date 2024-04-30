@@ -21,9 +21,9 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<ClassifiedTextRun>> TryTranslateMethodInformationAsync(IAsyncQuickInfoSession session)
+        public static async Task<IEnumerable<ClassifiedTextRun>> TryTranslateMethodInformationAsync(IAsyncQuickInfoSession session, SnapshotPoint snapshot)
         {
-            var str = TryGetMethodInformation(session);
+            var str = TryGetMethodInformation(session, snapshot.Snapshot.TextBuffer.ContentType.ToString());
             if (str != null)
             {
                 var s = TranslateClient.Instance.HumpUnfold(str);
@@ -60,14 +60,20 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public static string TryGetMethodInformation(IAsyncQuickInfoSession session)
+        public static string TryGetMethodInformation(IAsyncQuickInfoSession session, string content)
         {
             if (session.Properties.PropertyList.Count > 0)
             {
+                // 这个 Value 的类型应该为 Microsoft.VisualStudio.Language.Intellisense.Implementation.LegacyQuickInfoSession
+                // 但是我还没有找到这个类型所在的命名空间，现在使用的是类型强转
                 var quick = session.Properties.PropertyList[0].Value as IQuickInfoSession;
-                foreach (ContainerElement item in quick.QuickInfoContent.Cast<ContainerElement>())
+                foreach (ContainerElement i in quick.QuickInfoContent.Cast<ContainerElement>())
                 {
-                    foreach (ContainerElement element in item.Elements.Cast<ContainerElement>())
+                    if (content == "C/C++")
+                    {
+                        return TryGetCppMethodInformation(i.Elements);
+                    }
+                    foreach (ContainerElement element in i.Elements.Cast<ContainerElement>())
                     {
                         if (element.Elements.Count() > 1)
                         {
@@ -86,22 +92,42 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             return null;
         }
 
+        static string TryGetCppMethodInformation(IEnumerable<object> elements)
+        {
+            if (elements.Count() > 3
+                    && elements.ElementAt(2).GetType() == typeof(ContainerElement))
+            {
+                var element = elements.ElementAt(2) as ContainerElement;
+                if (element.Elements.Count() == 1
+                    && element.Elements.ElementAt(0).GetType() == typeof(ClassifiedTextElement))
+                {
+                    var textElement = element.Elements.ElementAt(0) as ClassifiedTextElement;
+                    if (textElement.Runs.Count() == 1)
+                    {
+                        var run = textElement.Runs.ElementAt(0);
+                        return run.Text;
+                    }
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// 翻译鼠标所在位置的附近的注释文本
         /// </summary>
         /// <param name="snapshot"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<ClassifiedTextRun>> TranslateAsync(SnapshotSpan snapshot)
+        public static async Task<IEnumerable<ClassifiedTextRun>> TranslateAsync(SnapshotPoint snapshot)
         {
             List<ClassifiedTextRun> classifieds = new List<ClassifiedTextRun>();
-            var strList = SearchComment(snapshot.Start);
+            var strList = SearchComment(snapshot);
             if (strList != null)
             {
+                var f = new List<ApiRecvFormat>();
                 foreach (var i in strList)
                 {
                     var s = TranslateClient.Instance.HumpUnfold(i);
                     var r = GeneralAnnotationData.Instance.IndexOf(s);
-                    var f = new List<ApiRecvFormat>();
                     if (r == null)
                     {
                         var recv = await TranslateClient.Instance.TranslateAsync(s);
@@ -117,12 +143,9 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                         };
                         f.Add(recv);
                     }
-                    var count = f.Count - 1;
-                    var temp = f[count].TargetText.TrimEnd('\n');
-                    f[count].TargetText = temp;
-                    CreateClassifiedTextRun(f, out var runs);
-                    classifieds.AddRange(runs);
                 }
+                CreateClassifiedTextRun(f, out var runs);
+                classifieds.AddRange(runs);
             }
             return await Task.FromResult(classifieds);
         }
@@ -134,8 +157,8 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// <returns></returns>
         static IEnumerable<string> SearchComment(SnapshotPoint snapshot)
         {
-            var contentType = snapshot.Snapshot.TextBuffer.ContentType.ToString();
-            switch (contentType)
+            var content = snapshot.Snapshot.TextBuffer.ContentType.ToString();
+            switch (content)
             {
                 case "C/C++":
                 case "CSharp":
@@ -148,26 +171,27 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         {
             runs = new List<ClassifiedTextRun>();
 
-            foreach (var i in formats)
+            for (int i = 0; i < formats.Count; i++)
             {
-                if (i.IsSuccess)
+                var temp = (i == formats.Count - 1) ? "" : "\n";
+                if (formats[i].IsSuccess)
                 {
                     runs.Add(new ClassifiedTextRun(
-                        PredefinedClassificationTypeNames.Comment, $"{i.TargetText}"));
+                        PredefinedClassificationTypeNames.Comment, $"{formats[i].TargetText}{temp}"));
                 }
-                else if (string.IsNullOrEmpty(i.TargetText))
+                else if (string.IsNullOrEmpty(formats[i].TargetText))
                 {
                     runs.Add(new ClassifiedTextRun(
-                        PredefinedClassificationTypeNames.String, $"[{i.Message}]"));
+                        PredefinedClassificationTypeNames.String, $"[{formats[i].Message}]"));
                     runs.Add(new ClassifiedTextRun(
-                        PredefinedClassificationTypeNames.Comment, $"{i.SourceText}"));
+                        PredefinedClassificationTypeNames.Comment, $"{formats[i].SourceText}{temp}"));
                 }
                 else
                 {
                     runs.Add(new ClassifiedTextRun(
-                        PredefinedClassificationTypeNames.Keyword, $"[{i.Message}]"));
+                        PredefinedClassificationTypeNames.Keyword, $"[{formats[i].Message}]"));
                     runs.Add(new ClassifiedTextRun(
-                        PredefinedClassificationTypeNames.Comment, $"{i.TargetText}"));
+                        PredefinedClassificationTypeNames.Comment, $"{formats[i].TargetText}{temp}"));
                 }
             }
         }

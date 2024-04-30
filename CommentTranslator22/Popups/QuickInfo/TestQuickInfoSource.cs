@@ -38,10 +38,11 @@ namespace CommentTranslator22.Popups.QuickInfo
             // 检查光标所指向的行
             var navigator = m_provider.NavigatorService.GetTextStructureNavigator(m_subjectBuffer);
             var span = navigator.GetExtentOfWord(subjectTriggerPoint.Value).Span;
+            var snapshotspan = span.Start;
 
             if (CommentTranslator22Package.Config.TranslateQuickInfoCommentText)
             {
-                var temp = await CommentTranslate.TryTranslateMethodInformationAsync(session);
+                var temp = await CommentTranslate.TryTranslateMethodInformationAsync(session, snapshotspan);
                 if (temp != null && temp.Any() == true)
                 {
                     var time = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
@@ -55,7 +56,7 @@ namespace CommentTranslator22.Popups.QuickInfo
 
             if (CommentTranslator22Package.Config.TranslateGeneralCommentText)
             {
-                var temp = await CommentTranslate.TranslateAsync(span);
+                var temp = await CommentTranslate.TranslateAsync(snapshotspan);
                 if (temp != null && temp.Any() == true)
                 {
                     var time = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
