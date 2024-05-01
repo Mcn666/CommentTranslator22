@@ -57,7 +57,7 @@
     <Compile Include="Popups\QuickInfo\Comment\Support\CSharp.cs" />
     <Compile Include="Dictionary\DictionaryFormat.cs" />
     <Compile Include="Dictionary\Dictionary.cs" />
-    <Compile Include="Dictionary\LocalDictionaryData.cs" />
+    <Compile Include="Dictionary\DictionaryUseData.cs" />
     <Compile Include="Popups\SignatureHelp\TestSignature.cs" />
     <Compile Include="Popups\SignatureHelp\TestSignatureHelpSource.cs" />
     <Compile Include="Popups\SignatureHelp\TestSignatureHelpSourceProvider.cs" />

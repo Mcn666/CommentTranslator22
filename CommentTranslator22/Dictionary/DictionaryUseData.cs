@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace CommentTranslator22.Dictionary
 {
-    internal class LocalDictionaryData
+    internal class DictionaryUseData
     {
-        public static LocalDictionaryData Instance
+        public static DictionaryUseData Instance
         {
             get
             {
@@ -18,7 +18,7 @@ namespace CommentTranslator22.Dictionary
 
         class Nested
         {
-            internal static LocalDictionaryData instance = new LocalDictionaryData();
+            internal static DictionaryUseData instance = new DictionaryUseData();
 
             static Nested() { }
         }
@@ -33,14 +33,14 @@ namespace CommentTranslator22.Dictionary
         {
             public static string MainFolder;
             public string FileName;
-            public int StorageLength;
+            public int MaximumStorageCount;
             public List<LocalDictionaryDataFormat> DataFormats = new List<LocalDictionaryDataFormat>();
         }
 
         List<LocalDictionaryDataFileFormat> FileFormats { get; set; } = new List<LocalDictionaryDataFileFormat>
         {
-            new LocalDictionaryDataFileFormat{StorageLength = 10000, FileName = "default.txt"},
-            new LocalDictionaryDataFileFormat{StorageLength = 10000, FileName = "unfound.txt"},
+            new LocalDictionaryDataFileFormat{MaximumStorageCount = 10000, FileName = "default.txt"},
+            new LocalDictionaryDataFileFormat{MaximumStorageCount = 10000, FileName = "unfound.txt"},
         };
 
         public enum StorageEnum
@@ -49,10 +49,10 @@ namespace CommentTranslator22.Dictionary
             Unfound
         }
 
-        LocalDictionaryData()
+        DictionaryUseData()
         {
             LocalDictionaryDataFileFormat.MainFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            LocalDictionaryDataFileFormat.MainFolder += "/CommentTranslator22/LocalDictionaryData";
+            LocalDictionaryDataFileFormat.MainFolder += "/CommentTranslator22/DictionaryUseData";
             AffirmLocalFolderExists();
             AffirmLocalFileExists();
             ReadAllData();
@@ -87,7 +87,7 @@ namespace CommentTranslator22.Dictionary
             foreach (var i in FileFormats)
             {
                 Sort(ref i.DataFormats);
-                Save(LocalDictionaryDataFileFormat.MainFolder, i.FileName, i.StorageLength, i.DataFormats);
+                Save(LocalDictionaryDataFileFormat.MainFolder, i.FileName, i.MaximumStorageCount, i.DataFormats);
             }
         }
 

@@ -224,7 +224,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                             if (CommentTranslator22Package.Config.UseCharacterStatistics)
                             {
                                 // 将结果保留到临时字符集中
-                                LocalDictionaryData.Instance.Add(temp, LocalDictionaryData.StorageEnum.Default);
+                                DictionaryUseData.Instance.Add(temp, DictionaryUseData.StorageEnum.Default);
                             }
                             continue;
                         }
@@ -236,10 +236,10 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                         if (CommentTranslator22Package.Config.UseCharacterStatistics && str.Length > 2)
                         {
                             // 将这个字符串保留到另一个字符集中
-                            LocalDictionaryData.Instance.Add(new DictionaryFormat
+                            DictionaryUseData.Instance.Add(new DictionaryFormat
                             {
                                 en = str,
-                            }, LocalDictionaryData.StorageEnum.Unfound);
+                            }, DictionaryUseData.StorageEnum.Unfound);
                         }
                     }
                     return new ClassifiedTextRun(

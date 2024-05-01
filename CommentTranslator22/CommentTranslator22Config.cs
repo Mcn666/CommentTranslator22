@@ -23,12 +23,6 @@ namespace CommentTranslator22
         #endregion
 
         #region 翻译内容
-
-        [Category("翻译内容")]
-        [DisplayName("保存的翻译数量")]
-        [Description("单个解决方案保存在本地的翻译量")]
-        public int MaximumStorageTranslateData { get; set; } = 1000;
-
         [Category("翻译内容")]
         [DisplayName("翻译快速信息文本")]
         [Description("鼠标指向函数、方法、变量、类、枚举等文本时，翻译弹出时的部分快速信息文本")]
@@ -99,7 +93,6 @@ namespace CommentTranslator22
             this.TargetLanguage = config.TargetLanguage;
 
             // 翻译内容
-            this.MaximumStorageTranslateData = config.MaximumStorageTranslateData;
             this.TranslateQuickInfoCommentText = config.TranslateQuickInfoCommentText;
             this.TranslateGeneralCommentText = config.TranslateGeneralCommentText;
             this.UseDictionary = config.UseDictionary;

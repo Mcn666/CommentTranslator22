@@ -39,13 +39,13 @@ namespace CommentTranslator22.Translate.TranslateData
         {
             public static string MainFolder;
             public string FileName;
-            public int StorageLength;
+            public int MaximumStorageCount;
             public List<MethodAnnotationDataFormat> DataFormats = new List<MethodAnnotationDataFormat>();
         }
 
         List<MethodAnnotationDataFileFormat> FileFormats { get; set; } = new List<MethodAnnotationDataFileFormat>
         {
-            new MethodAnnotationDataFileFormat { StorageLength = 1000, FileName = "default.txt"},
+            new MethodAnnotationDataFileFormat { MaximumStorageCount = 1000, FileName = "default.txt"},
         };
 
         MethodAnnotationData()
@@ -90,7 +90,7 @@ namespace CommentTranslator22.Translate.TranslateData
                     continue;
                 }
                 Sort(ref i.DataFormats);
-                Save(MethodAnnotationDataFileFormat.MainFolder, i.FileName, i.StorageLength, i.DataFormats);
+                Save(MethodAnnotationDataFileFormat.MainFolder, i.FileName, i.MaximumStorageCount, i.DataFormats);
             }
         }
 

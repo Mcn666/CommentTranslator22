@@ -62,9 +62,9 @@ namespace CommentTranslator22.Popups
         public int OnAfterCloseSolution(object pUnkReserved)
         {
             // 通知侦听客户端解决方案已关闭
-            GeneralAnnotationData.Instance.SaveAllData();
-            LocalDictionaryData.Instance.SaveAllData();
+            DictionaryUseData.Instance.SaveAllData();
             MethodAnnotationData.Instance.SaveAllData();
+            GeneralAnnotationData.Instance.SaveAllData();
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
     }

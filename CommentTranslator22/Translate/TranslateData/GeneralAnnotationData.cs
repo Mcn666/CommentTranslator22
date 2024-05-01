@@ -39,9 +39,10 @@ namespace CommentTranslator22.Translate.TranslateData
         {
             public string MainPath;
             public string InfoFileName;
-            //public string SolutionName;
+            public string SolutionName;
             public string SolutionPath;
             public string SolutionDataName;
+            public int MaximumStorageCount = 1000;
             public List<GeneralAnnotationDataFormat> DataFormats = new List<GeneralAnnotationDataFormat>();
         }
 
@@ -56,7 +57,7 @@ namespace CommentTranslator22.Translate.TranslateData
             //SolutionPath = Path.GetDirectoryName(solution.FullName);//解决方案路径
             FileFormat.MainPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             FileFormat.MainPath += "/CommentTranslator22/GeneralAnnotationData";
-            FileFormat.InfoFileName = $"{FileFormat.MainPath}/SolutionInfo";
+            FileFormat.InfoFileName = $"{FileFormat.MainPath}/SolutionInfo.txt";
         }
 
         public void ReadAllData()
@@ -115,7 +116,7 @@ namespace CommentTranslator22.Translate.TranslateData
             if (FileFormat.SolutionDataName == null)
             {
                 // 使用时间生成的文件几乎不会重复
-                FileFormat.SolutionDataName = DateTime.Now.ToFileTime().ToString();
+                FileFormat.SolutionDataName = DateTime.Now.ToFileTime().ToString() + ".txt";
                 using (var sw = new StreamWriter(FileFormat.InfoFileName, true))
                 {
                     sw.WriteLine(FileFormat.SolutionDataName + "|" + FileFormat.SolutionPath);
@@ -132,9 +133,9 @@ namespace CommentTranslator22.Translate.TranslateData
             {
                 using (var sw = new StreamWriter(fs))
                 {
-                    if (CommentTranslator22Package.Config.MaximumStorageTranslateData < FileFormat.DataFormats.Count)
+                    if (FileFormat.MaximumStorageCount < FileFormat.DataFormats.Count)
                     {
-                        var index = CommentTranslator22Package.Config.MaximumStorageTranslateData;
+                        var index = FileFormat.MaximumStorageCount;
                         var count = FileFormat.DataFormats.Count - index;
                         FileFormat.DataFormats.RemoveRange(index, count);
                     }
