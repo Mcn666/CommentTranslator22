@@ -106,7 +106,8 @@ namespace CommentTranslator22.Translate.TranslateData
         public void SaveAllData()
         {
             // 通常解决方案所在的路径长度会大于 10，这是为了避免单个文件引起的混乱
-            if (FileFormat.SolutionPath.Length < 10)
+            // 如果列表中没有数据也不会进行保存
+            if (FileFormat.SolutionPath.Length < 10 || FileFormat.DataFormats.Count == 0)
             {
                 return;
             }

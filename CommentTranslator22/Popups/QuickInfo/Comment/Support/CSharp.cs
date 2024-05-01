@@ -1,5 +1,6 @@
 ﻿using CommentTranslator22.Translate;
 using Microsoft.VisualStudio.Text;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -33,8 +34,10 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 
         public static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
         {
-            var splitResult = snapshot.GetContainingLine().Snapshot.GetText().Replace("\r\n", "\n").Split('\n');
-            if (splitResult.Length < 1)
+            // 先获得文件快照，再按顺序替换行尾符号，最后按行尾符号分割字符串
+            var snapshotBuffer = snapshot.Snapshot.GetText();
+            var splitResult = snapshotBuffer.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
+            if (splitResult == null || splitResult.Any() == false)
             {
                 return null;
             }
@@ -48,9 +51,15 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
             {
                 return null;
             }
-            for (var i = 0; i < lineNumber; i++)
+            if (snapshot.Snapshot.LineCount > lineNumber)
             {
-                currentPosition -= splitResult[i].Length + 2;
+                for (var i = 0; i < lineNumber; i++)
+                {
+                    // 从 Snapshot 的 Lines 中获取每一行的长度，但要注意不是使用 Length，而是使用 LengthIncludingLineBreak
+                    // LengthIncludingLineBreak 这个包含了行尾符号的长度
+                    var temp = snapshot.Snapshot.Lines.ElementAt(i);
+                    currentPosition -= temp.LengthIncludingLineBreak;
+                }
             }
             if (currentPosition < index)
             {
