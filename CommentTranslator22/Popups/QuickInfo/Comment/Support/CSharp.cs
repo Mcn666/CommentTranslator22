@@ -34,24 +34,37 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
         public static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
         {
             // 检查鼠标所指向的这一行是否使用了第一种注释
-            var lineText = snapshot.GetContainingLine().Extent.GetText();
-            var index = lineText.LastIndexOf("//");
-            if (index == -1) return null;
+            var currentPosition = snapshot.Position;
+            var currentLineText = snapshot.GetContainingLine().Extent.GetText();
+            var currentSnapshot = snapshot.GetContainingLine().Snapshot.GetText();
+            var index = currentSnapshot.LastIndexOf("//", currentPosition);
+
+            if (index == -1 || index + currentLineText.Length < currentPosition)
+            {
+                return null;
+            }
 
             // 获取鼠标所指向的行号，然后按行分割快照文本
-            int lineNumber = snapshot.GetContainingLineNumber();
-            var splitResult = snapshot.Snapshot.GetText().Replace("\r\n", "\n").Split('\n');
-            if (splitResult.Length < 1 || splitResult.Length < lineNumber) return null;
+            var lineNumber = snapshot.GetContainingLineNumber();
+            var splitResult = currentSnapshot.Replace("\r\n", "\n").Split('\n');
+            if (splitResult.Length < 1 || splitResult.Length < lineNumber)
+            {
+                return null;
+            }
 
             // 检查鼠标所指向的这一行是否属于不执行翻译的类型
-            lineText = splitResult[lineNumber].Substring(index + 2);
-            StringPretreatment(ref lineText);
-            if (CommentTranslateInterrupt.Check(lineText)) return null;
+            index = currentLineText.LastIndexOf("//");
+            currentLineText = splitResult[lineNumber].Substring(index + 2);
+            StringPretreatment(ref currentLineText);
+            if (CommentTranslateInterrupt.Check(currentLineText))
+            {
+                return null;
+            }
 
             var addNextLine = true;
             var addPreviousLine = true;
-            var linesTextLength = lineText.Length;
-            var lines = new List<string> { lineText };
+            var linesTextLength = currentLineText.Length;
+            var lines = new List<string> { currentLineText };
 
             for (int i = 1; i < 10; i++)
             {
@@ -125,7 +138,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
             var index1 = str.LastIndexOf("/*", pos);
             if (index1 != -1)
             {
-                var temp = str.LastIndexOf("*/", pos); ;
+                var temp = str.LastIndexOf("*/", pos);
                 if (temp != -1 && temp > index1)
                 {
                     return null;
@@ -150,7 +163,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                 return null;
             }
 
-            var splitResult = str.Substring(index1, index2 - index1 - 2).Replace("\r\n", "\n").Split('\n');
+            var splitResult = str.Substring(index1 + 2, index2 - index1 - 2).Replace("\r\n", "\n").Split('\n');
             var lines = new List<string>();
             var linesTextLength = 0;
             foreach (var line in splitResult)

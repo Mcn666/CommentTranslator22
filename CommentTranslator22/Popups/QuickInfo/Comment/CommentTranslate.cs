@@ -5,6 +5,8 @@ using CommentTranslator22.Translate.Format;
 using CommentTranslator22.Translate.TranslateData;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.StandardClassification;
+using Microsoft.VisualStudio.RemoteSettings;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using System.Collections.Generic;
@@ -207,7 +209,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             if (CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.简体中文
                 && Regex.IsMatch(str, "[\u4e00-\u9fff]") == false)
             {
-                var words = GetWordCollection(str);
+                var words = GetWordAnrray(str);
                 if (words != null)
                 {
                     var result = "";
@@ -250,25 +252,43 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// <summary>
         /// 拆分字符串，获取词组集合
         /// </summary>
-        /// <param name="str"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public static MatchCollection GetWordCollection(string str)
+        static IEnumerable<object> GetWordAnrray(string text)
         {
-            if (string.IsNullOrEmpty(str) || str.Length < 2 || str.Length > 50)
+            if (string.IsNullOrEmpty(text) || text.Length < 2 || text.Length > 50)
             {
                 return null;
             }
 
-            // 将所有十进制数字替换为空
-            //str = Regex.Replace(str, @"\d+", "");
+            // 先按下划线分割这个字符串
+            var strList = new List<object>();
+            var strings = text.Split('_');
+            foreach (var s in strings)
+            {
+                // 将所有非字母字符替换为空
+                var temp = Regex.Replace(s, "[^A-Za-z]", "");
+                if (temp.Length < 2)
+                {
+                    continue;
+                }
 
-            // 将所有非字母字符替换为空
-            str = Regex.Replace(str, "[^A-Za-z]", "");
+                // 检查是否全部为大写字母
+                if (Regex.IsMatch(temp, "^[A-Z]+$"))
+                {
+                    strList.Add(temp);
+                    continue;
+                }
 
-            // 匹配以大写字母开始后跟随一个或多个小写字母的单词,
-            // 或者，如果字符串以小写字母开始，则这些小写字母序列也算匹配（因为^可以匹配到字符串的开始，意味着紧跟其后的[a-z]+可以开始匹配）
-            var matchCollection = Regex.Matches(str, "([A-Z]|^)[a-z]+");
-            return matchCollection;
+                // 匹配以大写字母开始后跟随一个或多个小写字母的单词,
+                // 如果字符串以小写字母开始，则这些小写字母序列也算匹配（因为^可以匹配到字符串的开始，意味着紧跟其后的[a-z]+可以开始匹配）
+                var matches = Regex.Matches(temp, "([A-Z]|^)[a-z]+");
+                foreach (var macth in matches)
+                {
+                    strList.Add(macth);
+                }
+            }
+            return strList;
         }
 
     }
