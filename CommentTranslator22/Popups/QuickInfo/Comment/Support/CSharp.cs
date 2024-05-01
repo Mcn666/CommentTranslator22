@@ -33,27 +33,31 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 
         public static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
         {
-            // 检查鼠标所指向的这一行是否使用了第一种注释
-            var currentPosition = snapshot.Position;
-            var currentLineText = snapshot.GetContainingLine().Extent.GetText();
-            var currentSnapshot = snapshot.GetContainingLine().Snapshot.GetText();
-            var index = currentSnapshot.LastIndexOf("//", currentPosition);
-
-            if (index == -1 || index + currentLineText.Length < currentPosition)
+            var splitResult = snapshot.GetContainingLine().Snapshot.GetText().Replace("\r\n", "\n").Split('\n');
+            if (splitResult.Length < 1)
             {
                 return null;
             }
 
-            // 获取鼠标所指向的行号，然后按行分割快照文本
             var lineNumber = snapshot.GetContainingLineNumber();
-            var splitResult = currentSnapshot.Replace("\r\n", "\n").Split('\n');
-            if (splitResult.Length < 1 || splitResult.Length < lineNumber)
+            var currentPosition = snapshot.Position;
+            var currentLineText = splitResult[lineNumber];
+
+            var index = currentLineText.LastIndexOf("//");
+            if (index == -1)
+            {
+                return null;
+            }
+            for (var i = 0; i < lineNumber; i++)
+            {
+                currentPosition -= splitResult[i].Length + 2;
+            }
+            if (currentPosition < index)
             {
                 return null;
             }
 
             // 检查鼠标所指向的这一行是否属于不执行翻译的类型
-            index = currentLineText.LastIndexOf("//");
             currentLineText = splitResult[lineNumber].Substring(index + 2);
             StringPretreatment(ref currentLineText);
             if (CommentTranslateInterrupt.Check(currentLineText))

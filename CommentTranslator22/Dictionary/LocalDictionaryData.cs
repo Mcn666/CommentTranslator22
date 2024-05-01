@@ -142,15 +142,15 @@ namespace CommentTranslator22.Dictionary
         public void Add(DictionaryFormat format, StorageEnum storage)
         {
             var index = (int)storage;
-            if (index > FileFormats.Count)
+            if (index > FileFormats.Count || format == null)
             {
                 return;
             }
 
-            if (FileFormats[index].DataFormats.Any(f => f.DictionaryFormat == format))
+            if (FileFormats[index].DataFormats.Any(f => f.DictionaryFormat.en == format.en))
             {
-                var existingItem = FileFormats[index].DataFormats.First(f => f.DictionaryFormat == format);
-                existingItem.VisitsCount++;
+                var temp = FileFormats[index].DataFormats.First(f => f.DictionaryFormat.en == format.en);
+                temp.VisitsCount++;
             }
             else
             {

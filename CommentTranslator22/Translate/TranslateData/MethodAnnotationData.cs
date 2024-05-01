@@ -158,7 +158,7 @@ namespace CommentTranslator22.Translate.TranslateData
                 TargetLanguageCode = CommentTranslator22Package.Config.TargetLanguage,
             };
 
-            if (FileFormats[0].DataFormats.Any(f => f == temp) == false)
+            if (FileFormats[0].DataFormats.Any(f => f.SourceText == temp.SourceText) == false)
             {
                 FileFormats[0].DataFormats.Add(temp);
             }

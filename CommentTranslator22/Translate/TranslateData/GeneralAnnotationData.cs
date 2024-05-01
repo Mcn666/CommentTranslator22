@@ -78,10 +78,10 @@ namespace CommentTranslator22.Translate.TranslateData
                     foreach (var line in lines)
                     {
                         var temp = line.Split('|');
-                        if (Equals(temp[0], FileFormat.SolutionPath))
+                        if (temp.Count() == 2 && Equals(temp[1], FileFormat.SolutionPath))
                         {
-                            FileFormat.SolutionDataName = temp[1];
-                            ReadSolutionData($"{FileFormat.MainPath}/{temp[1]}");
+                            FileFormat.SolutionDataName = temp[0];
+                            ReadSolutionData($"{FileFormat.MainPath}/{temp[0]}");
                             return;
                         }
                     }
@@ -117,7 +117,7 @@ namespace CommentTranslator22.Translate.TranslateData
                 FileFormat.SolutionDataName = DateTime.Now.ToFileTime().ToString();
                 using (var sw = new StreamWriter(FileFormat.InfoFileName, true))
                 {
-                    sw.WriteLine(FileFormat.SolutionPath + "|" + FileFormat.SolutionDataName);
+                    sw.WriteLine(FileFormat.SolutionDataName + "|" + FileFormat.SolutionPath);
                 }
             }
 
@@ -190,7 +190,7 @@ namespace CommentTranslator22.Translate.TranslateData
                 LanguageEnumCode = CommentTranslator22Package.Config.TargetLanguage,
             };
 
-            if (FileFormat.DataFormats.Any(f => f == temp) == false)
+            if (FileFormat.DataFormats.Any(f => f.SourceText == temp.SourceText) == false)
             {
                 FileFormat.DataFormats.Add(temp);
             }
