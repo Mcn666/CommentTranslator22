@@ -28,6 +28,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             var str = TryGetMethodInformation(session, snapshot.Snapshot.TextBuffer.ContentType.ToString());
             if (str != null)
             {
+                CSharp.StringPretreatment(ref str);
                 var s = TranslateClient.Instance.HumpUnfold(str);
                 var r = MethodAnnotationData.Instance.IndexOf(s);
                 if (r == null)

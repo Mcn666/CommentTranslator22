@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Text;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
 
 namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 {
@@ -14,25 +15,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                 ?? SearchCommentScopeTwo(snapshot);
         }
 
-        public static void StringPretreatment(ref string str)
-        {
-            var count = 0;
-            var temp = str.TrimStart();
-            foreach (var s in str)
-            {
-                if (char.IsPunctuation(s))
-                {
-                    count++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            str = temp.Substring(count).Trim();
-        }
-
-        public static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
+        static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
         {
             // 先获得文件快照，再按顺序替换行尾符号，最后按行尾符号分割字符串
             var snapshotBuffer = snapshot.Snapshot.GetText();
@@ -130,20 +113,11 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
             {
                 return null;
             }
-            if (lines.Count > 1)
-            {
-                if (lines.Last().Length < TranslateClient.Instance.MinTranslateLength)
-                {
-                    var last = lines.Last();
-                    var temp = lines.Count - 2;
-                    lines[temp] = lines[temp] + " " + last;
-                    lines.RemoveAt(temp + 1);
-                }
-            }
-            return lines;
+
+            return ResultDispose(ref lines);
         }
 
-        public static IEnumerable<string> SearchCommentScopeTwo(SnapshotPoint snapshot)
+        static IEnumerable<string> SearchCommentScopeTwo(SnapshotPoint snapshot)
         {
             var pos = snapshot.Position;
             var str = snapshot.Snapshot.GetText();
@@ -190,17 +164,43 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
             {
                 return null;
             }
-            if (lines.Count > 1)
+
+            return ResultDispose(ref lines);
+        }
+
+        static IEnumerable<string> ResultDispose(ref List<string> ls)
+        {
+            if (ls.Count > 1)
             {
-                if (lines.Last().Length < TranslateClient.Instance.MinTranslateLength)
+                if (ls.Last().Length < TranslateClient.Instance.MinTranslateLength)
                 {
-                    var last = lines.Last();
-                    var temp = lines.Count - 2;
-                    lines[temp] = lines[temp] + " " + last;
-                    lines.RemoveAt(temp + 1);
+                    var temp = ls.Count - 2;
+                    if (ls[temp].Length > TranslateClient.Instance.MinTranslateLength)
+                    {
+                        ls[temp] = ls[temp] + " " + ls.Last();
+                        ls.RemoveAt(temp + 1);
+                    }
                 }
             }
-            return lines;
+            return ls;
+        }
+
+        public static void StringPretreatment(ref string str)
+        {
+            var count = 0;
+            var temp = str.TrimStart();
+            foreach (var s in str)
+            {
+                if (char.IsPunctuation(s))
+                {
+                    count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            str = temp.Substring(count).Trim();
         }
     }
 }

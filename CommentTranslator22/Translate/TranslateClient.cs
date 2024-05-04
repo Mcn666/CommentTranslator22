@@ -68,17 +68,6 @@ namespace CommentTranslator22.Translate
 
         public string Preprocessing(string text)
         {
-            if (CommentTranslator22Package.Config.SourceLanguage == CommentTranslator22Package.Config.TargetLanguage ||
-                CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.Auto)
-            {
-                return "?>?";
-            }
-
-            if (text.Length < MinTranslateLength || text.Length > MaxTranslateLength)
-            {
-                return "Len";
-            }
-
             switch (CommentTranslator22Package.Config.TargetLanguage)
             {
                 case LanguageEnum.English:
@@ -94,6 +83,18 @@ namespace CommentTranslator22.Translate
                         return "JA?";
                     break;
             }
+
+            if (text.Length < MinTranslateLength || text.Length > MaxTranslateLength)
+            {
+                return "Len";
+            }
+
+            if (CommentTranslator22Package.Config.SourceLanguage == CommentTranslator22Package.Config.TargetLanguage ||
+                CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.Auto)
+            {
+                return "?>?";
+            }
+
             return null;
         }
 

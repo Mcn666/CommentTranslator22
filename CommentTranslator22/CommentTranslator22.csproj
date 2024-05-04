@@ -48,6 +48,8 @@
     <Compile Include="CommentTranslator22Config.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Popups\CompletionSource\TestCompletionSource.cs" />
+    <Compile Include="Popups\CompletionSource\TestCompletionSourceProvider.cs" />
     <Compile Include="Popups\QuickInfo\TestQuickInfoSource.cs" />
     <Compile Include="Popups\QuickInfo\TestQuickInfoSourceProvider.cs" />
     <Compile Include="Translate\LanguageProportion.cs" />
@@ -105,6 +107,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Drawing" />
