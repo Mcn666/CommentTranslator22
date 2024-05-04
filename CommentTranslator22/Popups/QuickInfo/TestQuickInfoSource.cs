@@ -25,6 +25,12 @@ namespace CommentTranslator22.Popups.QuickInfo
         public async Task<QuickInfoItem> GetQuickInfoItemAsync(IAsyncQuickInfoSession session, CancellationToken cancellationToken)
         {
             var beginTime = DateTime.UtcNow;
+            var typeName = m_subjectBuffer.ContentType.TypeName;
+            if (typeName != "CSharp" && typeName != "C/C++")
+            {
+                return null;
+            }
+
             var subjectTriggerPoint = session.GetTriggerPoint(m_subjectBuffer.CurrentSnapshot);
             if (subjectTriggerPoint.HasValue == false)
             {
@@ -42,7 +48,7 @@ namespace CommentTranslator22.Popups.QuickInfo
 
             if (CommentTranslator22Package.Config.TranslateQuickInfoCommentText)
             {
-                var temp = await CommentTranslate.TryTranslateMethodInformationAsync(session, snapshotspan);
+                var temp = await CommentTranslate.TryTranslateMethodInformationAsync(session, typeName);
                 if (temp != null && temp.Any() == true)
                 {
                     var time = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();

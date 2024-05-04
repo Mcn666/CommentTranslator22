@@ -23,9 +23,9 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<ClassifiedTextRun>> TryTranslateMethodInformationAsync(IAsyncQuickInfoSession session, SnapshotPoint snapshot)
+        public static async Task<IEnumerable<ClassifiedTextRun>> TryTranslateMethodInformationAsync(IAsyncQuickInfoSession session, string typeName)
         {
-            var str = TryGetMethodInformation(session, snapshot.Snapshot.TextBuffer.ContentType.ToString());
+            var str = TryGetMethodInformation(session, typeName);
             if (str != null)
             {
                 CSharp.StringPretreatment(ref str);
@@ -63,7 +63,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public static string TryGetMethodInformation(IAsyncQuickInfoSession session, string content)
+        public static string TryGetMethodInformation(IAsyncQuickInfoSession session, string typeName)
         {
             if (session.Properties.PropertyList.Count > 0)
             {
@@ -72,7 +72,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                 var quick = session.Properties.PropertyList[0].Value as IQuickInfoSession;
                 foreach (ContainerElement i in quick.QuickInfoContent.Cast<ContainerElement>())
                 {
-                    if (content == "C/C++")
+                    if (typeName == "C/C++")
                     {
                         return TryGetCppMethodInformation(i.Elements);
                     }
@@ -160,8 +160,8 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// <returns></returns>
         static IEnumerable<string> SearchComment(SnapshotPoint snapshot)
         {
-            var content = snapshot.Snapshot.TextBuffer.ContentType.ToString();
-            switch (content)
+            var typeName = snapshot.Snapshot.TextBuffer.ContentType.TypeName;
+            switch (typeName)
             {
                 case "C/C++":
                 case "CSharp":
