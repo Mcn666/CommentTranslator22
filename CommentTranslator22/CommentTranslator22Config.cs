@@ -20,6 +20,16 @@ namespace CommentTranslator22
         [Category("翻译设置")]
         [DisplayName("翻译目标语言")]
         public LanguageEnum TargetLanguage { get; set; } = GetCurrentCulture();
+
+        [Category("翻译设置")]
+        [DisplayName("百度翻译ID")]
+        [Description("只有使用百度翻译时才会生效")]
+        public string AppId { get; set; }
+
+        [Category("翻译设置")]
+        [DisplayName("百度翻译密钥")]
+        [Description("只有使用百度翻译时才会生效")]
+        public string SecretKey { get; set; }
         #endregion
 
         #region 翻译内容
@@ -77,6 +87,7 @@ namespace CommentTranslator22
         public bool UseLevenshteinDistance { get; set; } = true;
 
         [DisplayName("使用词组统计")]
+        [Description("这是字典的使用数据统计")]
         public bool UseCharacterStatistics { get; set; } = true;
 
 

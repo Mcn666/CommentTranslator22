@@ -61,6 +61,16 @@ namespace CommentTranslator22.Translate
                     return await TranslateServer.BingAsync(apiRequest);
                 case ServerEnum.Google:
                     return await TranslateServer.GoogleAsync(apiRequest);
+                case ServerEnum.Baidu:
+                    {
+                        var i = CommentTranslator22Package.Config.AppId;
+                        var k = CommentTranslator22Package.Config.SecretKey;
+                        if (string.IsNullOrEmpty(k) || string.IsNullOrEmpty(i))
+                        {
+                            return new ApiRecvFormat();
+                        }
+                        return await TranslateServer.BaiduAsync(apiRequest, i, k);
+                    }
                 default:
                     return new ApiRecvFormat();
             }
@@ -86,7 +96,7 @@ namespace CommentTranslator22.Translate
 
             if (text.Length < MinTranslateLength || text.Length > MaxTranslateLength)
             {
-                return "Len";
+                return "LEN";
             }
 
             if (CommentTranslator22Package.Config.SourceLanguage == CommentTranslator22Package.Config.TargetLanguage ||

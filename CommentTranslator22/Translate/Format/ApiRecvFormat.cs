@@ -1,4 +1,6 @@
-﻿namespace CommentTranslator22.Translate.Format
+﻿using System.Net;
+
+namespace CommentTranslator22.Translate.Format
 {
     public class ApiRecvFormat
     {
@@ -7,9 +9,9 @@
         /// </summary>
         public bool IsSuccess { get; set; }
         /// <summary>
-        /// 翻译结果代码
+        /// 响应代码
         /// </summary>
-        public int Code { get; set; }
+        public HttpStatusCode Code { get; set; }
 
         public string Message { get; set; }
         /// <summary>
