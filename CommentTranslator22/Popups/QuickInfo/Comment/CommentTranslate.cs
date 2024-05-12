@@ -11,6 +11,8 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -30,13 +32,15 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             {
                 CSharp.StringPretreatment(ref str);
                 var s = TranslateClient.Instance.HumpUnfold(str);
-                var r = MethodAnnotationData.Instance.IndexOf(s);
+                var r = MethodAnnotationData.Instance.IndexOf(s) ?? GeneralAnnotationData.Instance.IndexOf(s);
                 if (r == null)
                 {
                     var recv = await TranslateClient.Instance.TranslateAsync(str);
-
-                    // 在这里将翻译后的方法注释保存到 ?? 方法中
-                    MethodAnnotationData.Instance.Add(recv);
+                    if (string.IsNullOrEmpty(recv.TargetText) == false)
+                    {
+                        // 在这里将翻译后的方法注释保存到 ?? 方法中
+                        MethodAnnotationData.Instance.Add(recv);
+                    }
 
                     var temp = new List<ApiRecvFormat> { recv };
                     CreateClassifiedTextRun(temp, out var runs);
@@ -78,13 +82,27 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                     }
                     foreach (ContainerElement element in i.Elements.Cast<ContainerElement>())
                     {
-                        if (element.Elements.Count() > 1)
+                        if (element.Elements.Count() < 2)
+                        {
+                            return null;
+                        }
+                        if (element.Elements.ElementAt(0).GetType() == typeof(ContainerElement) &&
+                            element.Elements.ElementAt(1).GetType() == typeof(ClassifiedTextElement))
                         {
                             ClassifiedTextElement textElement = element.Elements.ElementAt(1) as ClassifiedTextElement;
                             if (textElement.Runs.Count() == 1)
                             {
                                 ClassifiedTextRun run = textElement.Runs.ElementAt(0);
                                 return run.Text;
+                            }
+                            else if (textElement.Runs.Count() > 1)
+                            {
+                                var str = new StringBuilder();
+                                foreach (var run in textElement.Runs)
+                                {
+                                    str.Append(run.Text);
+                                }
+                                return str.ToString();
                             }
                         }
                         break;
@@ -97,18 +115,34 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
 
         static string TryGetCppMethodInformation(IEnumerable<object> elements)
         {
-            if (elements.Count() > 3
-                    && elements.ElementAt(2).GetType() == typeof(ContainerElement))
+            if (elements.Count() > 3 &&
+                elements.ElementAt(2).GetType() == typeof(ContainerElement))
             {
                 var element = elements.ElementAt(2) as ContainerElement;
-                if (element.Elements.Count() == 1
-                    && element.Elements.ElementAt(0).GetType() == typeof(ClassifiedTextElement))
+                if (element.Elements.Count() == 1 &&
+                    element.Elements.ElementAt(0).GetType() == typeof(ClassifiedTextElement))
                 {
                     var textElement = element.Elements.ElementAt(0) as ClassifiedTextElement;
                     if (textElement.Runs.Count() == 1)
                     {
                         var run = textElement.Runs.ElementAt(0);
                         return run.Text;
+                    }
+                    else if (textElement.Runs.Count() > 1)
+                    {
+                        if (textElement.Runs.ElementAt(0).Text.IndexOf("扩展到") != -1)
+                        {
+                            return null;
+                        }
+
+                        var str = new StringBuilder();
+                        foreach (var run in textElement.Runs)
+                        {
+                            var temp = run.Text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "");
+                            CSharp.StringPretreatment(ref temp);
+                            str.Append(temp);
+                        }
+                        return str.ToString();
                     }
                 }
             }
@@ -130,11 +164,15 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                 foreach (var i in strList)
                 {
                     var s = TranslateClient.Instance.HumpUnfold(i);
-                    var r = GeneralAnnotationData.Instance.IndexOf(s);
+                    var r = GeneralAnnotationData.Instance.IndexOf(s) ?? MethodAnnotationData.Instance.IndexOf(s);
                     if (r == null)
                     {
                         var recv = await TranslateClient.Instance.TranslateAsync(s);
-                        f.Add(recv);
+                        if (string.IsNullOrEmpty(recv.TargetText) == false)
+                        {
+                            f.Add(recv);
+                        }
+
                         GeneralAnnotationData.Instance.Add(recv);
                     }
                     else
@@ -179,6 +217,8 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                 var temp = (i == formats.Count - 1) ? "" : "\n";
                 if (formats[i].IsSuccess)
                 {
+                    runs.Add(new ClassifiedTextRun(
+                        PredefinedClassificationTypeNames.Keyword, $"[ok]"));
                     runs.Add(new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.Comment, $"{formats[i].TargetText}{temp}"));
                 }

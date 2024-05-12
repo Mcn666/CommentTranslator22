@@ -189,7 +189,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
         {
             var count = 0;
             var temp = str.TrimStart();
-            foreach (var s in str)
+            foreach (var s in temp)
             {
                 if (char.IsPunctuation(s))
                 {

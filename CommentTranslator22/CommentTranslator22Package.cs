@@ -40,6 +40,7 @@ namespace CommentTranslator22
 
             // 加载配置信息
             Config.ReloadSetting((CommentTranslator22Config)GetDialogPage(typeof(CommentTranslator22Config)));
+            Popups.TestSolutionEvents.Instance.Initialize();
         }
 
         #endregion

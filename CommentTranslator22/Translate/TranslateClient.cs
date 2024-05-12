@@ -81,22 +81,22 @@ namespace CommentTranslator22.Translate
             switch (CommentTranslator22Package.Config.TargetLanguage)
             {
                 case LanguageEnum.English:
-                    if (LanguageProportion.English(text) > 0.5f)
+                    if (LanguageProportion.English(text) > 0.4f)
                         return "EN?";
                     break;
                 case LanguageEnum.简体中文:
-                    if (LanguageProportion.Chinese(text) > 0.5f)
+                    if (LanguageProportion.Chinese(text) > 0.4f)
                         return "CN?";
                     break;
                 case LanguageEnum.日本語:
-                    if (LanguageProportion.Japanese(text) > 0.5f)
+                    if (LanguageProportion.Japanese(text) > 0.4f)
                         return "JA?";
                     break;
             }
 
             if (text.Length < MinTranslateLength || text.Length > MaxTranslateLength)
             {
-                return "LEN";
+                return "len";
             }
 
             if (CommentTranslator22Package.Config.SourceLanguage == CommentTranslator22Package.Config.TargetLanguage ||

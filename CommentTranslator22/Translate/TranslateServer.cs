@@ -110,15 +110,15 @@ namespace CommentTranslator22.Translate
         #region 百度翻译
         public class BaiduTranslationResult
         {
-            public string src;
-            public string dst;
+            public string src = null;
+            public string dst = null;
         }
 
         public class BaiduTranslationResponse
         {
-            public string from;
-            public string to;
-            public List<BaiduTranslationResult> trans_result;
+            public string from = null;
+            public string to = null;
+            public List<BaiduTranslationResult> trans_result = null;
         }
 
         /// <summary>

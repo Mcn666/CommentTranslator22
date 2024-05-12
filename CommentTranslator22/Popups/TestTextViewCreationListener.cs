@@ -11,7 +11,7 @@ namespace CommentTranslator22.Popups
     {
         public void TextViewCreated(IWpfTextView textView)
         {
-            TestSolutionEvents.Create();
+            TestSolutionEvents.Instance.Initialize();
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using CommentTranslator22.Translate.Format;
+using Microsoft.VisualStudio.LocalLogger;
+using Microsoft.VisualStudio.Shell;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -43,18 +45,13 @@ namespace CommentTranslator22.Translate.TranslateData
             public string SolutionPath;
             public string SolutionDataName;
             public int MaximumStorageCount = 1000;
-            public List<GeneralAnnotationDataFormat> DataFormats = new List<GeneralAnnotationDataFormat>();
+            public List<GeneralAnnotationDataFormat> DataFormats;
         }
 
         GeneralAnnotationDataFileFormat FileFormat { get; set; } = new GeneralAnnotationDataFileFormat();
 
         GeneralAnnotationData()
         {
-            //ThreadHelper.ThrowIfNotOnUIThread();
-            //var dte2 = Package.GetGlobalService(typeof(DTE)) as DTE2;
-            //var solution = dte2.Solution;
-            //SolutionName = Path.GetFileName(solution.FullName);     //解决方案名称
-            //SolutionPath = Path.GetDirectoryName(solution.FullName);//解决方案路径
             FileFormat.MainPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             FileFormat.MainPath += "/CommentTranslator22/GeneralAnnotationData";
             FileFormat.InfoFileName = $"{FileFormat.MainPath}/SolutionInfo.txt";
@@ -62,7 +59,11 @@ namespace CommentTranslator22.Translate.TranslateData
 
         public void ReadAllData()
         {
-            FileFormat.SolutionPath = Directory.GetCurrentDirectory();
+            var dte2 = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;
+            var solution = dte2.Solution;
+            FileFormat.SolutionName = Path.GetFileName(solution.FullName);     //解决方案名称
+            FileFormat.SolutionPath = Path.GetDirectoryName(solution.FullName);//解决方案路径
+            //FileFormat.SolutionPath = Directory.GetCurrentDirectory();
 
             AffirmLocalFolderExists();
             AffirmLocalFileExists();
@@ -106,9 +107,8 @@ namespace CommentTranslator22.Translate.TranslateData
 
         public void SaveAllData()
         {
-            // 通常解决方案所在的路径长度会大于 10，这是为了避免单个文件引起的混乱
-            // 如果列表中没有数据也不会进行保存
-            if (FileFormat.SolutionPath.Length < 10 || FileFormat.DataFormats.Count == 0)
+            if (FileFormat.SolutionPath == null || FileFormat.SolutionPath.Length < 10 ||
+                FileFormat.DataFormats == null || FileFormat.DataFormats.Count == 0)
             {
                 return;
             }

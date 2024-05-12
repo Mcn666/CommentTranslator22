@@ -7,25 +7,34 @@ namespace CommentTranslator22.Popups
 {
     public class TestSolutionEvents : IVsSolutionEvents
     {
-        private static TestSolutionEvents solutionEvents;
-        private IVsSolution solution;
-
-        public TestSolutionEvents()
+        public static TestSolutionEvents Instance
         {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-            this.solution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
-            this.solution.AdviseSolutionEvents(this, out uint solutionCookie);
-
-            // 现在是在解决方案打开后完成的实例化，需要执行一次OnAfterOpenSolution的代码
-            OnAfterOpenSolution(null, 0);
+            get
+            {
+                return Nested.instance;
+            }
         }
 
-        public static void Create()
+        class Nested
         {
-            if (solutionEvents == null)
-            {
-                solutionEvents = new TestSolutionEvents();
-            }
+            internal static TestSolutionEvents instance = new TestSolutionEvents();
+
+            static Nested() { }
+        }
+
+        private readonly IVsSolution solution;
+
+        TestSolutionEvents()
+        {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+            solution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
+            solution.AdviseSolutionEvents(this, out uint solutionCookie);
+
+            GeneralAnnotationData.Instance.ReadAllData();
+        }
+
+        public void Initialize()
+        {
         }
 
         public int OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded) =>
@@ -56,14 +65,17 @@ namespace CommentTranslator22.Popups
         public int OnQueryCloseSolution(object pUnkReserved, ref int pfCancel) =>
             Microsoft.VisualStudio.VSConstants.S_OK;
 
-        public int OnBeforeCloseSolution(object pUnkReserved) =>
-            Microsoft.VisualStudio.VSConstants.S_OK;
+        public int OnBeforeCloseSolution(object pUnkReserved)
+        {
+            // 通知侦听客户端解决方案关闭前
+            DictionaryUseData.Instance.SaveAllData();
+            MethodAnnotationData.Instance.SaveAllData();
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
 
         public int OnAfterCloseSolution(object pUnkReserved)
         {
             // 通知侦听客户端解决方案已关闭
-            DictionaryUseData.Instance.SaveAllData();
-            MethodAnnotationData.Instance.SaveAllData();
             GeneralAnnotationData.Instance.SaveAllData();
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }

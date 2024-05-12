@@ -4,7 +4,7 @@ namespace CommentTranslator22.Translate
 {
     /// <summary>
     /// 计算字符串相似度的算法
-    /// 此算法原地址：https://zhuanlan.zhihu.com/p/352503879
+    /// <a href ="https://zhuanlan.zhihu.com/p/352503879">来源地址</a>
     /// </summary>
     internal static class LevenshteinDistance
     {
