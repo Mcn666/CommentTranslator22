@@ -22,6 +22,15 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             return false;
         }
 
+        public static bool Check(string text, string str)
+        {
+            if (Regex.IsMatch(text, WildCardToRegular(str)))
+            {
+                return true;
+            }
+            return false;
+        }
+
         /// If you want to implement both "*" and "?"
         private static string WildCardToRegular(string value)
         {

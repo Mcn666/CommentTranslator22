@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="CommentTranslator22.f33792df-6136-403f-aee2-7e70b3657187" Version="1.2.8" Language="en-US" Publisher="McnF" />
+        <Identity Id="CommentTranslator22.f33792df-6136-403f-aee2-7e70b3657187" Version="1.2.9" Language="en-US" Publisher="McnF" />
         <DisplayName>CommentTranslator22</DisplayName>
         <Description xml:space="preserve">Empty descriptionEmpty description</Description>
     </Metadata>

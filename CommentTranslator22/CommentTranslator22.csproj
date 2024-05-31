@@ -50,6 +50,8 @@
     </Compile>
     <Compile Include="Popups\CompletionSource\TestCompletionSource.cs" />
     <Compile Include="Popups\CompletionSource\TestCompletionSourceProvider.cs" />
+    <Compile Include="Popups\QuickInfo\Comment\Support\CommentDispose.cs" />
+    <Compile Include="Popups\QuickInfo\Comment\Support\XAML.cs" />
     <Compile Include="Popups\QuickInfo\TestQuickInfoSource.cs" />
     <Compile Include="Popups\QuickInfo\TestQuickInfoSourceProvider.cs" />
     <Compile Include="Translate\LanguageProportion.cs" />
@@ -70,10 +72,13 @@
     <Compile Include="Translate\LanguageEnum.cs" />
     <Compile Include="Translate\Format\ApiRecvFormat.cs" />
     <Compile Include="Translate\Format\ApiSendFormat.cs" />
+    <Compile Include="Translate\Server\BaiduFanyi.cs" />
+    <Compile Include="Translate\Server\BingFanyi.cs" />
+    <Compile Include="Translate\Server\GoogleFanyi.cs" />
     <Compile Include="Translate\TranslateClient.cs" />
     <Compile Include="Translate\TranslateData\GeneralAnnotationData.cs" />
     <Compile Include="Translate\TranslateData\MethodAnnotationData.cs" />
-    <Compile Include="Translate\TranslateServer.cs" />
+    <Compile Include="Translate\Server\TranslateServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Dictionary\Data\words-a.json" />

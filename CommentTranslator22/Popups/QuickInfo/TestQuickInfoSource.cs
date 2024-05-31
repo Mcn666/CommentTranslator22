@@ -16,6 +16,8 @@ namespace CommentTranslator22.Popups.QuickInfo
         private ITextBuffer m_subjectBuffer;
         private bool disposedValue;
 
+        private string[] supportContentTypes = new string[] { "CSharp", "C/C++", "XML", "XAML" };
+
         public TestQuickInfoSource(TestQuickInfoSourceProvider quickInfoSourceProvider, ITextBuffer textBuffer)
         {
             this.m_provider = quickInfoSourceProvider;
@@ -26,9 +28,16 @@ namespace CommentTranslator22.Popups.QuickInfo
         {
             var beginTime = DateTime.UtcNow;
             var typeName = m_subjectBuffer.ContentType.TypeName;
-            if (typeName != "CSharp" && typeName != "C/C++")
+            for (int i = 0; i < supportContentTypes.Length; i++)
             {
-                return null;
+                if (typeName == supportContentTypes[i])
+                {
+                    break;
+                }
+                if (i == supportContentTypes.Length - 1)
+                {
+                    return null;
+                }
             }
 
             var subjectTriggerPoint = session.GetTriggerPoint(m_subjectBuffer.CurrentSnapshot);
@@ -40,11 +49,13 @@ namespace CommentTranslator22.Popups.QuickInfo
             var querySpan = new SnapshotSpan(subjectTriggerPoint.Value, 0);
             var currentSnapshot = subjectTriggerPoint.Value.Snapshot;
             var applicableToSpan = currentSnapshot.CreateTrackingSpan(querySpan, SpanTrackingMode.EdgeInclusive);
+            var snapshotPoint = subjectTriggerPoint.Value;
 
-            // 检查光标所指向的行
-            var navigator = m_provider.NavigatorService.GetTextStructureNavigator(m_subjectBuffer);
-            var span = navigator.GetExtentOfWord(subjectTriggerPoint.Value).Span;
-            var snapshotspan = span.Start;
+            // 获取给定位置的单词
+            // 使用 navigator.GetExtentOfWord 获取 XML、XAML 中的字符时会导致 VS 卡死
+            //var navigator = m_provider.NavigatorService.GetTextStructureNavigator(m_subjectBuffer);
+            //var span = navigator.GetExtentOfWord(subjectTriggerPoint.Value).Span;
+            var word = GetWordPosition(snapshotPoint.Snapshot.GetText(), snapshotPoint.Position);
 
             if (CommentTranslator22Package.Config.TranslateQuickInfoCommentText)
             {
@@ -62,7 +73,7 @@ namespace CommentTranslator22.Popups.QuickInfo
 
             if (CommentTranslator22Package.Config.TranslateGeneralCommentText)
             {
-                var temp = await CommentTranslate.TranslateAsync(snapshotspan);
+                var temp = await CommentTranslate.TranslateAsync(snapshotPoint);
                 if (temp != null && temp.Any() == true)
                 {
                     var time = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
@@ -74,9 +85,9 @@ namespace CommentTranslator22.Popups.QuickInfo
                 }
             }
 
-            if (CommentTranslator22Package.Config.UseDictionary)
+            if (CommentTranslator22Package.Config.UseDictionary && word != null)
             {
-                var temp = CommentTranslate.QueryDictionary(span.GetText().Trim());
+                var temp = CommentTranslate.QueryDictionary(word);
                 if (temp != null)
                 {
                     var time = (DateTime.UtcNow - beginTime).TotalSeconds.ToString();
@@ -88,6 +99,42 @@ namespace CommentTranslator22.Popups.QuickInfo
                 }
             }
             return null;
+        }
+
+        string GetWordPosition(string text, int position)
+        {
+            if (position < 0 || position >= text.Length)
+            {
+                return null;
+            }
+
+            // 获取单词边界
+            int strat = position;
+            int end = position;
+            while (strat >= 0)
+            {
+                if (char.IsWhiteSpace(text[strat]) || char.IsPunctuation(text[strat]) || char.IsSymbol(text[strat]))
+                {
+                    break;
+                }
+                strat--;
+            }
+            while (end < text.Length)
+            {
+                if (char.IsWhiteSpace(text[end]) || char.IsPunctuation(text[end]) || char.IsSymbol(text[end]))
+                {
+                    break;
+                }
+                end++;
+            }
+
+            if ((end > strat) == false)
+            {
+                return null;
+            }
+
+            // 返回单词
+            return text.Substring(strat + 1, end - strat - 1);
         }
 
         protected virtual void Dispose(bool disposing)

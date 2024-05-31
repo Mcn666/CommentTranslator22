@@ -9,10 +9,10 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 {
     internal class CSharp
     {
-        public static IEnumerable<string> SearechComment(SnapshotPoint snapshot)
+        public static IEnumerable<string> SearchComment(SnapshotPoint snapshot)
         {
             return SearchCommentScopeOne(snapshot)
-                ?? SearchCommentScopeTwo(snapshot);
+                ?? CommentDispose.SearchComment(snapshot, "/*", "*/");
         }
 
         static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
@@ -51,7 +51,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 
             // 检查鼠标所指向的这一行是否属于不执行翻译的类型
             currentLineText = splitResult[lineNumber].Substring(index + 2);
-            StringPretreatment(ref currentLineText);
+            CommentDispose.StringPretreatment(ref currentLineText);
             if (CommentTranslateInterrupt.Check(currentLineText))
             {
                 return null;
@@ -74,7 +74,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                     else
                     {
                         var temp = splitResult[lineNumber - i].Substring(index + 2).TrimEnd();
-                        StringPretreatment(ref temp);
+                        CommentDispose.StringPretreatment(ref temp);
                         if (temp == string.Empty || CommentTranslateInterrupt.Check(temp))
                         {
                             addPreviousLine = false;
@@ -96,7 +96,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                     else
                     {
                         var temp = splitResult[lineNumber + i].Substring(index + 2).TrimEnd();
-                        StringPretreatment(ref temp);
+                        CommentDispose.StringPretreatment(ref temp);
                         if (temp == "" || CommentTranslateInterrupt.Check(temp))
                         {
                             addNextLine = false;
@@ -114,93 +114,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                 return null;
             }
 
-            return ResultDispose(ref lines);
-        }
-
-        static IEnumerable<string> SearchCommentScopeTwo(SnapshotPoint snapshot)
-        {
-            var pos = snapshot.Position;
-            var str = snapshot.Snapshot.GetText();
-
-            var index1 = str.LastIndexOf("/*", pos);
-            if (index1 != -1)
-            {
-                var temp = str.LastIndexOf("*/", pos);
-                if (temp != -1 && temp > index1)
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return null;
-            }
-
-            var index2 = str.IndexOf("*/", pos);
-            if (index2 != -1)
-            {
-                var temp = str.IndexOf("/*", pos);
-                if (temp != -1 && temp < index2)
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return null;
-            }
-
-            var splitResult = str.Substring(index1 + 2, index2 - index1 - 2).Replace("\r\n", "\n").Split('\n');
-            var lines = new List<string>();
-            var linesTextLength = 0;
-            foreach (var line in splitResult)
-            {
-                var temp = line;
-                StringPretreatment(ref temp);
-                linesTextLength += temp.Length;
-                lines.Add(temp);
-            }
-            if (linesTextLength > TranslateClient.Instance.MaxTranslateLength)
-            {
-                return null;
-            }
-
-            return ResultDispose(ref lines);
-        }
-
-        static IEnumerable<string> ResultDispose(ref List<string> ls)
-        {
-            if (ls.Count > 1)
-            {
-                if (ls.Last().Length < TranslateClient.Instance.MinTranslateLength)
-                {
-                    var temp = ls.Count - 2;
-                    if (ls[temp].Length > TranslateClient.Instance.MinTranslateLength)
-                    {
-                        ls[temp] = ls[temp] + " " + ls.Last();
-                        ls.RemoveAt(temp + 1);
-                    }
-                }
-            }
-            return ls;
-        }
-
-        public static void StringPretreatment(ref string str)
-        {
-            var count = 0;
-            var temp = str.TrimStart();
-            foreach (var s in temp)
-            {
-                if (char.IsPunctuation(s))
-                {
-                    count++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            str = temp.Substring(count).Trim();
+            return CommentDispose.StringPretreatment(ref lines);
         }
     }
 }

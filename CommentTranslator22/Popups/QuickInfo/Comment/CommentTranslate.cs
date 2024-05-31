@@ -30,12 +30,13 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             var str = TryGetMethodInformation(session, typeName);
             if (str != null)
             {
-                CSharp.StringPretreatment(ref str);
-                var s = TranslateClient.Instance.HumpUnfold(str);
+                CommentDispose.StringPretreatment(ref str);
+                //var s = TranslateClient.Instance.HumpUnfold(str);
+                var s = str;
                 var r = MethodAnnotationData.Instance.IndexOf(s) ?? GeneralAnnotationData.Instance.IndexOf(s);
                 if (r == null)
                 {
-                    var recv = await TranslateClient.Instance.TranslateAsync(str);
+                    var recv = await TranslateClient.Instance.TranslateAsync(s);
                     if (string.IsNullOrEmpty(recv.TargetText) == false)
                     {
                         // 在这里将翻译后的方法注释保存到 ?? 方法中
@@ -72,7 +73,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             if (session.Properties.PropertyList.Count > 0)
             {
                 // 这个 Value 的类型应该为 Microsoft.VisualStudio.Language.Intellisense.Implementation.LegacyQuickInfoSession
-                // 但是我还没有找到这个类型所在的命名空间，现在使用的是类型强转
+                // 但是我还没有找到这个类型所在的命名空间，现在使用的是类型尝试转换，如果转换不成会返回 null
                 var quick = session.Properties.PropertyList[0].Value as IQuickInfoSession;
                 foreach (ContainerElement i in quick.QuickInfoContent.Cast<ContainerElement>())
                 {
@@ -130,7 +131,8 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                     }
                     else if (textElement.Runs.Count() > 1)
                     {
-                        if (textElement.Runs.ElementAt(0).Text.IndexOf("扩展到") != -1)
+                        if (textElement.Runs.ElementAt(0).Text.IndexOf("扩展到:") != -1 ||
+                            textElement.Runs.ElementAt(0).Text.IndexOf("大小:") != -1)
                         {
                             return null;
                         }
@@ -139,7 +141,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                         foreach (var run in textElement.Runs)
                         {
                             var temp = run.Text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "");
-                            CSharp.StringPretreatment(ref temp);
+                            CommentDispose.StringPretreatment(ref temp);
                             str.Append(temp);
                         }
                         return str.ToString();
@@ -157,23 +159,24 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         public static async Task<IEnumerable<ClassifiedTextRun>> TranslateAsync(SnapshotPoint snapshot)
         {
             List<ClassifiedTextRun> classifieds = new List<ClassifiedTextRun>();
-            var strList = SearchComment(snapshot);
+            var strList = CommentDispose.SearchComment(snapshot);
             if (strList != null)
             {
-                var f = new List<ApiRecvFormat>();
+                var recvs = new List<ApiRecvFormat>();
                 foreach (var i in strList)
                 {
-                    var s = TranslateClient.Instance.HumpUnfold(i);
+                    //var s = TranslateClient.Instance.HumpUnfold(i);
+                    var s = i;
                     var r = GeneralAnnotationData.Instance.IndexOf(s) ?? MethodAnnotationData.Instance.IndexOf(s);
                     if (r == null)
                     {
                         var recv = await TranslateClient.Instance.TranslateAsync(s);
                         if (string.IsNullOrEmpty(recv.TargetText) == false)
                         {
-                            f.Add(recv);
+                            GeneralAnnotationData.Instance.Add(recv);
                         }
 
-                        GeneralAnnotationData.Instance.Add(recv);
+                        recvs.Add(recv);
                     }
                     else
                     {
@@ -182,30 +185,13 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                             Message = "buf",
                             TargetText = r,
                         };
-                        f.Add(recv);
+                        recvs.Add(recv);
                     }
                 }
-                CreateClassifiedTextRun(f, out var runs);
+                CreateClassifiedTextRun(recvs, out var runs);
                 classifieds.AddRange(runs);
             }
             return await Task.FromResult(classifieds);
-        }
-
-        /// <summary>
-        /// TranslateAsync 方法需要使用的部分
-        /// </summary>
-        /// <param name="snapshot"></param>
-        /// <returns></returns>
-        static IEnumerable<string> SearchComment(SnapshotPoint snapshot)
-        {
-            var typeName = snapshot.Snapshot.TextBuffer.ContentType.TypeName;
-            switch (typeName)
-            {
-                case "C/C++":
-                case "CSharp":
-                    return CSharp.SearechComment(snapshot);
-            }
-            return null;
         }
 
         static void CreateClassifiedTextRun(List<ApiRecvFormat> formats, out List<ClassifiedTextRun> runs)
@@ -250,7 +236,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             if (CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.简体中文
                 && Regex.IsMatch(str, "[\u4e00-\u9fff]") == false)
             {
-                var words = GetWordAnrray(str);
+                var words = GetWords(str);
                 if (words != null)
                 {
                     var result = "";
@@ -283,8 +269,11 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                             }, DictionaryUseData.StorageEnum.Unfound);
                         }
                     }
-                    return new ClassifiedTextRun(
-                    PredefinedClassificationTypeNames.Comment, $"{result.TrimEnd('\n')}");
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        return new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, $"{result.TrimEnd('\n')}");
+                    }
+
                 }
             }
             return null;
@@ -295,7 +284,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        static IEnumerable<object> GetWordAnrray(string text)
+        static IEnumerable<object> GetWords(string text)
         {
             if (string.IsNullOrEmpty(text) || text.Length < 2 || text.Length > 50)
             {

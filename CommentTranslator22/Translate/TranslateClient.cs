@@ -1,4 +1,5 @@
 ﻿using CommentTranslator22.Translate.Format;
+using CommentTranslator22.Translate.Server;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -102,7 +103,7 @@ namespace CommentTranslator22.Translate
             if (CommentTranslator22Package.Config.SourceLanguage == CommentTranslator22Package.Config.TargetLanguage ||
                 CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.Auto)
             {
-                return "?>?";
+                return "?-?";
             }
 
             return null;
