@@ -1,1358 +1,200 @@
 [
   {
-    "en": "xa",
-    "zh": "abbr.辅助放大器（AuxiliaryAmplifier）"
+    "cht": "xml",
+    "en": "xml",
+    "zh": "xml",
+    "ja": "xml"
   },
   {
-    "en": "xanadu",
-    "zh": "n.华厦,行宫,世外桃源"
+    "cht": "xunit",
+    "en": "xunit",
+    "zh": "xunit",
+    "ja": "xunit"
   },
   {
-    "en": "xanth",
-    "zh": "[医][=xanthomatosis]黄瘤病，黄脂增生病"
-  },
-  {
-    "en": "xanthaline",
-    "zh": "(=papaveraldine)鸦片黄,罂粟酮碱"
-  },
-  {
-    "en": "xanthamide",
-    "zh": "[医]黄原酰胺"
-  },
-  {
-    "en": "xanthan",
-    "zh": "n.黄原胶（增稠剂和稳定剂在食品工业,医学和药学领域）"
-  },
-  {
-    "en": "xanthane",
-    "zh": "苍耳烷"
-  },
-  {
-    "en": "xanthate",
-    "zh": "n.黄原酸盐;[化]黄原酸盐(或酯)"
-  },
-  {
-    "en": "xanthates",
-    "zh": "黄原酸盐"
-  },
-  {
-    "en": "xanthation",
-    "zh": "黄原酸化作用,黄化"
-  },
-  {
-    "en": "xanthe",
-    "zh": "n.赞茜(f.)"
-  },
-  {
-    "en": "xanthein",
-    "zh": "n.黄色色素,花黄素"
-  },
-  {
-    "en": "xanthelasma",
-    "zh": "[医]黄斑瘤"
-  },
-  {
-    "en": "xanthelasmoidea",
-    "zh": "[医]类黄瘤,着色性荨麻疹"
-  },
-  {
-    "en": "xanthene",
-    "zh": "n.[化](夹)氧杂蒽"
-  },
-  {
-    "en": "xanthian",
-    "zh": "a.赞西亚的（土耳其西南部一城市）"
-  },
-  {
-    "en": "xanthic",
-    "zh": "a.黄色的,黄嘌呤的,带黄色的;[医]黄色的,黄嘌呤的"
-  },
-  {
-    "en": "xanthide",
-    "zh": "[医]植物黄质化物"
-  },
-  {
-    "en": "xanthydrol",
-    "zh": "(=9-hydroxyxanthene)吨氢醇,9-羟基吨"
-  },
-  {
-    "en": "xanthyl",
-    "zh": "(=xanthenyl)吨基,氧(杂)蒽基"
-  },
-  {
-    "en": "xanthin",
-    "zh": "n.叶黄素;[医]植物黄质"
-  },
-  {
-    "en": "xanthine",
-    "zh": "n.黄质,黄嘌呤;[化]黄嘌呤"
-  },
-  {
-    "en": "xanthines",
-    "zh": "(xanthine的第三人称-s形式)n.黄质,黄嘌呤;[化]黄嘌呤"
-  },
-  {
-    "en": "xanthinuria",
-    "zh": "n.[医]黄嘌呤尿"
-  },
-  {
-    "en": "xanthippe",
-    "zh": "n.粘西比(苏格拉底之妻),悍妇"
-  },
-  {
-    "en": "xanthism",
-    "zh": "n.黄色素过多症"
-  },
-  {
-    "en": "xanthite",
-    "zh": "黄符山石"
-  },
-  {
-    "en": "xanthium",
-    "zh": "n.苔儿属"
-  },
-  {
-    "en": "xanthiuria",
-    "zh": "[医]黄嘌呤尿"
-  },
-  {
-    "en": "xantho",
-    "zh": "扇蟹属"
-  },
-  {
-    "en": "xanthocarpous",
-    "zh": "a.[植]有黄色果实的"
-  },
-  {
-    "en": "xanthochroi",
-    "zh": "pl.白色人种"
-  },
-  {
-    "en": "xanthochroia",
-    "zh": "[医]黄变,黄化(皮肤)"
-  },
-  {
-    "en": "xanthochroic",
-    "zh": "a.白种人的"
-  },
-  {
-    "en": "xanthochroid",
-    "zh": "发肤颜色甚浅的人"
-  },
-  {
-    "en": "xanthochroism",
-    "zh": "n.(某些动物尤指水族馆金鱼的)黄色现象"
-  },
-  {
-    "en": "xanthochromia",
-    "zh": "[医]黄变(脑脊液或皮肤)"
-  },
-  {
-    "en": "xanthochromic",
-    "zh": "[医]黄变的,黄色的"
-  },
-  {
-    "en": "xanthochroous",
-    "zh": "a.(皮肤和头发)呈淡黄色的,带黄色的"
-  },
-  {
-    "en": "xanthocyanopsia",
-    "zh": "红绿色盲,黄蓝视症"
-  },
-  {
-    "en": "xanthocobaltic",
-    "zh": "黄钴基团"
-  },
-  {
-    "en": "xanthoconite",
-    "zh": "n.[矿]黄砷硫银矿"
-  },
-  {
-    "en": "xanthocreatinine",
-    "zh": "黄肌酸酐"
-  },
-  {
-    "en": "xanthoderm",
-    "zh": "[医]黄肤者,黄种人"
-  },
-  {
-    "en": "xanthoderma",
-    "zh": "黄色皮肤"
-  },
-  {
-    "en": "xanthodont",
-    "zh": "a.[动]有黄齿的"
-  },
-  {
-    "en": "xanthodontous",
-    "zh": "[医]黄牙的"
-  },
-  {
-    "en": "xanthogen",
-    "zh": "黄原"
-  },
-  {
-    "en": "xanthogenamide",
-    "zh": "乙黄原酰胺"
-  },
-  {
-    "en": "xanthogenate",
-    "zh": "n.[化]黄原酸盐"
-  },
-  {
-    "en": "xanthogenic",
-    "zh": "黄酸盐的"
-  },
-  {
-    "en": "xanthoma",
-    "zh": "n.黄瘤,黄疣,黄色瘤;[医]黄瘤"
-  },
-  {
-    "en": "xanthomatosis",
-    "zh": "n.[医]黄瘤症"
-  },
-  {
-    "en": "xanthomatous",
-    "zh": "[医]黄瘤的"
-  },
-  {
-    "en": "xanthomelanous",
-    "zh": "a.有橄榄色(或黄色)皮肤和黑色头发的"
-  },
-  {
-    "en": "xanthometer",
-    "zh": "水色计"
-  },
-  {
-    "en": "xanthomyeloma",
-    "zh": "[医]黄髓瘤,黄肉瘤"
-  },
-  {
-    "en": "xanthomonas",
-    "zh": "[医]黄[单胞]杆菌属"
-  },
-  {
-    "en": "xanthone",
-    "zh": "n.[化]一种化学原料(为杀虫剂及合成染料)"
-  },
-  {
-    "en": "xanthophane",
-    "zh": "视网膜黄素"
-  },
-  {
-    "en": "xanthophyceae",
-    "zh": "黄藻"
-  },
-  {
-    "en": "xanthophyl",
-    "zh": "n.叶黄素,胡萝卜醇"
-  },
-  {
-    "en": "xanthophyll",
-    "zh": "[医]叶黄素"
-  },
-  {
-    "en": "xanthophyllite",
-    "zh": "黄绿脆云毋"
-  },
-  {
-    "en": "xanthophore",
-    "zh": "n.[生]黄色素细胞"
-  },
-  {
-    "en": "xanthophose",
-    "zh": "[医]黄色幻视"
-  },
-  {
-    "en": "xanthopia",
-    "zh": "[医]黄视症"
-  },
-  {
-    "en": "xanthopicrin",
-    "zh": "秦椒黄"
-  },
-  {
-    "en": "xanthopicrite",
-    "zh": "[医]花椒树脂"
-  },
-  {
-    "en": "xanthoproteic",
-    "zh": "a.黄色蛋白质的"
-  },
-  {
-    "en": "xanthoprotein",
-    "zh": "n.[生化]黄色蛋白"
-  },
-  {
-    "en": "xanthopsia",
-    "zh": "n.黄幻视,视物显黄症,黄视症;[医]黄视症"
-  },
-  {
-    "en": "xanthopsydracia",
-    "zh": "[医]黄脓皮病"
-  },
-  {
-    "en": "xanthopsin",
-    "zh": "视黄质,眼黄素(昆虫)"
-  },
-  {
-    "en": "xanthopterin",
-    "zh": "黄蝶呤,2-氨基-4,6-二羟基蝶呤"
-  },
-  {
-    "en": "xanthopurpurin",
-    "zh": "(=purpuroxanthin)1,3-二羟基蒽醌"
-  },
-  {
-    "en": "xanthorhamnin",
-    "zh": "黄色鼠李苷"
-  },
-  {
-    "en": "xanthorrhiza",
-    "zh": "(=xanthorhiza)黄根树"
-  },
-  {
-    "en": "xanthorrhoea",
-    "zh": "[医]澳洲香树,香树脂"
-  },
-  {
-    "en": "xanthosiderite",
-    "zh": "n.黄针铁矿"
-  },
-  {
-    "en": "xanthosis",
-    "zh": "n.黄肤症,黄变病"
-  },
-  {
-    "en": "xanthosoma",
-    "zh": "[医]黄体芋属"
-  },
-  {
-    "en": "xanthospermous",
-    "zh": "a.[植]有黄色种子的"
-  },
-  {
-    "en": "xanthous",
-    "zh": "a.黄色的,黄色人种的,蒙古人种的;[医]黄的,黄色的"
-  },
-  {
-    "en": "xanthoxenite",
-    "zh": "黄磷铁钙矿"
-  },
-  {
-    "en": "xanthoxylin",
-    "zh": "[医]花椒素,秦椒素"
-  },
-  {
-    "en": "xanthuria",
-    "zh": "[医]黄嘌呤尿"
-  },
-  {
-    "en": "xanthus",
-    "zh": "n.克桑托斯（土耳其古城）"
-  },
-  {
-    "en": "xantippe",
-    "zh": "n.粘西比(苏格拉底之妻),悍妇,泼妇"
-  },
-  {
-    "en": "xat",
-    "zh": "n.为纪念死者的雕刻柱"
-  },
-  {
-    "en": "xavier",
-    "zh": "n.泽维尔（男子名）"
-  },
-  {
-    "en": "xb",
-    "zh": "abbr.crossbar纵横开关;交叉棒;闩;explodingbridgewire爆炸桥丝点火器（代号）"
-  },
-  {
-    "en": "xc",
-    "zh": "abbr.电抗;电容（CapacitiveReactance）"
-  },
-  {
-    "en": "xcl",
-    "zh": "abbr.excesscurrentliabilities短期债务逾额（代号）"
-  },
-  {
-    "en": "xd",
-    "zh": "abbr.无红利（ex-dividend）"
-  },
-  {
-    "en": "xdr",
-    "zh": "外部数据表示协议"
-  },
-  {
-    "en": "xe",
-    "zh": "[医]氙(45号元素)"
-  },
-  {
-    "en": "xebec",
-    "zh": "n.三桅小帆船"
-  },
-  {
-    "en": "xeme",
-    "zh": "n.[鸟]北极鸥"
-  },
-  {
-    "en": "xen",
-    "zh": "abbr.Xenia种子直感，异粉性;Xenos（希腊语）陌生（的）"
-  },
-  {
-    "en": "xena",
-    "zh": "n.齐娜（行星名称）"
-  },
-  {
-    "en": "xenarthra",
-    "zh": "异关节类"
-  },
-  {
-    "en": "xenelasia",
-    "zh": "n.抗拒外人的条例"
-  },
-  {
-    "en": "xenia",
-    "zh": "[医]种子直感"
-  },
-  {
-    "en": "xenial",
-    "zh": "a.异花受粉的"
-  },
-  {
-    "en": "xenicidae",
-    "zh": "[网络]异鹩科;鹪鹩"
-  },
-  {
-    "en": "xenicus",
-    "zh": "[网络]异鹩属;鹪鹩类;刺鹩属"
-  },
-  {
-    "en": "xenyl",
-    "zh": "[化]联苯基;[医]联苯基"
-  },
-  {
-    "en": "xenylamine",
-    "zh": "苯基苯胺"
-  },
-  {
-    "en": "xenium",
-    "zh": "n.赠与宾客的礼物"
-  },
-  {
-    "en": "xeno",
-    "zh": "abbr.xenophobe仇外;xenophobia仇外;xenogenic异种的;xenolithic外来石的"
-  },
-  {
-    "en": "xeno",
-    "zh": "abbr.xenophobe仇外;xenophobia仇外;xenogenic异种的;xenolithic外来石的"
-  },
-  {
-    "en": "xenobiology",
-    "zh": "n.外(层)空(间)生物学,宇宙生物学"
-  },
-  {
-    "en": "xenobiosis",
-    "zh": "宾主共栖"
-  },
-  {
-    "en": "xenoblast",
-    "zh": "他形变晶"
-  },
-  {
-    "en": "xenocrates",
-    "zh": "n.齐诺克雷蒂（古希腊哲学家）"
-  },
-  {
-    "en": "xenocryst",
-    "zh": "n.[矿]捕获晶"
-  },
-  {
-    "en": "xenodiagnosis",
-    "zh": "n.异体接种诊断法,病媒接种诊断法;[医]动物接种诊断"
-  },
-  {
-    "en": "xenodiagnostic",
-    "zh": "[医]异体接种诊断的,宿主诊断的"
-  },
-  {
-    "en": "xenodochium",
-    "zh": "n.(中世纪时收容香客,异乡人,病人的)救济院"
-  },
-  {
-    "en": "xenogamy",
-    "zh": "n.异株异花受粉"
-  },
-  {
-    "en": "xenogamous",
-    "zh": "a.异花受粉的"
-  },
-  {
-    "en": "xenogeneic",
-    "zh": "a.[生]异种的,异基因的"
-  },
-  {
-    "en": "xenogenesis",
-    "zh": "n.自然发生,世代交替,亲子异型;[医]世代交替,异配生殖,亲子异形"
-  },
-  {
-    "en": "xenogenetic",
-    "zh": "a.自然发生的,世代交替的"
-  },
-  {
-    "en": "xenogeny",
-    "zh": "n.[生物]自然发生,世代交替"
-  },
-  {
-    "en": "xenogenic",
-    "zh": "异种的,异基因的"
-  },
-  {
-    "en": "xenogenous",
-    "zh": "由体外原因发生的,体外性的,异体的"
-  },
-  {
-    "en": "xenoglossia",
-    "zh": "n.(自称具有的)讲陌生语言的能力"
-  },
-  {
-    "en": "xenograft",
-    "zh": "n.异种皮移植"
-  },
-  {
-    "en": "xenolite",
-    "zh": "重夕线石"
-  },
-  {
-    "en": "xenolith",
-    "zh": "n.[地]捕虏体,捕虏岩(指火成岩中与其无成因关系的包体)"
-  },
-  {
-    "en": "xenolithic",
-    "zh": "a.xenolith的变形"
-  },
-  {
-    "en": "xenoliths",
-    "zh": "(xenolith的复数)n.[地]捕虏体,捕虏岩(指火成岩中与其无成因关系的包体)"
-  },
-  {
-    "en": "xenomania",
-    "zh": "n.外国迷,外国狂"
-  },
-  {
-    "en": "xenomorphic",
-    "zh": "a.[矿]他形的"
-  },
-  {
-    "en": "xenon",
-    "zh": "n.氙;[化]氙Xe"
-  },
-  {
-    "en": "xenoparasite",
-    "zh": "异常寄生物"
-  },
-  {
-    "en": "xenophanes",
-    "zh": "色诺芬尼(公元前6世纪的希腊哲学家、诗人)"
-  },
-  {
-    "en": "xenophile",
-    "zh": "n.喜爱外国人及其文物者,亲外者"
-  },
-  {
-    "en": "xenophobe",
-    "zh": "n.畏惧和憎恨外国人的人;[法]仇视外国人,恐惧外国人者,害怕生人者"
-  },
-  {
-    "en": "xenophobia",
-    "zh": "n.无端畏惧和憎恨外国人/陌生人,对外国人的畏惧和憎恨;[医]生客恐怖"
-  },
-  {
-    "en": "xenophobic",
-    "zh": "a.畏惧和憎恨外国人的;[法]仇外的,恐惧外国人的"
-  },
-  {
-    "en": "xenophon",
-    "zh": "色诺芬(约公元前434-前355,希腊将军,历史学家,著有《长征记》一书)"
-  },
-  {
-    "en": "xenophthalmia",
-    "zh": "异物性眼炎"
-  },
-  {
-    "en": "xenopodidae",
-    "zh": "[网络]科为爪蟾科;非洲有爪蛙"
-  },
-  {
-    "en": "xenopsylla",
-    "zh": "[医]客蚤属"
-  },
-  {
-    "en": "xenopus",
-    "zh": "[医]非洲蟾蜍属"
-  },
-  {
-    "en": "xenosauridae",
-    "zh": "异蜥科"
-  },
-  {
-    "en": "xenosaurus",
-    "zh": "[网络]细长墨西哥蜥蜴"
-  },
-  {
-    "en": "xenotime",
-    "zh": "n.[矿]磷钇矿"
-  },
-  {
-    "en": "xenotropic",
-    "zh": "a.[微](病毒)向异的,亲异的"
-  },
-  {
-    "en": "xer",
-    "zh": "abbr.Xeroxreproduction静电印刷复制品"
-  },
-  {
-    "en": "xeransis",
-    "zh": "n.干燥,除湿;[医]干燥,除湿"
-  },
-  {
-    "en": "xeranthemum",
-    "zh": "n.一年生灰毛菊"
-  },
-  {
-    "en": "xerantic",
-    "zh": "a.除湿的,使干燥的"
-  },
-  {
-    "en": "xerarch",
-    "zh": "a.在干旱地发展的"
-  },
-  {
-    "en": "xerasia",
-    "zh": "n.[医]干发病"
-  },
-  {
-    "en": "xeres",
-    "zh": "n.为Jerez的旧称"
-  },
-  {
-    "en": "xeric",
-    "zh": "a.干旱的,环境干燥的,耐旱的,沙漠般的"
-  },
-  {
-    "en": "xero",
-    "zh": "n.鑫元鸿（台湾公司名）"
-  },
-  {
-    "en": "xerocline",
-    "zh": "旱坡"
-  },
-  {
-    "en": "xeroderma",
-    "zh": "n.干皮病,皮肤干燥病;[医]干皮病,皮肤干燥病"
-  },
-  {
-    "en": "xerodermatic",
-    "zh": "[医]干皮病的,皮肤干燥的"
-  },
-  {
-    "en": "xerodermia",
-    "zh": "[医]干皮病,皮肤干燥病"
-  },
-  {
-    "en": "xerodermic",
-    "zh": "干皮病的"
-  },
-  {
-    "en": "xerogel",
-    "zh": "干凝胶"
-  },
-  {
-    "en": "xerography",
-    "zh": "n.静电复印术;[计]静电复印术;干印法"
-  },
-  {
-    "en": "xerographic",
-    "zh": "a.静电印刷(术);[计]静电的"
-  },
-  {
-    "en": "xerographically",
-    "zh": "静电印刷术"
-  },
-  {
-    "en": "xeroma",
-    "zh": "n.[医]干性眼炎,干眼病"
-  },
-  {
-    "en": "xeromenia",
-    "zh": "干经,干性月经"
-  },
-  {
-    "en": "xeromorph",
-    "zh": "n.[植]旱生型,旱生植物"
-  },
-  {
-    "en": "xeromorphy",
-    "zh": "n.旱性形态植物"
-  },
-  {
-    "en": "xeromorphic",
-    "zh": "a.[植]旱性结构的,旱生型的"
-  },
-  {
-    "en": "xerophagy",
-    "zh": "n.[宗](东派教会尊奉的)严斋"
-  },
-  {
-    "en": "xerophagia",
-    "zh": "[医]干食,干食法"
-  },
-  {
-    "en": "xerophil",
-    "zh": "n.旱生植物"
-  },
-  {
-    "en": "xerophile",
-    "zh": "n.旱生植物"
-  },
-  {
-    "en": "xerophily",
-    "zh": "n.[生]适旱性"
-  },
-  {
-    "en": "xerophyllum",
-    "zh": "[网络]旱叶百合属;北美药草;百合科旱叶草"
-  },
-  {
-    "en": "xerophilous",
-    "zh": "a.适旱的,好旱的,旱栖的"
-  },
-  {
-    "en": "xerophyte",
-    "zh": "n.旱生植物"
-  },
-  {
-    "en": "xerophytic",
-    "zh": "旱生性的"
-  },
-  {
-    "en": "xerophytism",
-    "zh": "n.适旱性,喜旱性"
-  },
-  {
-    "en": "xerophobous",
-    "zh": "a.[植]避旱的"
-  },
-  {
-    "en": "xerophthalmia",
-    "zh": "n.眼干燥,干眼病;[医]眼干燥,干眼病"
-  },
-  {
-    "en": "xerophthalmic",
-    "zh": "xerophthalmia的变形"
-  },
-  {
-    "en": "xeroprinting",
-    "zh": "[电]干式印刷"
-  },
-  {
-    "en": "xerosere",
-    "zh": "n.[植]旱生演替系列"
-  },
-  {
-    "en": "xerosis",
-    "zh": "n.干燥病;[医]干燥[病]"
-  },
-  {
-    "en": "xerostomia",
-    "zh": "n.[医]口腔干燥"
-  },
-  {
-    "en": "xerotes",
-    "zh": "[医]干燥"
-  },
-  {
-    "en": "xerothermic",
-    "zh": "a.干热的,适于干热环境的"
-  },
-  {
-    "en": "xerotic",
-    "zh": "a.干燥病的,有干燥特征的"
-  },
-  {
-    "en": "xerotocia",
-    "zh": "[医]干产"
-  },
-  {
-    "en": "xerotripsis",
-    "zh": "[医]干擦"
-  },
-  {
-    "en": "xerox",
-    "zh": "v.静电复印"
-  },
-  {
-    "en": "xeroxed",
-    "zh": "v.复印,影印(Xerox的过去式和过去分词)"
-  },
-  {
-    "en": "xeroxes",
-    "zh": "(xerox的复数)vt.静电复印;vi.静电复印"
-  },
-  {
-    "en": "xeroxing",
-    "zh": "n.复印的"
-  },
-  {
-    "en": "xerus",
-    "zh": "[医]干毛地松鼠"
-  },
-  {
-    "en": "xerxes",
-    "zh": "n.薛西斯;赛瑟斯（波斯王）"
-  },
-  {
-    "en": "xfer",
-    "zh": "[计]传输,传递,转移"
-  },
-  {
-    "en": "xhosa",
-    "zh": "n.科萨人使用的班图语;科萨人（居住在南非开普省的牧民）"
-  },
-  {
-    "en": "xi",
-    "zh": "n.希腊字母的第14个字母;粒子（等于xiparticle）"
-  },
-  {
-    "en": "xian",
-    "zh": "n.西安（中国地名）"
-  },
-  {
-    "en": "xie",
-    "zh": "n.谢（中国姓氏名）"
-  },
-  {
-    "en": "xii",
-    "zh": "num.罗马数字12"
-  },
-  {
-    "en": "xiii",
-    "zh": "num.罗马数字13"
-  },
-  {
-    "en": "xylan",
-    "zh": "n.[植]木聚糖"
-  },
-  {
-    "en": "xylanthrax",
-    "zh": "n.木炭"
-  },
-  {
-    "en": "xylaria",
-    "zh": "[网络]炭角菌属;炭棒菌属;炭团菌属"
-  },
-  {
-    "en": "xylariaceae",
-    "zh": "[网络]炭角菌科;炭棒科;鹿角菌科"
-  },
-  {
-    "en": "xylem",
-    "zh": "n.木质部;[医]木质部(植物纤维束的)"
-  },
-  {
-    "en": "xylene",
-    "zh": "n.二甲苯;[化]二甲苯"
-  },
-  {
-    "en": "xylenol",
-    "zh": "n.[化]二甲苯酚"
-  },
-  {
-    "en": "xylic",
-    "zh": "a.木质部的;二甲苯甲酸的"
-  },
-  {
-    "en": "xylidine",
-    "zh": "n.二甲代苯胺;[化]二甲苯胺"
-  },
-  {
-    "en": "xylyl",
-    "zh": "n.二甲苯基,甲苄基;[化]二甲苯基;甲苄基"
-  },
-  {
-    "en": "xylylene",
-    "zh": "n.苯撑二甲基;[化]苯二甲基"
-  },
-  {
-    "en": "xylindein",
-    "zh": "[医]盘菌木素,碗菌木素(染料)"
-  },
-  {
-    "en": "xylite",
-    "zh": "[机]木糖醇"
-  },
-  {
-    "en": "xylitol",
-    "zh": "n.[化]木糖醇"
-  },
-  {
-    "en": "xylitone",
-    "zh": "[医]丙酮油"
-  },
-  {
-    "en": "xylo",
-    "zh": "利多卡因、硫双二氯酚、维生素D2复合制剂(消炎、镇痛外用药)"
-  },
-  {
-    "en": "xylobalsamum",
-    "zh": "(吉利亚德产的)香树脂"
-  },
-  {
-    "en": "xylocarp",
-    "zh": "n.木质果"
-  },
-  {
-    "en": "xylocarpous",
-    "zh": "a.木质果的"
-  },
-  {
-    "en": "xylocopa",
-    "zh": "[网络]木蜂属"
-  },
-  {
-    "en": "xylocopidae",
-    "zh": "木蜂科"
-  },
-  {
-    "en": "xylogen",
-    "zh": "n.木质素,木纤维"
-  },
-  {
-    "en": "xyloglyphy",
-    "zh": "n.木刻术"
-  },
-  {
-    "en": "xylograph",
-    "zh": "n.木版,木版画,木刻版"
-  },
-  {
-    "en": "xylographer",
-    "zh": "n.木刻者"
-  },
-  {
-    "en": "xylography",
-    "zh": "n.木刻(术),木版画印画法"
-  },
-  {
-    "en": "xylographic",
-    "zh": "a.木刻的,木版的,木版画的"
-  },
-  {
-    "en": "xylographical",
-    "zh": "a.木刻的,木版的,木版画的"
-  },
-  {
-    "en": "xyloid",
-    "zh": "a.木质的,似木质的"
-  },
-  {
-    "en": "xyloidin",
-    "zh": "[医]木炸药,赛劳丁硝化淀粉(一种炸药)"
-  },
-  {
-    "en": "xyloyl",
-    "zh": "(=dimethylbenzoyl)二甲苯酰"
-  },
-  {
-    "en": "xylol",
-    "zh": "n.混合二甲苯;[化]二甲苯"
-  },
-  {
-    "en": "xylology",
-    "zh": "n.树木构造学"
-  },
-  {
-    "en": "xyloma",
-    "zh": "菌核荚"
-  },
-  {
-    "en": "xylomancy",
-    "zh": "n.木片占卜术"
-  },
-  {
-    "en": "xylometer",
-    "zh": "n.木材比重计"
-  },
-  {
-    "en": "xylon",
-    "zh": "木质,木纤维"
-  },
-  {
-    "en": "xylonite",
-    "zh": "n.(英)赛璐珞,假象牙;[医]赛璐珞,假象牙"
-  },
-  {
-    "en": "xylophagan",
-    "zh": "a.蚀木虫的"
-  },
-  {
-    "en": "xylophage",
-    "zh": "[罕]食木虫"
-  },
-  {
-    "en": "xylophagous",
-    "zh": "a.食木的,蚀木的,蛀木的"
-  },
-  {
-    "en": "xylophilous",
-    "zh": "a.喜木的,适木的,木生的"
-  },
-  {
-    "en": "xylophone",
-    "zh": "n.木琴"
-  },
-  {
-    "en": "xylophones",
-    "zh": "n.木琴(xylophone的复数形式)"
-  },
-  {
-    "en": "xylophonist",
-    "zh": "n.木琴演奏员"
-  },
-  {
-    "en": "xylophonists",
-    "zh": "木琴演奏家(xylophonist的名词复数)"
-  },
-  {
-    "en": "xylopia",
-    "zh": "[网络]木瓣树属;非洲常绿树"
-  },
-  {
-    "en": "xylopyrography",
-    "zh": "烫画"
-  },
-  {
-    "en": "xyloquinone",
-    "zh": "[化]二甲基醌"
-  },
-  {
-    "en": "xylorcinol",
-    "zh": "(=4,6-dimethylresorcinol)木间二酚,4,6-二甲基苯间二酚"
-  },
-  {
-    "en": "xylose",
-    "zh": "n.木糖;[化]木糖"
-  },
-  {
-    "en": "xyloside",
-    "zh": "木糖苷"
-  },
-  {
-    "en": "xylosma",
-    "zh": "柞木属,剌柞属"
-  },
-  {
-    "en": "xylostroma",
-    "zh": "根皮鬃,根皮子座"
-  },
-  {
-    "en": "xylotile",
-    "zh": "n.[矿]换质石棉"
-  },
-  {
-    "en": "xylotomy",
-    "zh": "n.木材解剖术,木材切片术"
-  },
-  {
-    "en": "xylotomist",
-    "zh": "木材解剖学家"
-  },
-  {
-    "en": "xylotomous",
-    "zh": "a.能钻木的,有蚀木能力的"
-  },
-  {
-    "en": "xylotrya",
-    "zh": "穿木属"
-  },
-  {
-    "en": "ximenes",
-    "zh": "希梅内斯(即JiménezdeCisneros)"
-  },
-  {
-    "en": "ximenia",
-    "zh": "[医]西门木属(铁青树科)"
-  },
-  {
-    "en": "xinca",
-    "zh": "n.辛卡人(印第安之一族),辛卡语"
-  },
-  {
-    "en": "xing",
-    "zh": "n.侨兴环球（公司名字,已在美国纳斯达克上市）"
-  },
-  {
-    "en": "xingu",
-    "zh": "n.兴谷河(巴西中北部一河流)"
-  },
-  {
-    "en": "xinhua",
-    "zh": "[经]新华社"
-  },
-  {
-    "en": "xiphi",
-    "zh": "[医]剑,剑突"
-  },
-  {
-    "en": "xiphias",
-    "zh": "n.旗鱼属,剑座"
-  },
-  {
-    "en": "xiphydriidae",
-    "zh": "长颈树蜂科"
-  },
-  {
-    "en": "xiphihumeralis",
-    "zh": "剑肱骨,剑突肱骨肌"
-  },
-  {
-    "en": "xiphiidae",
-    "zh": "[网络]剑旗鱼科;剑鱼科;箭鱼科"
-  },
-  {
-    "en": "xiphiplastron",
-    "zh": "剑腹甲"
-  },
-  {
-    "en": "xiphisterna",
-    "zh": "n.剑胸骨(xiphisternum的名词复数);[医]剑突,剑胸骨"
-  },
-  {
-    "en": "xiphisternal",
-    "zh": "[医]剑突的"
-  },
-  {
-    "en": "xiphisternum",
-    "zh": "n.[解][动]剑胸骨"
-  },
-  {
-    "en": "xiphocostal",
-    "zh": "[医]剑突肋骨的"
-  },
-  {
-    "en": "xiphodynia",
-    "zh": "[医]剑突痛"
-  },
-  {
-    "en": "xiphodon",
-    "zh": "n.剑齿兽"
-  },
-  {
-    "en": "xiphoid",
-    "zh": "n.剑突;a.剑状的"
-  },
-  {
-    "en": "xyphoid",
-    "zh": "n.剑状软骨,剑状突起;a.剑状的"
-  },
-  {
-    "en": "xiphopagus",
-    "zh": "[医]剑突联胎"
-  },
-  {
-    "en": "xiphophyllous",
-    "zh": "a.[植]有剑状叶的"
-  },
-  {
-    "en": "xiphosura",
-    "zh": "n.剑尾类动物"
-  },
-  {
-    "en": "xiphosuran",
-    "zh": "n.剑尾目动物;a.剑尾目动物的"
-  },
-  {
-    "en": "xiphura",
-    "zh": "n.(=Xiphosura)剑尾类动物"
-  },
-  {
-    "en": "xyridaceae",
-    "zh": "黄眼草科"
-  },
-  {
-    "en": "xyridales",
-    "zh": "[网络]黄眼草目"
-  },
-  {
-    "en": "xyris",
-    "zh": "n.黄眼草属"
-  },
-  {
-    "en": "xis",
-    "zh": "abbr.xenoninfraredsearchlight氙红外探照灯"
-  },
-  {
-    "en": "xyst",
-    "zh": "n.门廊,林木夹道"
-  },
-  {
-    "en": "xyster",
-    "zh": "n.刮骨刀,骨刮;[医]括骨刀,骨刮,刮器"
-  },
-  {
-    "en": "xystus",
-    "zh": "n.古希腊室内运动场"
-  },
-  {
-    "en": "xiv",
-    "zh": "num.罗马数字14"
-  },
-  {
-    "en": "xix",
-    "zh": "num.罗马数字19"
-  },
-  {
-    "en": "xyz",
-    "zh": "n.坐标轴;未知数"
-  },
-  {
-    "en": "xl",
-    "zh": "abbr.特大号（extralarge）"
-  },
-  {
-    "en": "xmas",
-    "zh": "n.圣诞节"
-  },
-  {
-    "en": "xmm",
-    "zh": "abbr.X-raymultiplemirrorX射线多面镜"
-  },
-  {
-    "en": "xms",
-    "zh": "abbr.扩展内存规范（extendedMemorySpecification）"
-  },
-  {
-    "en": "xmtr",
-    "zh": "n.xmitter发射机的缩写"
-  },
-  {
-    "en": "xn",
-    "zh": "abbr.无新股票权（exnew）"
-  },
-  {
-    "en": "xns",
-    "zh": "[计]施乐网络服务系统"
-  },
-  {
-    "en": "xo",
-    "zh": "abbr.藏窖年份40-75年的白兰地规格（extraold）"
-  },
-  {
-    "en": "xoanon",
-    "zh": "n.木雕神像"
-  },
-  {
-    "en": "xograph",
-    "zh": "(照片、图画等)立体复印,立体复印法"
-  },
-  {
-    "en": "xonotlite",
-    "zh": "硬硅钙石"
-  },
-  {
-    "en": "xor",
-    "zh": "abbr.“异”或（逻辑运算）（ExclusiveOR）"
-  },
-  {
-    "en": "xp",
-    "zh": "abbr.加快费已付（ExpressPaid）;运用优先权（ExercisePriority）"
-  },
-  {
-    "en": "xpg",
-    "zh": "abbr.convertedmerchantship改装商船，改装舰船（美国海军舰船符号）;X/OpenportabilityguideX/Open可移植性指南"
-  },
-  {
-    "en": "xq",
-    "zh": "abbr.交叉问题,相互提问（Cross-Question）"
-  },
-  {
-    "en": "xr",
-    "zh": "[计]外部复位"
-  },
-  {
-    "en": "xray",
-    "zh": "n.X光"
-  },
-  {
-    "en": "xs",
-    "zh": "[计]余三码"
-  },
-  {
+    "cht": "xt",
     "en": "xt",
-    "zh": "abbr.串音（CrossTalk）"
+    "zh": "xt",
+    "ja": "xt"
   },
   {
-    "en": "xtal",
-    "zh": "[电]晶体"
+    "cht": "xbox",
+    "en": "xbox",
+    "zh": "xbox",
+    "ja": "xbox"
   },
   {
-    "en": "xtc",
-    "zh": "[医][=xylenetrichloride]三氯代二甲苯"
+    "cht": "xiph",
+    "en": "xiph",
+    "zh": "xiph",
+    "ja": "xiph"
   },
   {
-    "en": "xu",
-    "zh": "n.北越货币单位;许（姓氏）"
+    "cht": "xaml",
+    "en": "xaml",
+    "zh": "xaml",
+    "ja": "xaml"
   },
   {
-    "en": "xuthus",
-    "zh": "n.[希神]苏托斯(传说中雅典的爱奥尼亚的始祖)"
+    "cht": "xy",
+    "en": "xy",
+    "zh": "xy",
+    "ja": "xy"
   },
   {
-    "en": "xuv",
-    "zh": "abbr.extremeultraviolet超紫外（线）的（代号）"
+    "cht": "除息的",
+    "en": "xd",
+    "zh": "除息的",
+    "ja": "利息除去"
   },
   {
-    "en": "xvi",
-    "zh": "num.罗马数字16"
+    "cht": "xdr",
+    "en": "xdr",
+    "zh": "xdr",
+    "ja": "xdr"
   },
   {
-    "en": "xvii",
-    "zh": "num.罗马数字17"
+    "cht": "xlib",
+    "en": "xlib",
+    "zh": "xlib",
+    "ja": "xlib"
   },
   {
-    "en": "xviii",
-    "zh": "num.罗马数字18"
+    "cht": "xcb",
+    "en": "xcb",
+    "zh": "xcb",
+    "ja": "xcb"
   },
   {
-    "en": "xw",
-    "zh": "abbr.无认股证书（exwarrants）"
+    "cht": "xnl",
+    "en": "xnl",
+    "zh": "xnl",
+    "ja": "xnl"
   },
   {
+    "cht": "xor",
+    "en": "xor",
+    "zh": "xor",
+    "ja": "xor"
+  },
+  {
+    "cht": "xv",
+    "en": "xv",
+    "zh": "xv",
+    "ja": "xv"
+  },
+  {
+    "cht": "xinerama",
+    "en": "xinerama",
+    "zh": "xinerama",
+    "ja": "xinerama"
+  },
+  {
+    "cht": "xrf",
+    "en": "xrf",
+    "zh": "xrf",
+    "ja": "xrf"
+  },
+  {
+    "cht": "xi",
+    "en": "xi",
+    "zh": "xi",
+    "ja": "xi"
+  },
+  {
+    "cht": "xkb",
+    "en": "xkb",
+    "zh": "xkb",
+    "ja": "xkb"
+  },
+  {
+    "cht": "xdnd",
+    "en": "xdnd",
+    "zh": "xdnd",
+    "ja": "xdnd"
+  },
+  {
+    "cht": "xdbe",
+    "en": "xdbe",
+    "zh": "xdbe",
+    "ja": "xdbe"
+  },
+  {
+    "cht": "新蒲",
+    "en": "xinput",
+    "zh": "新蒲",
+    "ja": "蒲団"
+  },
+  {
+    "cht": "xx",
     "en": "xx",
-    "zh": "abbr.血型（xuexing,汉语拼音）"
+    "zh": "xx",
+    "ja": "xx"
   },
   {
-    "en": "xxi",
-    "zh": "num.罗马数字21"
+    "cht": "xf",
+    "en": "xf",
+    "zh": "xf",
+    "ja": "xf"
   },
   {
-    "en": "xxii",
-    "zh": "num.罗马数字22"
+    "cht": "xnm",
+    "en": "xnm",
+    "zh": "xnm",
+    "ja": "xnm"
   },
   {
-    "en": "xxiii",
-    "zh": "[网络]二十三;致谢;尽职尽责"
+    "cht": "xconst",
+    "en": "xconst",
+    "zh": "xconst",
+    "ja": "xconst"
   },
   {
-    "en": "xxiv",
-    "zh": "[网络]八乡乡事委员会;锦田乡事委员会"
+    "cht": "xll",
+    "en": "xll",
+    "zh": "xll",
+    "ja": "xll"
   },
   {
-    "en": "xxv",
-    "zh": "num.罗马数字25"
+    "cht": "徐",
+    "en": "xu",
+    "zh": "徐",
+    "ja": "徐"
   },
   {
-    "en": "xxx",
-    "zh": "num.罗马数字30"
+    "cht": "xn",
+    "en": "xn",
+    "zh": "xn",
+    "ja": "xn"
+  },
+  {
+    "cht": "xs",
+    "en": "xs",
+    "zh": "xs",
+    "ja": "xs"
+  },
+  {
+    "cht": "xc",
+    "en": "xc",
+    "zh": "xc",
+    "ja": "xc"
+  },
+  {
+    "cht": "邢",
+    "en": "xing",
+    "zh": "邢",
+    "ja": "ケイ"
+  },
+  {
+    "cht": "激元",
+    "en": "xcursor",
+    "zh": "激元",
+    "ja": "エキシマ"
+  },
+  {
+    "cht": "xr",
+    "en": "xr",
+    "zh": "xr",
+    "ja": "xr"
   }
 ]

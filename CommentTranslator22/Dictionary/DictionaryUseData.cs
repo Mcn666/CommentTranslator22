@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CommentTranslator22.Popups;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,7 +38,7 @@ namespace CommentTranslator22.Dictionary
             public List<LocalDictionaryDataFormat> DataFormats = new List<LocalDictionaryDataFormat>();
         }
 
-        List<LocalDictionaryDataFileFormat> FileFormats { get; set; } = new List<LocalDictionaryDataFileFormat>
+        List<LocalDictionaryDataFileFormat> Formats { get; set; } = new List<LocalDictionaryDataFileFormat>
         {
             new LocalDictionaryDataFileFormat{MaximumStorageCount = 10000, FileName = "default.txt"},
             new LocalDictionaryDataFileFormat{MaximumStorageCount = 10000, FileName = "unfound.txt"},
@@ -56,11 +57,12 @@ namespace CommentTranslator22.Dictionary
             AffirmLocalFolderExists();
             AffirmLocalFileExists();
             ReadAllData();
+            TestSolutionEvents.Instance.SolutionCloseFunc.Add(SaveAllData);
         }
 
         void ReadAllData()
         {
-            foreach (var i in FileFormats)
+            foreach (var i in Formats)
             {
                 Read(LocalDictionaryDataFileFormat.MainFolder, i.FileName, ref i.DataFormats);
             }
@@ -82,9 +84,9 @@ namespace CommentTranslator22.Dictionary
             }
         }
 
-        public void SaveAllData()
+        void SaveAllData()
         {
-            foreach (var i in FileFormats)
+            foreach (var i in Formats)
             {
                 Sort(ref i.DataFormats);
                 Save(LocalDictionaryDataFileFormat.MainFolder, i.FileName, i.MaximumStorageCount, i.DataFormats);
@@ -129,7 +131,7 @@ namespace CommentTranslator22.Dictionary
 
         void AffirmLocalFileExists()
         {
-            foreach (var i in FileFormats)
+            foreach (var i in Formats)
             {
                 if (File.Exists($"{LocalDictionaryDataFileFormat.MainFolder}/{i.FileName}"))
                 {
@@ -142,19 +144,19 @@ namespace CommentTranslator22.Dictionary
         public void Add(DictionaryFormat format, StorageEnum storage)
         {
             var index = (int)storage;
-            if (index > FileFormats.Count || format == null)
+            if (index > Formats.Count || format == null)
             {
                 return;
             }
 
-            if (FileFormats[index].DataFormats.Any(f => f.DictionaryFormat.en == format.en))
+            if (Formats[index].DataFormats.Any(f => f.DictionaryFormat.en == format.en))
             {
-                var temp = FileFormats[index].DataFormats.First(f => f.DictionaryFormat.en == format.en);
+                var temp = Formats[index].DataFormats.First(f => f.DictionaryFormat.en == format.en);
                 temp.VisitsCount++;
             }
             else
             {
-                FileFormats[index].DataFormats.Add(new LocalDictionaryDataFormat()
+                Formats[index].DataFormats.Add(new LocalDictionaryDataFormat()
                 {
                     VisitsCount = 1,
                     DictionaryFormat = format
