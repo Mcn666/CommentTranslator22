@@ -1,37 +1,33 @@
 ﻿using CommentTranslator22.Translate;
 using Microsoft.VisualStudio.Text;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 {
-    internal class CommentDispose
+    internal class CommentHelp
     {
         /// <summary>
         /// TranslateAsync 方法需要使用的部分
         /// </summary>
         /// <param name="snapshot"></param>
         /// <returns></returns>
-        public static IEnumerable<string> SearchComment(SnapshotPoint snapshot)
+        public static IEnumerable<string> FindComment(SnapshotPoint snapshot)
         {
             var typeName = snapshot.Snapshot.TextBuffer.ContentType.TypeName;
             switch (typeName)
             {
                 case "C/C++":
                 case "CSharp":
-                    return CSharp.SearchComment(snapshot);
+                    return CSharp.FindComment(snapshot);
                 case "XML":
                 case "XAML":
-                    return XAML.SearchComment(snapshot);
+                    return XAML.FindComment(snapshot);
             }
             return null;
         }
 
-        public static IEnumerable<string> SearchComment(SnapshotPoint snapshot, string start, string end)
+        public static IEnumerable<string> FindComment(SnapshotPoint snapshot, string start, string end)
         {
             var pos = snapshot.Position;
             var str = snapshot.Snapshot.GetText();
@@ -122,6 +118,6 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
             str = temp.Substring(count).Trim();
         }
 
-        
+
     }
 }

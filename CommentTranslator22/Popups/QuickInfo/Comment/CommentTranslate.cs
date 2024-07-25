@@ -5,13 +5,11 @@ using CommentTranslator22.Translate.Format;
 using CommentTranslator22.Translate.TranslateData;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.StandardClassification;
-using Microsoft.VisualStudio.RemoteSettings;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -30,7 +28,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             var str = TryGetMethodInformation(session, typeName);
             if (str != null)
             {
-                CommentDispose.StringPretreatment(ref str);
+                CommentHelp.StringPretreatment(ref str);
                 //var s = TranslateClient.Instance.HumpUnfold(str);
                 var s = str;
                 var r = MethodAnnotationData.Instance.IndexOf(s) ?? GeneralAnnotationData.Instance.IndexOf(s);
@@ -141,7 +139,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                         foreach (var run in textElement.Runs)
                         {
                             var temp = run.Text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "");
-                            CommentDispose.StringPretreatment(ref temp);
+                            CommentHelp.StringPretreatment(ref temp);
                             str.Append(temp);
                         }
                         return str.ToString();
@@ -159,7 +157,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         public static async Task<IEnumerable<ClassifiedTextRun>> TranslateAsync(SnapshotPoint snapshot)
         {
             List<ClassifiedTextRun> classifieds = new List<ClassifiedTextRun>();
-            var strList = CommentDispose.SearchComment(snapshot);
+            var strList = CommentHelp.FindComment(snapshot);
             if (strList != null)
             {
                 var recvs = new List<ApiRecvFormat>();
@@ -232,9 +230,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
         /// <returns></returns>
         public static ClassifiedTextRun QueryDictionary(string str)
         {
-            // 如果找不到可以翻译的文本，就检查一下是不是使用了字典，以及字典支持的翻译目标语言，现在还无法确定源文本的语言
-            if (CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.简体中文
-                && Regex.IsMatch(str, "[\u4e00-\u9fff]") == false)
+            if (Regex.IsMatch(str, @"^[A-Za-z]+$"))
             {
                 var words = GetWords(str);
                 if (words != null)
@@ -243,40 +239,40 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                     foreach (var word in words)
                     {
                         str = word.ToString();
-                        var temp = Dictionary.Dictionary.Instance.Query(str.ToLower());
+                        var temp = Dictionary.Dictionary.Instance.IndexOf(str);
                         if (temp != null)
                         {
-                            result += $"{str}  {temp.zh}\n";
-
-                            if (CommentTranslator22Package.Config.UseCharacterStatistics)
-                            {
-                                // 将结果保留到临时字符集中
-                                DictionaryUseData.Instance.Add(temp, DictionaryUseData.StorageEnum.Default);
-                            }
-                            continue;
+                            result += $"{str}  {GetDictionaryLanguageItem(temp)}\n";
                         }
                         else
                         {
                             result += $"{str}\n";
                         }
-
-                        if (CommentTranslator22Package.Config.UseCharacterStatistics && str.Length > 2)
-                        {
-                            // 将这个字符串保留到另一个字符集中
-                            DictionaryUseData.Instance.Add(new DictionaryFormat
-                            {
-                                en = str,
-                            }, DictionaryUseData.StorageEnum.Unfound);
-                        }
                     }
-                    if (!string.IsNullOrEmpty(result))
+                    if (result != "")
                     {
-                        return new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, $"{result.TrimEnd('\n')}");
+                        return new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, result.TrimEnd('\n'));
                     }
-
                 }
             }
             return null;
+        }
+
+        static string GetDictionaryLanguageItem(DictionaryFormat format)
+        {
+            switch (CommentTranslator22Package.Config.TargetLanguage)
+            {
+                case LanguageEnum.English:
+                    return format.en;
+                case LanguageEnum.简体中文:
+                    return format.zh;
+                case LanguageEnum.繁體中文:
+                    return format.cht;
+                case LanguageEnum.日本語:
+                    return format.ja;
+                default:
+                    return string.Empty;
+            }
         }
 
         /// <summary>

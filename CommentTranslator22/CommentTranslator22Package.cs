@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using CommentTranslator22.Popups.Command;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Runtime.InteropServices;
@@ -14,6 +15,7 @@ namespace CommentTranslator22
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(CommentTranslator22Package.PackageGuidString)]
     [ProvideOptionPage(typeof(CommentTranslator22Config), "CommentTranslator22", "常规", 0, 0, true)]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
     public sealed class CommentTranslator22Package : AsyncPackage
     {
         /// <summary>
@@ -40,7 +42,7 @@ namespace CommentTranslator22
 
             // 加载配置信息
             Config.ReloadSetting((CommentTranslator22Config)GetDialogPage(typeof(CommentTranslator22Config)));
-            Popups.TestSolutionEvents.Instance.Initialize();
+            await Command1.InitializeAsync(this);
         }
 
         #endregion

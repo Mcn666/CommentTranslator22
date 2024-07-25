@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="CommentTranslator22.Popups.CompletionToolTip.TestCompletionDescriptionWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CommentTranslator22.Popups.CompletionToolTip"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="400" MaxWidth="500" Background="#FF2E2E2E">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" BorderThickness="1" BorderBrush="DimGray">
+            <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="TextBlock"/>
+        </Border>
+        <Border Grid.Row="1" BorderThickness="1" BorderBrush="DimGray">
+            <TextBlock TextWrapping="Wrap" Text="{Binding TranslateResult}" Foreground="LightGray"/>
+        </Border>
+    </Grid>
+</UserControl>

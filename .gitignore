@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /Test/Test.csproj
 /Test
+/CommentTranslator22/Popups/QuickInfo/CSharpQuickInfoSourceProvider.cs

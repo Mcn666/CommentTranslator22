@@ -22,12 +22,12 @@ namespace CommentTranslator22
         public LanguageEnum TargetLanguage { get; set; } = GetCurrentCulture();
 
         [Category("翻译设置")]
-        [DisplayName("百度翻译ID")]
+        [DisplayName("Appid")]
         [Description("只有使用百度翻译时才会生效")]
         public string AppId { get; set; }
 
         [Category("翻译设置")]
-        [DisplayName("百度翻译密钥")]
+        [DisplayName("Appkey")]
         [Description("只有使用百度翻译时才会生效")]
         public string SecretKey { get; set; }
         #endregion
@@ -45,7 +45,7 @@ namespace CommentTranslator22
 
         [Category("翻译内容")]
         [DisplayName("使用字典")]
-        [Description("如果是支持的语言则会自动翻译，目前只支持【英文->中文】")]
+        [Description("如果是支持的语言则会自动翻译")]
         public bool UseDictionary { get; set; } = false;
 
         #endregion
@@ -84,11 +84,11 @@ namespace CommentTranslator22
 
         [DisplayName("使用相似度算法")]
         [Description("相似度大于85%的注释使用相同的结果")]
-        public bool UseLevenshteinDistance { get; set; } = true;
+        public bool UseLevenshteinDistance { get; set; } = false;
 
-        [DisplayName("使用词组统计")]
-        [Description("这是字典的使用数据统计")]
-        public bool UseCharacterStatistics { get; set; } = true;
+        [DisplayName("缓解UI卡顿问题")]
+        [Description("如果更改了此项，需要重启VS。用于控制布局更新时检查UI状态的选项")]
+        public bool UseUiLimit { get; set; } = false;
 
 
 
@@ -112,9 +112,8 @@ namespace CommentTranslator22
             this.UseMask = config.UseMask;
             this.UseMaskType = config.UseMaskType;
 
-
-            this.UseCharacterStatistics = config.UseCharacterStatistics;
             this.UseLevenshteinDistance = config.UseLevenshteinDistance;
+            this.UseUiLimit = config.UseUiLimit;
         }
 
         protected override void OnApply(PageApplyEventArgs e)

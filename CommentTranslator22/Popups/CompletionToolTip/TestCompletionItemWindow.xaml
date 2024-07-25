@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="CommentTranslator22.Popups.CompletionToolTip.TestCompletionItemWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CommentTranslator22.Popups.CompletionToolTip"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="400" MaxHeight="200">
+    <Grid>
+        <ListBox x:Name="listBox" d:ItemsSource="{d:SampleData ItemCount=5}" BorderBrush="DimGray" SelectionChanged="listBox_SelectionChanged" MouseDoubleClick="listBox_MouseDoubleClick" PreviewMouseDown="listBox_PreviewMouseDown" Background="#FF383838" SizeChanged="listBox_SizeChanged"/>
+    </Grid>
+</UserControl>

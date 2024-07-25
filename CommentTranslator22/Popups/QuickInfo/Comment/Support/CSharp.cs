@@ -1,21 +1,19 @@
 ﻿using CommentTranslator22.Translate;
 using Microsoft.VisualStudio.Text;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media;
 
 namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 {
     internal class CSharp
     {
-        public static IEnumerable<string> SearchComment(SnapshotPoint snapshot)
+        public static IEnumerable<string> FindComment(SnapshotPoint snapshot)
         {
-            return SearchCommentScopeOne(snapshot)
-                ?? CommentDispose.SearchComment(snapshot, "/*", "*/");
+            return FindComment2(snapshot)
+                ?? CommentHelp.FindComment(snapshot, "/*", "*/");
         }
 
-        static IEnumerable<string> SearchCommentScopeOne(SnapshotPoint snapshot)
+        static IEnumerable<string> FindComment2(SnapshotPoint snapshot)
         {
             // 先获得文件快照，再按顺序替换行尾符号，最后按行尾符号分割字符串
             var snapshotBuffer = snapshot.Snapshot.GetText();
@@ -51,7 +49,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
 
             // 检查鼠标所指向的这一行是否属于不执行翻译的类型
             currentLineText = splitResult[lineNumber].Substring(index + 2);
-            CommentDispose.StringPretreatment(ref currentLineText);
+            CommentHelp.StringPretreatment(ref currentLineText);
             if (CommentTranslateInterrupt.Check(currentLineText))
             {
                 return null;
@@ -74,7 +72,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                     else
                     {
                         var temp = splitResult[lineNumber - i].Substring(index + 2).TrimEnd();
-                        CommentDispose.StringPretreatment(ref temp);
+                        CommentHelp.StringPretreatment(ref temp);
                         if (temp == string.Empty || CommentTranslateInterrupt.Check(temp))
                         {
                             addPreviousLine = false;
@@ -96,7 +94,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                     else
                     {
                         var temp = splitResult[lineNumber + i].Substring(index + 2).TrimEnd();
-                        CommentDispose.StringPretreatment(ref temp);
+                        CommentHelp.StringPretreatment(ref temp);
                         if (temp == "" || CommentTranslateInterrupt.Check(temp))
                         {
                             addNextLine = false;
@@ -114,7 +112,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                 return null;
             }
 
-            return CommentDispose.StringPretreatment(ref lines);
+            return CommentHelp.StringPretreatment(ref lines);
         }
     }
 }
