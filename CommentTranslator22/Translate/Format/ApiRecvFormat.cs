@@ -12,7 +12,9 @@ namespace CommentTranslator22.Translate.Format
         /// 响应代码
         /// </summary>
         public HttpStatusCode Code { get; set; }
-
+        /// <summary>
+        /// 文本检查信息
+        /// </summary>
         public string Message { get; set; }
         /// <summary>
         /// 待翻译文件

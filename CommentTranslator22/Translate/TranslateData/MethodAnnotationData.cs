@@ -1,4 +1,5 @@
-﻿using CommentTranslator22.Translate.Format;
+﻿using CommentTranslator22.Popups;
+using CommentTranslator22.Translate.Format;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -43,9 +44,11 @@ namespace CommentTranslator22.Translate.TranslateData
             public List<MethodAnnotationDataFormat> DataFormats = new List<MethodAnnotationDataFormat>();
         }
 
-        List<MethodAnnotationDataFileFormat> FileFormats { get; set; } = new List<MethodAnnotationDataFileFormat>
+        List<MethodAnnotationDataFileFormat> Formats { get; set; } = new List<MethodAnnotationDataFileFormat>
         {
-            new MethodAnnotationDataFileFormat { MaximumStorageCount = 1000, FileName = "default.txt"},
+            new MethodAnnotationDataFileFormat { MaximumStorageCount = 2000, FileName = "default.txt"},
+            new MethodAnnotationDataFileFormat { MaximumStorageCount = 2000, FileName = "cpp.txt"},
+            new MethodAnnotationDataFileFormat { MaximumStorageCount = 2000, FileName = "cs.txt"},
         };
 
         MethodAnnotationData()
@@ -55,11 +58,12 @@ namespace CommentTranslator22.Translate.TranslateData
             AffirmLocalFolderExists();
             AffirmLocalFileExists();
             ReadAllData();
+            TestSolutionEvents.Instance.SolutionCloseFunc.Add(SaveAllData);
         }
 
         void ReadAllData()
         {
-            foreach (var i in FileFormats)
+            foreach (var i in Formats)
             {
                 Read(MethodAnnotationDataFileFormat.MainFolder, i.FileName, ref i.DataFormats);
             }
@@ -81,15 +85,14 @@ namespace CommentTranslator22.Translate.TranslateData
             }
         }
 
-        public void SaveAllData()
+        void SaveAllData()
         {
-            foreach (var i in FileFormats)
+            foreach (var i in Formats)
             {
                 if (i.DataFormats.Count == 0)
                 {
                     continue;
                 }
-                Sort(ref i.DataFormats);
                 Save(MethodAnnotationDataFileFormat.MainFolder, i.FileName, i.MaximumStorageCount, i.DataFormats);
             }
         }
@@ -102,8 +105,29 @@ namespace CommentTranslator22.Translate.TranslateData
             });
         }
 
+        void Join(ref List<MethodAnnotationDataFormat> formats1, in List<MethodAnnotationDataFormat> formats2)
+        {
+            if (formats1.Count != formats2.Count)
+            {
+                foreach (var i in formats2)
+                {
+                    if (formats1.Any(f => f.SourceText == i.SourceText) == true)
+                    {
+                        continue;
+                    }
+                    formats1.Add(i);
+                }
+            }
+
+            Sort(ref formats1);
+        }
+
         void Save(string filePath, string fileName, int length, List<MethodAnnotationDataFormat> formats)
         {
+            var temp = new List<MethodAnnotationDataFormat>();
+            Read(filePath, fileName, ref temp);
+            Join(ref formats, temp);
+
             using (var fs = new FileStream($"{filePath}/{fileName}", FileMode.Create, FileAccess.Write, FileShare.Write))
             {
                 using (var sw = new StreamWriter(fs))
@@ -130,7 +154,7 @@ namespace CommentTranslator22.Translate.TranslateData
 
         void AffirmLocalFileExists()
         {
-            foreach (var i in FileFormats)
+            foreach (var i in Formats)
             {
                 if (File.Exists($"{MethodAnnotationDataFileFormat.MainFolder}/{i.FileName}"))
                 {
@@ -140,7 +164,7 @@ namespace CommentTranslator22.Translate.TranslateData
             }
         }
 
-        public void Add(ApiRecvFormat format)
+        public void Add(ApiRecvFormat format, string language = "default")
         {
             if (format.IsSuccess == false)
             {
@@ -158,17 +182,40 @@ namespace CommentTranslator22.Translate.TranslateData
                 TargetLanguageCode = CommentTranslator22Package.Config.TargetLanguage,
             };
 
-            if (FileFormats[0].DataFormats.Any(f => f.SourceText == temp.SourceText) == false)
+            foreach (var i in Formats)
             {
-                FileFormats[0].DataFormats.Add(temp);
+                if (i.DataFormats.Any(f => f.SourceText == temp.SourceText) == true)
+                {
+                    return;
+                }
+            }
+            foreach (var i in Formats)
+            {
+                if (i.FileName == $"{language}.txt")
+                {
+                    i.DataFormats.Add(temp);
+                }
             }
         }
 
         public string IndexOf(string str)
         {
+            foreach (var i in Formats)
+            {
+                var r = IndexOf(i.DataFormats, str);
+                if (r != null)
+                {
+                    return r;
+                }
+            }
+            return null;
+        }
+
+        string IndexOf(List<MethodAnnotationDataFormat> formats, string str)
+        {
             if (CommentTranslator22Package.Config.UseLevenshteinDistance)
             {
-                foreach (var i in FileFormats[0].DataFormats)
+                foreach (var i in formats)
                 {
                     if (LevenshteinDistance.LevenshteinDistancePercent(i.SourceText, str) > 0.85f
                         && i.TargetLanguageCode == CommentTranslator22Package.Config.TargetLanguage)
@@ -180,9 +227,9 @@ namespace CommentTranslator22.Translate.TranslateData
             }
             else
             {
-                foreach (var i in FileFormats[0].DataFormats)
+                foreach (var i in formats)
                 {
-                    if (Equals(i.SourceText, str)
+                    if (i.SourceText == str
                         && i.TargetLanguageCode == CommentTranslator22Package.Config.TargetLanguage)
                     {
                         i.VisitsCount++;

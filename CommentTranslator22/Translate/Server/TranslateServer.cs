@@ -1,14 +1,5 @@
 ﻿using CommentTranslator22.Translate.Format;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace CommentTranslator22.Translate.Server
 {

@@ -1,5 +1,5 @@
-﻿using CommentTranslator22.Translate.Format;
-using Microsoft.VisualStudio.LocalLogger;
+﻿using CommentTranslator22.Popups;
+using CommentTranslator22.Translate.Format;
 using Microsoft.VisualStudio.Shell;
 using Newtonsoft.Json;
 using System;
@@ -45,29 +45,34 @@ namespace CommentTranslator22.Translate.TranslateData
             public string SolutionPath;
             public string SolutionDataName;
             public int MaximumStorageCount = 1000;
+            public bool IsInitializationComplete = false;
             public List<GeneralAnnotationDataFormat> DataFormats;
         }
 
-        GeneralAnnotationDataFileFormat FileFormat { get; set; } = new GeneralAnnotationDataFileFormat();
+        GeneralAnnotationDataFileFormat Format { get; set; } = new GeneralAnnotationDataFileFormat();
 
         GeneralAnnotationData()
         {
-            FileFormat.MainPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            FileFormat.MainPath += "/CommentTranslator22/GeneralAnnotationData";
-            FileFormat.InfoFileName = $"{FileFormat.MainPath}/SolutionInfo.txt";
+            Format.MainPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            Format.MainPath += "/CommentTranslator22/GeneralAnnotationData";
+            Format.InfoFileName = $"{Format.MainPath}/SolutionInfo.txt";
+            TestSolutionEvents.Instance.SolutionCloseFunc.Add(SaveAllData);
         }
 
-        public void ReadAllData()
+        void ReadAllData()
         {
-            var dte2 = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;
-            var solution = dte2.Solution;
-            FileFormat.SolutionName = Path.GetFileName(solution.FullName);     //解决方案名称
-            FileFormat.SolutionPath = Path.GetDirectoryName(solution.FullName);//解决方案路径
-            //FileFormat.SolutionPath = Directory.GetCurrentDirectory();
-
-            AffirmLocalFolderExists();
-            AffirmLocalFileExists();
-            ReadData(FileFormat.InfoFileName);
+            _ = ThreadHelper.JoinableTaskFactory.RunAsync(async delegate
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                var dte2 = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;
+                var solution = dte2.Solution;
+                Format.SolutionName = Path.GetFileName(solution.FullName);     //解决方案名称
+                Format.SolutionPath = Path.GetDirectoryName(solution.FullName);//解决方案路径
+                AffirmLocalFolderExists();
+                AffirmLocalFileExists();
+                ReadData(Format.InfoFileName);
+                Format.IsInitializationComplete = Format.DataFormats != null;
+            });
         }
 
         void ReadData(string filePath)
@@ -80,15 +85,15 @@ namespace CommentTranslator22.Translate.TranslateData
                     foreach (var line in lines)
                     {
                         var temp = line.Split('|');
-                        if (temp.Count() == 2 && Equals(temp[1], FileFormat.SolutionPath))
+                        if (temp.Count() == 2 && Equals(temp[1], Format.SolutionPath))
                         {
-                            FileFormat.SolutionDataName = temp[0];
-                            ReadSolutionData($"{FileFormat.MainPath}/{temp[0]}");
+                            Format.SolutionDataName = temp[0];
+                            ReadSolutionData($"{Format.MainPath}/{temp[0]}");
                             return;
                         }
                     }
-                    FileFormat.SolutionDataName = null;
-                    FileFormat.DataFormats = new List<GeneralAnnotationDataFormat>();
+                    Format.SolutionDataName = null;
+                    Format.DataFormats = new List<GeneralAnnotationDataFormat>();
                 }
             }
         }
@@ -100,31 +105,40 @@ namespace CommentTranslator22.Translate.TranslateData
                 using (var sr = new StreamReader(fs))
                 {
                     var str = sr.ReadToEnd();
-                    FileFormat.DataFormats = JsonConvert.DeserializeObject<List<GeneralAnnotationDataFormat>>(str);
+                    Format.DataFormats = JsonConvert.DeserializeObject<List<GeneralAnnotationDataFormat>>(str);
                 }
             }
         }
 
-        public void SaveAllData()
+        void SaveAllData()
         {
-            if (FileFormat.SolutionPath == null || FileFormat.SolutionPath.Length < 10 ||
-                FileFormat.DataFormats == null || FileFormat.DataFormats.Count == 0)
+            if (Format.IsInitializationComplete == false)
             {
                 return;
             }
 
-            if (FileFormat.SolutionDataName == null)
+            if (Format.SolutionPath == null
+                || Format.SolutionPath.Length < 10
+                || Format.DataFormats == null
+                || Format.DataFormats.Count == 0)
+            {
+                return;
+            }
+
+            if (Format.SolutionDataName == null)
             {
                 // 使用时间生成的文件几乎不会重复
-                FileFormat.SolutionDataName = DateTime.Now.ToFileTime().ToString() + ".txt";
-                using (var sw = new StreamWriter(FileFormat.InfoFileName, true))
+                Format.SolutionDataName = DateTime.Now.ToFileTime().ToString() + ".txt";
+                using (var sw = new StreamWriter(Format.InfoFileName, true))
                 {
-                    sw.WriteLine(FileFormat.SolutionDataName + "|" + FileFormat.SolutionPath);
+                    sw.WriteLine(Format.SolutionDataName + "|" + Format.SolutionPath);
                 }
             }
 
-            Sort(ref FileFormat.DataFormats);
-            Save($"{FileFormat.MainPath}/{FileFormat.SolutionDataName}");
+            Sort(ref Format.DataFormats);
+            Save($"{Format.MainPath}/{Format.SolutionDataName}");
+
+            Format.IsInitializationComplete = false;
         }
 
         void Save(string filePath)
@@ -133,14 +147,14 @@ namespace CommentTranslator22.Translate.TranslateData
             {
                 using (var sw = new StreamWriter(fs))
                 {
-                    if (FileFormat.MaximumStorageCount < FileFormat.DataFormats.Count)
+                    if (Format.MaximumStorageCount < Format.DataFormats.Count)
                     {
-                        var index = FileFormat.MaximumStorageCount;
-                        var count = FileFormat.DataFormats.Count - index;
-                        FileFormat.DataFormats.RemoveRange(index, count);
+                        var index = Format.MaximumStorageCount;
+                        var count = Format.DataFormats.Count - index;
+                        Format.DataFormats.RemoveRange(index, count);
                     }
 
-                    var json = JsonConvert.SerializeObject(FileFormat.DataFormats, Formatting.Indented);
+                    var json = JsonConvert.SerializeObject(Format.DataFormats, Formatting.Indented);
                     sw.WriteLine(json);
                 }
             }
@@ -156,17 +170,17 @@ namespace CommentTranslator22.Translate.TranslateData
 
         void AffirmLocalFolderExists()
         {
-            if (Directory.Exists(FileFormat.MainPath) == false)
+            if (Directory.Exists(Format.MainPath) == false)
             {
-                Directory.CreateDirectory(FileFormat.MainPath);
+                Directory.CreateDirectory(Format.MainPath);
             }
         }
 
         void AffirmLocalFileExists()
         {
-            if (File.Exists(FileFormat.InfoFileName) == false)
+            if (File.Exists(Format.InfoFileName) == false)
             {
-                File.Create(FileFormat.InfoFileName).Close();
+                File.Create(Format.InfoFileName).Close();
             }
         }
 
@@ -192,9 +206,9 @@ namespace CommentTranslator22.Translate.TranslateData
                 LanguageEnumCode = CommentTranslator22Package.Config.TargetLanguage,
             };
 
-            if (FileFormat.DataFormats.Any(f => f.SourceText == temp.SourceText) == false)
+            if (Format.DataFormats.Any(f => f.SourceText == temp.SourceText) == false)
             {
-                FileFormat.DataFormats.Add(temp);
+                Format.DataFormats.Add(temp);
             }
         }
 
@@ -205,9 +219,19 @@ namespace CommentTranslator22.Translate.TranslateData
         /// <returns></returns>
         public string IndexOf(string text)
         {
+            if (Format.IsInitializationComplete == false)
+            {
+                ReadAllData();
+            }
+            if (Format.IsInitializationComplete == false)
+            {
+                return null;
+            }
+
+
             if (CommentTranslator22Package.Config.UseLevenshteinDistance)
             {
-                foreach (var i in FileFormat.DataFormats)
+                foreach (var i in Format.DataFormats)
                 {
                     if (LevenshteinDistance.LevenshteinDistancePercent(i.SourceText, text) > 0.85f
                         && i.LanguageEnumCode == CommentTranslator22Package.Config.TargetLanguage)
@@ -219,7 +243,7 @@ namespace CommentTranslator22.Translate.TranslateData
             }
             else
             {
-                foreach (var i in FileFormat.DataFormats)
+                foreach (var i in Format.DataFormats)
                 {
                     if (Equals(i.SourceText, text)
                         && i.LanguageEnumCode == CommentTranslator22Package.Config.TargetLanguage)

@@ -2,9 +2,8 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -101,9 +100,12 @@ namespace CommentTranslator22.Translate.Server
             {
                 var bytes = await response.Content.ReadAsByteArrayAsync();
                 html = Encoding.UTF8.GetString(bytes);
-                var doc = Newtonsoft.Json.Linq.JArray.Parse(html);
 
+                // 这是扩展 CommentTranslator64 的原代码
+                var doc = Newtonsoft.Json.Linq.JArray.Parse(html);
                 r = doc[0]["translations"][0]["text"].ToString();
+
+                // Json 反序列化
                 //var bingRecv = JsonConvert.DeserializeObject<TranslationResponse[]>(html);
             }
 

@@ -28,9 +28,9 @@ namespace CommentTranslator22.Translate
 
         }
 
-        public int MaxTranslateLength { get; private set; } = 300;
+        public int MaxTranslateLength { get; } = 300;
 
-        public int MinTranslateLength { get; private set; } = 15;
+        public int MinTranslateLength { get; } = 10;
 
         public async Task<ApiRecvFormat> TranslateAsync(string str)
         {
@@ -40,7 +40,7 @@ namespace CommentTranslator22.Translate
                 return new ApiRecvFormat
                 {
                     Message = res,
-                    SourceText = str
+                    SourceText = Equals("len", res) ? str.Length.ToString() : str
                 };
             }
 
@@ -97,13 +97,13 @@ namespace CommentTranslator22.Translate
 
             if (text.Length < MinTranslateLength || text.Length > MaxTranslateLength)
             {
-                return "len";
+                return $"len";
             }
 
             if (CommentTranslator22Package.Config.SourceLanguage == CommentTranslator22Package.Config.TargetLanguage ||
                 CommentTranslator22Package.Config.TargetLanguage == LanguageEnum.Auto)
             {
-                return "?-?";
+                return "?=>?";
             }
 
             return null;
@@ -119,10 +119,10 @@ namespace CommentTranslator22.Translate
                 var matcher = Regex.Matches(s, "([A-Z]|^)[a-z]+");
                 if (matcher.Count > 0)
                 {
-                    StringBuilder sb = new StringBuilder();
+                    var sb = new StringBuilder();
                     foreach (Match match in matcher)
                     {
-                        string g = match.Groups[0].Value;
+                        var g = match.Groups[0].Value;
                         sb.Append(g + " ");
                     }
 

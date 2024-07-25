@@ -18,6 +18,7 @@
 
     internal class LanguageCode
     {
+        // 此顺序和枚举的顺序需要一致
         public static string[][] Code { get; set; } = new string[][]
         {
             new string[]{"auto-detect", "en", "zh-Hans", "zh-Hant", "ja"}, //Bing
