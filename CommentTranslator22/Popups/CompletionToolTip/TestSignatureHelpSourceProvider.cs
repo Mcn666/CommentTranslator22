@@ -33,7 +33,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
             var point = session.GetTriggerPoint(textBuffer).GetPoint(textBuffer.CurrentSnapshot);
             var span = session.TextView.GetTextElementSpan(point);
             var view = session.TextView;
-            TestAdornmentLayer.AdjustWindowPosition(view, span, typeof(TestCompletionItemWindow));
+            TestAdornmentLayer.AdjustViewPosition<TestCompletionItemView>(view, span);
         }
 
         private void Session_Dismissed(object sender, System.EventArgs e)
@@ -42,7 +42,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
             if (sender is ISignatureHelpSession session)
             {
                 var view = session.TextView;
-                TestAdornmentLayer.AdjustWindowPositionEnd(view, typeof(TestCompletionItemWindow));
+                TestAdornmentLayer.AdjustViewPositionEnd<TestCompletionItemView>(view);
             }
         }
 

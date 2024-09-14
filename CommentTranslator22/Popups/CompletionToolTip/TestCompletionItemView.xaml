@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="CommentTranslator22.Popups.CompletionToolTip.TestCompletionItemView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CommentTranslator22.Popups.CompletionToolTip"
+             mc:Ignorable="d"
+             Background="Transparent">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
+                     ItemsSource="{Binding CompletionCollection}"
+                     SelectedIndex="{Binding SelectedIndex}"
+                     BorderBrush="DimGray"
+                     BorderThickness="1"
+                     Background="#FF383838"
+                     MinWidth="100"
+                     Height="160"
+                     ScrollViewer.ScrollChanged="ListBox_ScrollChanged"
+                     PreviewMouseDoubleClick="ListBox_PreviewMouseDoubleClick"
+                     PreviewMouseDown="ListBox_PreviewMouseDown"
+                     SelectionChanged="ListBox_SelectionChanged"/>
+        </Grid>
+
+        <Grid Grid.Column="1" MaxWidth="400">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    BorderBrush="DimGray"
+                    BorderThickness="1"
+                    Background="Black">
+                <ContentControl d:Content="选择项描述" d:Foreground="White"
+                                Content="{Binding Description}"/>
+            </Border>
+            
+            <Border Grid.Row="1"
+                    BorderBrush="DimGray"
+                    BorderThickness="1,0,1,1"
+                    Background="Black">
+                <TextBlock d:Text="选择项描述翻译结果"
+                           Text="{Binding TranslatedDescription}"
+                           Foreground="White"
+                           TextWrapping="Wrap"/>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

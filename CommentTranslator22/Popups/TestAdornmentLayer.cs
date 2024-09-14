@@ -17,26 +17,26 @@ namespace CommentTranslator22.Popups
         {
             public bool IsLimit { get; set; }
 
-            public bool IsDisplay { get; set; }
+            public bool IsShow { get; set; }
 
             public WindowState(bool limit, bool display)
             {
                 IsLimit = limit;
-                IsDisplay = display;
+                IsShow = display;
             }
         }
 
         private readonly IWpfTextView view;
         private readonly IAdornmentLayer layer;
-        private readonly Dictionary<object, object> window = new Dictionary<object, object>()
+        private readonly Dictionary<object, object> views = new Dictionary<object, object>()
         {
-            [typeof(Command1Window)] = new Command1Window(),
+            [typeof(Command1View)] = new Command1View(),
+            [typeof(TestCompletionItemView)] = new TestCompletionItemView(),
         };
         private readonly Dictionary<object, WindowState> state = new Dictionary<object, WindowState>()
         {
-            [typeof(Command1Window)] = new WindowState(false, false),
-            [typeof(TestCompletionDescriptionWindow)] = new WindowState(false, false),
-            [typeof(TestCompletionItemWindow)] = new WindowState(false, false),
+            [typeof(Command1View)] = new WindowState(false, false),
+            [typeof(TestCompletionItemView)] = new WindowState(false, false),
         };
 
         public TestAdornmentLayer(IWpfTextView view)
@@ -50,11 +50,6 @@ namespace CommentTranslator22.Popups
             {
                 (layer as UIElement).LayoutUpdated += TestAdornmentLayer_LayoutUpdated;
             }
-
-            var window1 = new TestCompletionDescriptionWindow();
-            var window2 = new TestCompletionItemWindow(window1);
-            window.Add(window1.GetType(), window1);
-            window.Add(window2.GetType(), window2);
         }
 
         private void TestAdornmentLayer_LayoutUpdated(object sender, EventArgs e)
@@ -65,9 +60,9 @@ namespace CommentTranslator22.Popups
             {
                 return;
             }
-            foreach (var w in window)
+            foreach (var w in views)
             {
-                if (state[w.Key].IsDisplay == true)
+                if (state[w.Key].IsShow == true)
                 {
                     AddAdornment(w.Value as UIElement, view.Selection.SelectedSpans[0]);
                 }
@@ -80,7 +75,7 @@ namespace CommentTranslator22.Popups
 
         private void View_Closed(object sender, EventArgs e)
         {
-            foreach (var i in window)
+            foreach (var i in views)
             {
                 i.Value.GetType().GetMethod("Close")?.Invoke(i.Value, null);
             }
@@ -88,7 +83,7 @@ namespace CommentTranslator22.Popups
 
         private void Selection_SelectionChanged(object sender, EventArgs e)
         {
-            foreach (var i in window)
+            foreach (var i in views)
             {
                 i.Value.GetType().GetMethod("Close")?.Invoke(i.Value, null);
             }
@@ -106,19 +101,14 @@ namespace CommentTranslator22.Popups
             }
         }
 
-        public static object GetWindow(ITextView view, SnapshotSpan span, Type key, bool autoPos = true)
+        public static T GetView<T>(ITextView view, SnapshotSpan span) where T : class
         {
-            return GetAdornment(view)?.GetWindow(span, key, autoPos);
+            return GetAdornment(view)?.GetView<T>(span);
         }
 
-        public static T GetWindow<T>(ITextView view, SnapshotSpan span, Type key, bool autoPos = true)
+        private T GetView<T>(SnapshotSpan span)
         {
-            return (T)(GetAdornment(view)?.GetWindow(span, key, autoPos));
-        }
-
-        private object GetWindow(SnapshotSpan span, Type key, bool pos)
-        {
-            if (window.TryGetValue(key, out var value))
+            if (views.TryGetValue(typeof(T), out var value))
             {
                 EventHandler handler = null;
                 handler = (sender, e) =>
@@ -128,14 +118,11 @@ namespace CommentTranslator22.Popups
                 };
 
                 value.GetType().GetEvent("OnClosed")?.AddEventHandler(value, handler);
-                if (pos == true)
-                {
-                    PopupPosition(value as UIElement, span);
-                }
+                PopupPosition(value as UIElement, span);
                 AddAdornment(value as UIElement, span);
-                return value;
+                return (T)value;
             }
-            return null;
+            return default;
         }
 
         private void PopupPosition(UIElement window, SnapshotSpan span)
@@ -164,54 +151,54 @@ namespace CommentTranslator22.Popups
                 }
             }
             layer.AddAdornment(span, null, window);
-            state[window.GetType()].IsDisplay = true;
+            state[window.GetType()].IsShow = true;
         }
 
         private void RemoveAdornment(UIElement window)
         {
             layer.RemoveAdornment(window);
-            state[window.GetType()].IsDisplay = false;
+            state[window.GetType()].IsShow = false;
         }
 
-        public static void CloseWindow(ITextView view, Type type)
+        public static void HideView<T>(ITextView view)
         {
-            GetAdornment(view)?.CloseWindow(type);
+            GetAdornment(view)?.HideView<T>();
         }
 
-        private void CloseWindow(Type type)
+        private void HideView<T>()
         {
-            if (window.TryGetValue(type, out var value))
+            if (views.TryGetValue(typeof(T), out var value))
             {
                 value.GetType().GetMethod("Close")?.Invoke(value, null);
                 RemoveAdornment(value as UIElement);
             }
         }
 
-        public static void AdjustWindowPosition(ITextView view, SnapshotSpan span, Type type)
+        public static void AdjustViewPosition<T>(ITextView view, SnapshotSpan span)
         {
-            GetAdornment(view)?.AdjustWindowPosition(span, type);
+            GetAdornment(view)?.AdjustViewPosition<T>(span);
         }
 
-        private void AdjustWindowPosition(SnapshotSpan span, Type type)
+        private void AdjustViewPosition<T>(SnapshotSpan span)
         {
-            if (window.TryGetValue(type, out var value))
+            if (views.TryGetValue(typeof(T), out var value))
             {
                 var bounds = view.TextViewLines.GetCharacterBounds(span.Start);
                 var ui = value as UserControl;
                 Canvas.SetLeft(ui, bounds.Left);
                 Canvas.SetTop(ui, bounds.Top - ui.ActualHeight);
-                state[type].IsLimit = true;
+                state[typeof(T)].IsLimit = true;
             }
         }
 
-        public static void AdjustWindowPositionEnd(ITextView view, Type type)
+        public static void AdjustViewPositionEnd<T>(ITextView view)
         {
-            GetAdornment(view)?.AdjustWindowPositionEnd(type);
+            GetAdornment(view)?.AdjustViewPositionEnd<T>();
         }
 
-        private void AdjustWindowPositionEnd(Type type)
+        private void AdjustViewPositionEnd<T>()
         {
-            state[type].IsLimit = false;
+            state[typeof(T)].IsLimit = false;
         }
     }
 }

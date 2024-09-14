@@ -40,8 +40,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
         public void Close()
         {
             CompletionClosed?.Invoke(this, new CompletionClosedEventArgs(view));
-            TestAdornmentLayer.CloseWindow(view, typeof(TestCompletionItemWindow));
-            TestAdornmentLayer.CloseWindow(view, typeof(TestCompletionDescriptionWindow));
+            TestAdornmentLayer.HideView<TestCompletionItemView>(view);
         }
 
         public void Dispose()
@@ -67,51 +66,37 @@ namespace CommentTranslator22.Popups.CompletionToolTip
             //  使用鼠标单击选择项后再用键盘上下选择时，存在选择项还原的问题，如果点击两次（非双击）就正常，原因未知
             //  输入字符"."获取成员时，会导致UI关闭，原因未知，但我发现添加到IAdornmentLayer图层的UI被移除了
 
-            var span = session.ApplicableToSpan.GetSpan(view.TextSnapshot);
-            var window1 = TestAdornmentLayer.GetWindow(view, span, typeof(TestCompletionItemWindow));
-            var window2 = TestAdornmentLayer.GetWindow(view, span, typeof(TestCompletionDescriptionWindow), false);
-            if (window1 == default || window2 == default)
+            var span = session.ApplicableToSpan.GetSpan(this.view.TextSnapshot);
+            var view = TestAdornmentLayer.GetView<TestCompletionItemView>(this.view, span);
+            if (view == default)
             {
                 session.Dismiss();
                 return;
             }
 
-            var w1 = window1 as TestCompletionItemWindow;
-            var w2 = window2 as TestCompletionDescriptionWindow;
-
-            _ = ThreadHelper.JoinableTaskFactory.RunAsync(async delegate
-            {
-                await w1.UpdateCompletionItemAsync(session, model);
-                w1.CommitRequested += Window1_CommitRequested;
-                w1.CompletionItemSelected += Window1_CompletionItemSelected;
-
-                var index = model.SelectedItemIndex;
-                if (index > -1)
-                {
-                    var item = model.Items[index].CompletionItem;
-                    await w2.UpdateCompletionDescriptionAsync(session, item);
-                }
-            });
+            view.SetCompletionCollection(session, model);
+            view.CommitRequested += View_CommitRequested;
+            view.CompletionItemSelected += View_CompletionItemSelected;
         }
 
-        private void Window1_CompletionItemSelected(object sender, CompletionItemSelectedEventArgs e)
+        private void View_CompletionItemSelected(object sender, CompletionItemSelectedEventArgs e)
         {
             // 通过引发此事件来更改UI中的选择项，问题点：
             //  触发此事件会导致多次循环
-            if (sender is TestCompletionItemWindow window)
+            if (sender is TestCompletionItemView window)
             {
-                window.CompletionItemSelected -= Window1_CompletionItemSelected;
+                window.CompletionItemSelected -= View_CompletionItemSelected;
                 CompletionItemSelected?.Invoke(this, e);
             }
         }
 
-        private void Window1_CommitRequested(object sender, CompletionItemEventArgs e)
+        private void View_CommitRequested(object sender, CompletionItemEventArgs e)
         {
             // 通过引发此事件来提交完成项，问题点：
             //  提交后编辑器视图没有获得焦点，需要鼠标点击编辑器视图。可能的原因：使用鼠标双击提交完成项时，焦点在UI上
-            if (sender is TestCompletionItemWindow window)
+            if (sender is TestCompletionItemView window)
             {
-                window.CommitRequested -= Window1_CommitRequested;
+                window.CommitRequested -= View_CommitRequested;
                 CommitRequested?.Invoke(this, e);
                 Close();
             }

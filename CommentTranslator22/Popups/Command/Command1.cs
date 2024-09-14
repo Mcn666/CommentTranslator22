@@ -1,4 +1,5 @@
-﻿using EnvDTE;
+﻿using CommentTranslator22.Popups.CompletionToolTip;
+using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
@@ -114,10 +115,10 @@ namespace CommentTranslator22.Popups.Command
                     }
                     var view = await GetActiveWpfTextViewAsync();
                     var span = view.Selection.SelectedSpans[0];
-                    var window = TestAdornmentLayer.GetWindow<Command1Window>(view, span, typeof(Command1Window));
-                    if (window != default)
+                    var cview = TestAdornmentLayer.GetView<Command1View>(view, span);
+                    if (cview != default)
                     {
-                        window.TranslateText(text);
+                        cview.TranslateText(text);
                     }
                 }
             });

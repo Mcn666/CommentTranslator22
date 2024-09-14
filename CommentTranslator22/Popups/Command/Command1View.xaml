@@ -1,14 +1,17 @@
-﻿<UserControl x:Class="CommentTranslator22.Popups.Command.Command1Window"
+﻿<UserControl x:Class="CommentTranslator22.Popups.Command.Command1View"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CommentTranslator22.Popups.Command"
-             mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="400" Background="#FF424242" MaxWidth="600">
+             mc:Ignorable="d">
     <Grid>
-        <Border BorderThickness="1" BorderBrush="DimGray">
-            <TextBlock TextWrapping="Wrap" Text="{Binding TranslateResult}" Foreground="White" Margin="5,5,5,5"/>
+        <Border Background="#FF424242" MaxWidth="600">
+            <TextBlock d:Text="测试文本"
+                       Text="{Binding TranslateText}"
+                       TextWrapping="Wrap"
+                       Foreground="Wheat"
+                       Margin="5"/>
         </Border>
     </Grid>
 </UserControl>

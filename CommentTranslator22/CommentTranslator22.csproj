@@ -49,17 +49,14 @@
     <Compile Include="Dictionary\DictionaryFormat.cs" />
     <Compile Include="Dictionary\DictionaryUseData.cs" />
     <Compile Include="Popups\Command\Command1.cs" />
-    <Compile Include="Popups\Command\Command1Window.xaml.cs">
-      <DependentUpon>Command1Window.xaml</DependentUpon>
+    <Compile Include="Popups\Command\Command1View.xaml.cs">
+      <DependentUpon>Command1View.xaml</DependentUpon>
     </Compile>
     <Compile Include="CommentTranslator22Config.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Popups\CompletionToolTip\TestCompletionDescriptionWindow.xaml.cs">
-      <DependentUpon>TestCompletionDescriptionWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Popups\CompletionToolTip\TestCompletionItemWindow.xaml.cs">
-      <DependentUpon>TestCompletionItemWindow.xaml</DependentUpon>
+    <Compile Include="Popups\CompletionToolTip\TestCompletionItemView.xaml.cs">
+      <DependentUpon>TestCompletionItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Popups\CompletionToolTip\TestCompletionPresenterProvider.cs" />
     <Compile Include="Popups\CompletionToolTip\TestCompletionToolTip.cs" />
@@ -151,15 +148,11 @@
     <Content Include="Resources\Command1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Popups\Command\Command1Window.xaml">
+    <Page Include="Popups\Command\Command1View.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Popups\CompletionToolTip\TestCompletionDescriptionWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Popups\CompletionToolTip\TestCompletionItemWindow.xaml">
+    <Page Include="Popups\CompletionToolTip\TestCompletionItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
