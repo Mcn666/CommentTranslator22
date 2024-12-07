@@ -6,7 +6,21 @@
              xmlns:local="clr-namespace:CommentTranslator22.Popups.Command"
              mc:Ignorable="d">
     <Grid>
-        <Border Background="#FF424242" MaxWidth="600">
+        <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Background="#FF424242">
+            <TextBlock d:Text="翻译信息"
+                       Text="{Binding TranslateInfo}"
+                       Foreground="Wheat"
+                       Margin="5"/>
+        </Border>
+        <Border Grid.Column="1"
+                Background="#FF424242"
+                MaxWidth="600">
             <TextBlock d:Text="测试文本"
                        Text="{Binding TranslateText}"
                        TextWrapping="Wrap"

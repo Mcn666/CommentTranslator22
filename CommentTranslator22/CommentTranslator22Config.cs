@@ -36,17 +36,17 @@ namespace CommentTranslator22
         [Category("翻译内容")]
         [DisplayName("翻译快速信息文本")]
         [Description("鼠标指向函数、方法、变量、类、枚举等文本时，翻译弹出时的部分快速信息文本")]
-        public bool TranslateQuickInfoCommentText { get; set; } = false;
+        public bool TranslateQuickInfoCommentText { get; set; } = true;
 
         [Category("翻译内容")]
         [DisplayName("翻译普通注释文本")]
         [Description("翻译鼠标所指向的注释文本及其附近的注释文本")]
-        public bool TranslateGeneralCommentText { get; set; } = false;
+        public bool TranslateGeneralCommentText { get; set; } = true;
 
         [Category("翻译内容")]
         [DisplayName("使用字典")]
         [Description("如果是支持的语言则会自动翻译")]
-        public bool UseDictionary { get; set; } = false;
+        public bool UseDictionary { get; set; } = true;
 
         #endregion
 

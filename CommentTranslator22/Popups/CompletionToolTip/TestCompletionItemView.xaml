@@ -8,11 +8,11 @@
              Background="Transparent">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0">
+        <Grid Grid.Column="0" VerticalAlignment="Top">
             <ListBox d:ItemsSource="{d:SampleData ItemCount=5}"
                      ItemsSource="{Binding CompletionCollection}"
                      SelectedIndex="{Binding SelectedIndex}"

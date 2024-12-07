@@ -46,9 +46,9 @@ namespace CommentTranslator22.Translate.TranslateData
 
         List<MethodAnnotationDataFileFormat> Formats { get; set; } = new List<MethodAnnotationDataFileFormat>
         {
-            new MethodAnnotationDataFileFormat { MaximumStorageCount = 2000, FileName = "default.txt"},
-            new MethodAnnotationDataFileFormat { MaximumStorageCount = 2000, FileName = "cpp.txt"},
-            new MethodAnnotationDataFileFormat { MaximumStorageCount = 2000, FileName = "cs.txt"},
+            new MethodAnnotationDataFileFormat { MaximumStorageCount = 3000, FileName = "default.txt"},
+            new MethodAnnotationDataFileFormat { MaximumStorageCount = 3000, FileName = "cpp.txt"},
+            new MethodAnnotationDataFileFormat { MaximumStorageCount = 3000, FileName = "cs.txt"},
         };
 
         MethodAnnotationData()
@@ -107,16 +107,17 @@ namespace CommentTranslator22.Translate.TranslateData
 
         void Join(ref List<MethodAnnotationDataFormat> formats1, in List<MethodAnnotationDataFormat> formats2)
         {
-            if (formats1.Count != formats2.Count)
+            foreach (var i in formats2)
             {
-                foreach (var i in formats2)
+                if (formats1.Any(f => f.SourceText == i.SourceText) == true)
                 {
-                    if (formats1.Any(f => f.SourceText == i.SourceText) == true)
+                    if (i.VisitsCount > 1) // 防止重复记录
                     {
-                        continue;
+                        i.VisitsCount--;
                     }
-                    formats1.Add(i);
+                    continue;
                 }
+                formats1.Add(i);
             }
 
             Sort(ref formats1);

@@ -11,6 +11,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -103,7 +104,16 @@ namespace CommentTranslator22.Popups.CompletionToolTip
                 {
                     tb.Inlines.Add(new Run(i.DisplayText));
                 }
-                viewModel.CompletionCollection.Add(tb);
+
+                var stack = new StackPanel()
+                {
+                    Orientation = Orientation.Horizontal,
+                };
+                stack.Children.Add(new Image() { Source = GetCompletionImage(i.Filters), Width = 16, Height = 16 });
+                stack.Children.Add(tb);
+                
+                viewModel.CompletionCollection.Add(stack);
+                //viewModel.CompletionCollection.Add(tb);
             }
         }
 
@@ -164,7 +174,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
                     var e = tb.Inlines.ElementAt(tb.Inlines.Count - 1);
                     tb.Inlines.Remove(e);
                 }
-
+                
                 if (ce.Elements.Count() > 1)
                 {
                     SetDescriptionTranslation(ce.Elements.ElementAt(1));
@@ -210,11 +220,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
 
         private Brush GetBrush(ImmutableArray<CompletionFilter> filters)
         {
-            if (filters.Count() > 0)
-            {
-                return GetBrush(filters[0].AccessKey);
-            }
-            return Brushes.LightGray;
+            return filters.Length > 0 ? GetBrush(filters[0].AccessKey) : Brushes.LightGray;
         }
 
         private Brush GetBrush(ClassifiedTextRun run)
@@ -262,6 +268,81 @@ namespace CommentTranslator22.Popups.CompletionToolTip
                     return Brushes.LightGray;
             }
         }
+
+        private BitmapImage GetCompletionImage(ImmutableArray<CompletionFilter> filters)
+        {
+            return filters.Length > 0 ? GetCompletionImage(filters[0].AccessKey) : null;
+        }
+
+
+        private BitmapImage GetCompletionImage(string key)
+        {
+            var imageNameMap = new Dictionary<string, string>()
+            {
+                { "n", "Namespace" },  // 命名空间
+                { "c", "Class" },      // 类
+                { "s", "Struct" },     // 结构体
+                { "i", "Interface" },  // 接口
+                { "e", "Enum" },       // 枚举
+                { "d", "Delegate" },   // 委托
+                { "o", "Constant" },   // 常量
+                { "f", "Field" },      // 字段
+                { "v", "Event" },      // 事件
+                { "p", "Property" },   // 属性
+                { "m", "Method" },     // 方法
+                { "l", "Local" },      // 局部变量和参数
+                { "k", "Keyword" },    // 关键字
+                { "t", "Snippet" }     // 片段
+            };
+
+            if (imageNameMap.TryGetValue(key, out var name))
+            {
+                return GetResourceImage("CommentTranslator22.Assets.Images." + name + ".png");
+            }
+
+            return null;
+        }
+
+
+        private readonly Dictionary<string, BitmapImage> _imageCache = new Dictionary<string, BitmapImage>();
+
+        private BitmapImage GetResourceImage(string name)
+        {
+            // 首先检查缓存中是否存在该图片
+            if (_imageCache.TryGetValue(name, out var cachedImage))
+            {
+                return cachedImage;
+            }
+
+            try
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                using (var stream = assembly.GetManifestResourceStream(name))
+                {
+                    if (stream == null)
+                    {
+                        return null;
+                    }
+
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = stream;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad; // 避免流关闭后丢失图像数据
+                    bitmap.EndInit();
+                    bitmap.Freeze(); // 如果需要从多个线程访问，可以考虑冻结图像
+
+                    // 将加载的图片缓存起来
+                    _imageCache[name] = bitmap;
+
+                    return bitmap;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
 
         private void ListBox_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {

@@ -33,7 +33,8 @@ namespace CommentTranslator22.Popups.Command
 
         public void TranslateText(string text)
         {
-            viewModel.TranslateText = "(翻译中...)" + text;
+            viewModel.TranslateInfo = "(translating...)";
+            viewModel.TranslateText = text;
 
             _ = ThreadHelper.JoinableTaskFactory.RunAsync(async delegate
             {
@@ -41,11 +42,13 @@ namespace CommentTranslator22.Popups.Command
                 var result = await TranslateClient.Instance.TranslateAsync(text);
                 if (result.IsSuccess)
                 {
-                    viewModel.TranslateText = "(翻译成功)" + result.TargetText;
+                    viewModel.TranslateInfo = "(success)";
+                    viewModel.TranslateText = result.TargetText;
                 }
                 else
                 {
-                    viewModel.TranslateText = "(翻译失败)";
+                    viewModel.TranslateInfo = "(failed)";
+                    viewModel.TranslateText = "";
                 }
             });
         }
@@ -60,6 +63,13 @@ namespace CommentTranslator22.Popups.Command
 
     public class Command1ViewModel : ViewModelBase
     {
+        public string TranslateInfo
+        {
+            get => _translateInfo;
+            set => SetProperty(ref _translateInfo, value);
+        }
+        private string _translateInfo = "";
+
         public string TranslateText
         {
             get => _translateText;

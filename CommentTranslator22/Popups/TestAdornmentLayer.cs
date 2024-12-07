@@ -46,29 +46,32 @@ namespace CommentTranslator22.Popups
             this.view.Closed += View_Closed;
 
             layer = view.GetAdornmentLayer(nameof(TestAdornmentLayer));
-            if (CommentTranslator22Package.Config.UseUiLimit == false)
+            if (layer is UIElement element)
             {
-                (layer as UIElement).LayoutUpdated += TestAdornmentLayer_LayoutUpdated;
+                element.LayoutUpdated += TestAdornmentLayer_LayoutUpdated;
             }
         }
 
         private void TestAdornmentLayer_LayoutUpdated(object sender, EventArgs e)
         {
-            // 此事件用于缓解UI关闭的问题，在布局更新时，总是去检查控件的显示状态
-            // 如果有更好的方法，以后会进行更改
-            if (view == null)
+            if (CommentTranslator22Package.Config.UseUiLimit == false)
             {
-                return;
-            }
-            foreach (var w in views)
-            {
-                if (state[w.Key].IsShow == true)
+                // 此事件用于缓解UI关闭的问题，在布局更新时，总是去检查控件的显示状态
+                // 如果有更好的方法，以后会进行更改
+                if (view == null)
                 {
-                    AddAdornment(w.Value as UIElement, view.Selection.SelectedSpans[0]);
+                    return;
                 }
-                else if (layer.Elements.Count > 0)
+                foreach (var w in views)
                 {
-                    RemoveAdornment(w.Value as UIElement);
+                    if (state[w.Key].IsShow == true)
+                    {
+                        AddAdornment(w.Value as UIElement, view.Selection.SelectedSpans[0]);
+                    }
+                    else if (layer.Elements.Count > 0)
+                    {
+                        RemoveAdornment(w.Value as UIElement);
+                    }
                 }
             }
         }
