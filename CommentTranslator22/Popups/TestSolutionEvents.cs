@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
-using System.Collections.Generic;
 
 namespace CommentTranslator22.Popups
 {
@@ -22,11 +21,13 @@ namespace CommentTranslator22.Popups
             static Nested() { }
         }
 
-        public List<Action> SolutionCloseFunc { get; set; } = new List<Action>();
+        public event EventHandler SolutionStart;
+
+        public event EventHandler SolutionClose;
 
         TestSolutionEvents()
         {
-            _ = ThreadHelper.JoinableTaskFactory.RunAsync(async delegate
+            ThreadHelper.JoinableTaskFactory.Run(async delegate
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 var solution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
@@ -52,8 +53,11 @@ namespace CommentTranslator22.Popups
         public int OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy) =>
             Microsoft.VisualStudio.VSConstants.S_OK;
 
-        public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution) =>
-            Microsoft.VisualStudio.VSConstants.S_OK;
+        public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
+        {
+            SolutionStart?.Invoke(this, EventArgs.Empty); // 通知侦听客户端解决方案已打开
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
 
         public int OnQueryCloseSolution(object pUnkReserved, ref int pfCancel) =>
             Microsoft.VisualStudio.VSConstants.S_OK;
@@ -63,11 +67,7 @@ namespace CommentTranslator22.Popups
 
         public int OnAfterCloseSolution(object pUnkReserved)
         {
-            // 通知侦听客户端解决方案已关闭
-            foreach (var i in SolutionCloseFunc)
-            {
-                i.Invoke();
-            }
+            SolutionClose?.Invoke(this, EventArgs.Empty); // 通知侦听客户端解决方案已关闭
             return Microsoft.VisualStudio.VSConstants.S_OK;
         }
     }

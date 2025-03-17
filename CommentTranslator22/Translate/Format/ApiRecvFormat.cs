@@ -17,7 +17,7 @@ namespace CommentTranslator22.Translate.Format
         /// </summary>
         public string Message { get; set; }
         /// <summary>
-        /// 待翻译文件
+        /// 待翻译的文本
         /// </summary>
         public string SourceText { get; set; }
         /// <summary>

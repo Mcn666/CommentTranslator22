@@ -3,6 +3,7 @@
   <PropertyGroup>
     <MinimumVisualStudioVersion>17.0</MinimumVisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -49,18 +50,25 @@
     <Compile Include="Dictionary\DictionaryFormat.cs" />
     <Compile Include="Dictionary\DictionaryUseData.cs" />
     <Compile Include="Popups\Command\Command1.cs" />
-    <Compile Include="Popups\Command\Command1View.xaml.cs">
-      <DependentUpon>Command1View.xaml</DependentUpon>
+    <Compile Include="Popups\CompletionToolTip\View\CompletionResources.cs" />
+    <Compile Include="Popups\CompletionToolTip\View\CompletionView.xaml.cs">
+      <DependentUpon>CompletionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CommentTranslator22Config.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Popups\CompletionToolTip\TestCompletionItemView.xaml.cs">
-      <DependentUpon>TestCompletionItemView.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Popups\CompletionToolTip\View\ControlFinder.cs" />
+    <Compile Include="Popups\CompletionToolTip\View\RelayCommand.cs" />
     <Compile Include="Popups\CompletionToolTip\TestCompletionPresenterProvider.cs" />
     <Compile Include="Popups\CompletionToolTip\TestCompletionToolTip.cs" />
     <Compile Include="Popups\CompletionToolTip\TestSignatureHelpSourceProvider.cs" />
+    <Compile Include="Popups\CompletionToolTip\View\CompletionViewModel.cs" />
+    <Compile Include="Popups\CompletionToolTip\View\ViewModelBase.cs" />
+    <Compile Include="Popups\Config\ConfigWindowLanguage.cs" />
+    <Compile Include="Popups\Config\ConfigWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Popups\Config\ConfigWindow.Designer.cs">
+      <DependentUpon>ConfigWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Popups\Config\ConfigWindowModel.cs" />
     <Compile Include="Popups\QuickInfo\Comment\CommentTranslate.cs" />
     <Compile Include="Popups\QuickInfo\Comment\CommentTranslateInterrupt.cs" />
     <Compile Include="Popups\QuickInfo\Comment\Support\CommentHelp.cs" />
@@ -74,6 +82,7 @@
     <Compile Include="Popups\TestTextViewCreationListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CommentTranslator22Package.cs" />
+    <Compile Include="Translate\TaskExecutor.cs" />
     <Compile Include="Translate\Format\ApiRecvFormat.cs" />
     <Compile Include="Translate\Format\ApiSendFormat.cs" />
     <Compile Include="Translate\LanguageEnum.cs" />
@@ -83,17 +92,22 @@
     <Compile Include="Translate\Server\BingFanyi.cs" />
     <Compile Include="Translate\Server\GoogleFanyi.cs" />
     <Compile Include="Translate\Server\TranslateServer.cs" />
-    <Compile Include="Translate\TranslateClient.cs" />
-    <Compile Include="Translate\TranslateData\GeneralAnnotationData.cs" />
-    <Compile Include="Translate\TranslateData\MethodAnnotationData.cs" />
+    <Compile Include="Translate\TranslateData\GeneralTranslationData.cs" />
+    <Compile Include="Translate\TranslateData\MethodTranslationData.cs" />
+    <Compile Include="Translate\TranslateData\PhraseTranslationData.cs" />
+    <Compile Include="Translate\TranslationClient.cs" />
+    <Compile Include="Translate\TranslationData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Images\Class.png" />
-    <EmbeddedResource Include="Assets\Images\Enum.png" />
-    <EmbeddedResource Include="Assets\Images\Interface.png" />
-    <EmbeddedResource Include="Assets\Images\Namespace.png" />
-    <EmbeddedResource Include="Assets\Images\Snippet.png" />
-    <EmbeddedResource Include="Assets\Images\Local.png" />
+    <EmbeddedResource Include="Popups\Config\ConfigWindow.resx">
+      <DependentUpon>ConfigWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Images\Class.png" />
+    <EmbeddedResource Include="Resources\Images\Enum.png" />
+    <EmbeddedResource Include="Resources\Images\Interface.png" />
+    <EmbeddedResource Include="Resources\Images\Namespace.png" />
+    <EmbeddedResource Include="Resources\Images\Snippet.png" />
+    <EmbeddedResource Include="Resources\Images\Local.png" />
     <EmbeddedResource Include="Dictionary\Data\words-a.json" />
     <EmbeddedResource Include="Dictionary\Data\words-b.json" />
     <EmbeddedResource Include="Dictionary\Data\words-c.json" />
@@ -133,16 +147,23 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.8.2365" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.13.40008" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.13.2126">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.1</Version>
+      <Version>13.0.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -151,22 +172,18 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Images\Constant.png" />
-    <EmbeddedResource Include="Assets\Images\Delegate.png" />
-    <EmbeddedResource Include="Assets\Images\Event.png" />
-    <EmbeddedResource Include="Assets\Images\Field.png" />
-    <EmbeddedResource Include="Assets\Images\Keyword.png" />
-    <EmbeddedResource Include="Assets\Images\Method.png" />
-    <EmbeddedResource Include="Assets\Images\Property.png" />
-    <EmbeddedResource Include="Assets\Images\Struct.png" />
+    <EmbeddedResource Include="Resources\Images\Constant.png" />
+    <EmbeddedResource Include="Resources\Images\Delegate.png" />
+    <EmbeddedResource Include="Resources\Images\Event.png" />
+    <EmbeddedResource Include="Resources\Images\Field.png" />
+    <EmbeddedResource Include="Resources\Images\Keyword.png" />
+    <EmbeddedResource Include="Resources\Images\Method.png" />
+    <EmbeddedResource Include="Resources\Images\Property.png" />
+    <EmbeddedResource Include="Resources\Images\Struct.png" />
     <Content Include="Resources\Command1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Popups\Command\Command1View.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Popups\CompletionToolTip\TestCompletionItemView.xaml">
+    <Page Include="Popups\CompletionToolTip\View\CompletionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

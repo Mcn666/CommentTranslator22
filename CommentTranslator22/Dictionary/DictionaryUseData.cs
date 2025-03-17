@@ -57,7 +57,7 @@ namespace CommentTranslator22.Dictionary
             AffirmLocalFolderExists();
             AffirmLocalFileExists();
             ReadAllData();
-            TestSolutionEvents.Instance.SolutionCloseFunc.Add(SaveAllData);
+            TestSolutionEvents.Instance.SolutionClose += (s, e) => SaveAllData();
         }
 
         void ReadAllData()

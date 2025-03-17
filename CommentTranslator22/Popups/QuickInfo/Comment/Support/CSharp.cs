@@ -107,7 +107,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                     }
                 }
             }
-            if (linesTextLength > TranslateClient.Instance.MaxTranslateLength)
+            if (linesTextLength > TranslationClient.Instance.MaxTranslateLength)
             {
                 return null;
             }

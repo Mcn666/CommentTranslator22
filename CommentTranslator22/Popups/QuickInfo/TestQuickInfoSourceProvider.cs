@@ -1,9 +1,11 @@
 ﻿using CommentTranslator22.Popups.QuickInfo.Comment;
+using CommentTranslator22.Translate;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Utilities;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
@@ -13,7 +15,7 @@ namespace CommentTranslator22.Popups.QuickInfo
 {
     [Export(typeof(IAsyncQuickInfoSourceProvider))]
     [Name(nameof(TestQuickInfoSourceProvider))]
-    [ContentType("text")]
+    [ContentType("code")]
     internal class TestQuickInfoSourceProvider : IAsyncQuickInfoSourceProvider
     {
         public IAsyncQuickInfoSource TryCreateQuickInfoSource(ITextBuffer textBuffer)
@@ -24,20 +26,20 @@ namespace CommentTranslator22.Popups.QuickInfo
 
     internal class TestQuickInfoSource : IAsyncQuickInfoSource
     {
-        private ITextBuffer m_subjectBuffer;
-        private bool disposedValue;
+        private readonly ITextBuffer _subjectBuffer;
+        private bool _disposed;
 
         public TestQuickInfoSource(ITextBuffer textBuffer)
         {
-            this.m_subjectBuffer = textBuffer;
+            _subjectBuffer = textBuffer;
         }
 
         public void Dispose()
         {
-            if (!disposedValue)
+            if (!_disposed)
             {
-                GC.SuppressFinalize(this); // 告诉GC不用调用终结器来释放对象
-                disposedValue = true;
+                GC.SuppressFinalize(this);
+                _disposed = true;
             }
         }
 
@@ -45,96 +47,124 @@ namespace CommentTranslator22.Popups.QuickInfo
         {
             try
             {
-                var typeName = m_subjectBuffer.ContentType.TypeName;
-                var subjectTriggerPoint = session.GetTriggerPoint(m_subjectBuffer.CurrentSnapshot);
-                if (subjectTriggerPoint.HasValue == false)
+                var triggerPoint = session.GetTriggerPoint(_subjectBuffer.CurrentSnapshot);
+                if (!triggerPoint.HasValue)
                 {
                     return null;
                 }
 
-                var querySpan = new SnapshotSpan(subjectTriggerPoint.Value, 0);
-                var currentSnapshot = subjectTriggerPoint.Value.Snapshot;
-                var applicableToSpan = currentSnapshot.CreateTrackingSpan(querySpan, SpanTrackingMode.EdgeInclusive);
-                var snapshotPoint = subjectTriggerPoint.Value;
+                var snapshotPoint = triggerPoint.Value;
+                var applicableToSpan = CreateTrackingSpan(snapshotPoint);
+                var containerElement = await BuildQuickInfoContentAsync(session, snapshotPoint);
 
-                // 获取给定位置的单词
-                // 使用 navigator.GetExtentOfWord 获取 XML、XAML 中的字符时会导致 VS 卡死
-                //var navigator = m_provider.NavigatorService.GetTextStructureNavigator(m_subjectBuffer);
-                //var span = navigator.GetExtentOfWord(subjectTriggerPoint.Value).Span;
-                var word = GetWord(snapshotPoint.Snapshot.GetText(), snapshotPoint.Position);
-
-                var element = new ContainerElement(ContainerElementStyle.Stacked);
-
-                if (CommentTranslator22Package.Config.TranslateQuickInfoCommentText)
-                {
-                    var temp = await CommentTranslate.TryTranslateMethodInformationAsync(session, typeName);
-                    if (temp != null && temp.Any() == true)
-                    {
-                        var e = element.Elements.Append(new ClassifiedTextElement(temp));
-                        element = new ContainerElement(ContainerElementStyle.Stacked, e);
-                    }
-                }
-
-                if (CommentTranslator22Package.Config.TranslateGeneralCommentText)
-                {
-                    var temp = await CommentTranslate.TranslateAsync(snapshotPoint);
-                    if (temp != null && temp.Any() == true)
-                    {
-                        var e = element.Elements.Append(new ClassifiedTextElement(temp));
-                        element = new ContainerElement(ContainerElementStyle.Stacked, e);
-                    }
-                }
-
-                if (CommentTranslator22Package.Config.UseDictionary && word != null)
-                {
-                    var temp = CommentTranslate.QueryDictionary(word);
-                    if (temp != null)
-                    {
-                        var e = element.Elements.Append(new ClassifiedTextElement(temp));
-                        element = new ContainerElement(ContainerElementStyle.Stacked, e);
-                    }
-                }
-                return new QuickInfoItem(applicableToSpan, element);
+                return new QuickInfoItem(applicableToSpan, containerElement);
             }
-            catch
+            catch (Exception)
             {
+                // Log the exception if needed
+                // Logger.Log(ex);
                 return null;
             }
         }
 
-        public string GetWord(string text, int position)
+        private ITrackingSpan CreateTrackingSpan(SnapshotPoint snapshotPoint)
+        {
+            var querySpan = new SnapshotSpan(snapshotPoint, 0);
+            return snapshotPoint.Snapshot.CreateTrackingSpan(querySpan, SpanTrackingMode.EdgeInclusive);
+        }
+
+        private async Task<ContainerElement> BuildQuickInfoContentAsync(IAsyncQuickInfoSession session, SnapshotPoint snapshotPoint)
+        {
+            var tasks = new List<Task<ContainerElement>>();
+            var timeout = TimeSpan.FromSeconds(1); // Timeout for each task
+
+            if (CommentTranslator22Package.Config.UseDefaultTranslation)
+            {
+                tasks.Add(TaskExecutor.RunWithTimeoutAsync(() => GetMethodInformationAsync(session), timeout));
+                tasks.Add(TaskExecutor.RunWithTimeoutAsync(() => GetGeneralCommentAsync(snapshotPoint), timeout));
+            }
+
+            if (CommentTranslator22Package.Config.UsePhraseTranslation)
+            {
+                tasks.Add(TaskExecutor.RunWithTimeoutAsync(() => GetPhraseTranslationResultAsync(snapshotPoint), timeout));
+            }
+
+            if (CommentTranslator22Package.Config.UseDictionaryTranslation)
+            {
+                tasks.Add(TaskExecutor.RunWithTimeoutAsync(() => GetDictionaryInformationAsync(snapshotPoint), timeout));
+            }
+
+            var results = await Task.WhenAll(tasks);
+
+            // Combine all non-null results into a single ContainerElement
+            var elements = results.Where(r => r != null).SelectMany(r => r.Elements);
+            return new ContainerElement(ContainerElementStyle.Stacked, elements);
+        }
+
+        private async Task<ContainerElement> GetMethodInformationAsync(IAsyncQuickInfoSession session)
+        {
+            var methodInfo = await CommentTranslate.TryTranslateMethodInformationAsync(session, _subjectBuffer.ContentType.TypeName);
+            return methodInfo != null && methodInfo.Any()
+                ? CreateContainerElement(methodInfo)
+                : null;
+        }
+
+        private async Task<ContainerElement> GetGeneralCommentAsync(SnapshotPoint snapshotPoint)
+        {
+            var commentInfo = await CommentTranslate.TranslateAsync(snapshotPoint);
+            return commentInfo != null && commentInfo.Any()
+                ? CreateContainerElement(commentInfo)
+                : null;
+        }
+
+        private async Task<ContainerElement> GetPhraseTranslationResultAsync(SnapshotPoint snapshotPoint)
+        {
+            var word = ExtractWord(snapshotPoint.Snapshot.GetText(), snapshotPoint.Position);
+            if (word == null) return null;
+
+            var translationResult = await CommentTranslate.TranslateWordsAsync(word);
+            return translationResult != null && translationResult.Any()
+                ? CreateContainerElement(translationResult)
+                : null;
+        }
+
+        private async Task<ContainerElement> GetDictionaryInformationAsync(SnapshotPoint snapshotPoint)
+        {
+            var word = ExtractWord(snapshotPoint.Snapshot.GetText(), snapshotPoint.Position);
+            if (word == null) return null;
+
+            var dictionaryInfo = await CommentTranslate.FetchDictionaryEntriesAsync(word);
+            return dictionaryInfo != null && dictionaryInfo.Any()
+                ? CreateContainerElement(dictionaryInfo)
+                : null;
+        }
+
+        private ContainerElement CreateContainerElement(IEnumerable<ClassifiedTextRun> textRuns)
+        {
+            return new ContainerElement(ContainerElementStyle.Stacked, new ClassifiedTextElement(textRuns));
+        }
+
+        private string ExtractWord(string text, int position)
         {
             if (position < 0 || position >= text.Length)
             {
                 return null;
             }
 
-            // 获取单词边界
-            int strat = position, end = position;
-            while (strat >= 0)
+            int start = position;
+            int end = position;
+
+            while (start >= 0 && char.IsLetter(text[start]))
             {
-                if (char.IsWhiteSpace(text[strat]) || char.IsPunctuation(text[strat]) || char.IsSymbol(text[strat]))
-                {
-                    break;
-                }
-                strat--;
+                start--;
             }
-            while (end < text.Length)
+
+            while (end < text.Length && char.IsLetter(text[end]))
             {
-                if (char.IsWhiteSpace(text[end]) || char.IsPunctuation(text[end]) || char.IsSymbol(text[end]))
-                {
-                    break;
-                }
                 end++;
             }
 
-            if ((end > strat) == false)
-            {
-                return null;
-            }
-
-            // 返回单词
-            return text.Substring(strat + 1, end - strat - 1);
+            return start < end ? text.Substring(start + 1, end - start - 1) : null;
         }
     }
 }

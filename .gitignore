@@ -364,3 +364,7 @@ FodyWeavers.xsd
 /Test/Test.csproj
 /Test
 /CommentTranslator22/Popups/QuickInfo/CSharpQuickInfoSourceProvider.cs
+/CommentTranslator22/Popups/CompletionToolTip/View/RelayCommand.cs
+/CommentTranslator22/Popups/Config/ConfigWindow.cs
+/CommentTranslator22/Popups/Config/ConfigWindow.Designer.cs
+/CommentTranslator22/Popups/Config/ConfigWindow.resx

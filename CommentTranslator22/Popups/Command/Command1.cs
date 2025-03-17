@@ -1,10 +1,7 @@
-﻿using CommentTranslator22.Popups.CompletionToolTip;
-using EnvDTE;
-using EnvDTE80;
+﻿using CommentTranslator22.Popups.Config;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System;
@@ -93,35 +90,37 @@ namespace CommentTranslator22.Popups.Command
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e)
         {
-            _ = ThreadHelper.JoinableTaskFactory.RunAsync(async delegate
-            {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                var dte = await ServiceProvider.GetServiceAsync(typeof(DTE)) as DTE2;
-                if (dte.ActiveDocument != null)
-                {
-                    var select = dte.ActiveDocument.Selection as TextSelection;
-                    if (string.IsNullOrEmpty(select.Text))
-                    {
-                        //select.SelectLine(); // 如果没有选择的文本就选择行
-                        return;
-                    }
+            //_ = ThreadHelper.JoinableTaskFactory.RunAsync(async delegate
+            //{
+            //    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            //    var dte = await ServiceProvider.GetServiceAsync(typeof(DTE)) as DTE2;
+            //    if (dte.ActiveDocument != null)
+            //    {
+            //        var select = dte.ActiveDocument.Selection as TextSelection;
+            //        if (string.IsNullOrEmpty(select.Text))
+            //        {
+            //            //select.SelectLine(); // 如果没有选择的文本就选择行
+            //            return;
+            //        }
 
-                    // 在这里应该进行修剪行文本
+            //        // 在这里应该进行修剪行文本
 
-                    var text = select.Text;
-                    if (string.IsNullOrEmpty(text))
-                    {
-                        return; // 如果执行到这里，文本还是为空
-                    }
-                    var view = await GetActiveWpfTextViewAsync();
-                    var span = view.Selection.SelectedSpans[0];
-                    var cview = TestAdornmentLayer.GetView<Command1View>(view, span);
-                    if (cview != default)
-                    {
-                        cview.TranslateText(text);
-                    }
-                }
-            });
+            //        var text = select.Text;
+            //        if (string.IsNullOrEmpty(text))
+            //        {
+            //            return; // 如果执行到这里，文本还是为空
+            //        }
+            //        var view = await GetActiveWpfTextViewAsync();
+            //        var span = view.Selection.SelectedSpans[0];
+            //        var cview = TestAdornmentLayer.GetView<Command1View>(view, span);
+            //        if (cview != default)
+            //        {
+            //            cview.TranslateText(text);
+            //        }
+            //    }
+            //});
+
+            new ConfigWindow().Show();
         }
 
         async Task<IWpfTextView> GetActiveWpfTextViewAsync()

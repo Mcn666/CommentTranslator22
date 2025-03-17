@@ -1,4 +1,5 @@
 ﻿using CommentTranslator22.Popups.Command;
+using CommentTranslator22.Popups.Config;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -14,7 +15,7 @@ namespace CommentTranslator22
     [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(CommentTranslator22Package.PackageGuidString)]
-    [ProvideOptionPage(typeof(CommentTranslator22Config), "CommentTranslator22", "常规", 0, 0, true)]
+    //[ProvideOptionPage(typeof(CommentTranslator22Config), "CommentTranslator22", "Default", 0, 0, true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     public sealed class CommentTranslator22Package : AsyncPackage
     {
@@ -23,7 +24,7 @@ namespace CommentTranslator22
         /// </summary>
         public const string PackageGuidString = "3ce0a949-a32a-4108-9dd1-9103ff35e40c";
 
-        public static CommentTranslator22Config Config { get; set; } = new CommentTranslator22Config();
+        public static ConfigWindowModel Config => ConfigWindow.Model;
 
         #region Package Members
 
@@ -41,7 +42,7 @@ namespace CommentTranslator22
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             // 加载配置信息
-            Config.ReloadSetting((CommentTranslator22Config)GetDialogPage(typeof(CommentTranslator22Config)));
+            //Config.ReloadSetting((CommentTranslator22Config)GetDialogPage(typeof(CommentTranslator22Config)));
             await Command1.InitializeAsync(this);
         }
 

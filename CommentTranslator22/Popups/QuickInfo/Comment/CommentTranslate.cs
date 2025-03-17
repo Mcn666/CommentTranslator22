@@ -5,7 +5,6 @@ using CommentTranslator22.Translate.Format;
 using CommentTranslator22.Translate.TranslateData;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.StandardClassification;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using System.Collections.Generic;
@@ -29,34 +28,23 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             if (str != null)
             {
                 CommentHelp.StringPretreatment(ref str);
-                //var s = TranslateClient.Instance.HumpUnfold(str);
-                var s = str;
-                var r = MethodAnnotationData.Instance.IndexOf(s) ?? GeneralAnnotationData.Instance.IndexOf(s);
-                if (r == null)
+                var key = str;
+                var results = new List<ApiRecvFormat>();
+                var result = MethodTranslationData.Instance.GetTranslationResult(key);
+                if (result == null)
                 {
-                    var recv = await TranslateClient.Instance.TranslateAsync(s);
-                    if (string.IsNullOrEmpty(recv.TargetText) == false)
+                    result = await TranslationClient.Instance.TranslateAsync(key);
+                    if (result.IsSuccess)
                     {
-                        // 在这里将翻译后的方法注释保存到 ?? 方法中
-                        MethodAnnotationData.Instance.Add(recv);
+                        MethodTranslationData.Instance.AddTranslationEntry(key, result.TargetText);
                     }
-
-                    var temp = new List<ApiRecvFormat> { recv };
-                    CreateClassifiedTextRun(temp, out var runs);
-                    return runs;
                 }
-                else
+                if (result != null)
                 {
-                    var recv = new ApiRecvFormat()
-                    {
-                        Message = "buf",
-                        TargetText = r,
-                    };
-
-                    var temp = new List<ApiRecvFormat> { recv };
-                    CreateClassifiedTextRun(temp, out var runs);
-                    return runs;
+                    results.Add(result);
                 }
+                CreateClassifiedTextRun(results, out var runs);
+                return runs;
             }
             return null;
         }
@@ -138,7 +126,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                         var str = new StringBuilder();
                         foreach (var run in textElement.Runs)
                         {
-                            var temp = run.Text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "");
+                            var temp = run.Text.Replace("\result\n", "\n").Replace("\result", "\n").Replace("\n", "");
                             CommentHelp.StringPretreatment(ref temp);
                             str.Append(temp);
                         }
@@ -160,33 +148,25 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             var strList = CommentHelp.FindComment(snapshot);
             if (strList != null)
             {
-                var recvs = new List<ApiRecvFormat>();
-                foreach (var i in strList)
+                var results = new List<ApiRecvFormat>();
+                foreach (var str in strList)
                 {
-                    //var s = TranslateClient.Instance.HumpUnfold(i);
-                    var s = i;
-                    var r = GeneralAnnotationData.Instance.IndexOf(s) ?? MethodAnnotationData.Instance.IndexOf(s);
-                    if (r == null)
+                    var key = str;
+                    var result = GeneralTranslationData.Instance.GetTranslationResult(key);
+                    if (result == null)
                     {
-                        var recv = await TranslateClient.Instance.TranslateAsync(s);
-                        if (string.IsNullOrEmpty(recv.TargetText) == false)
+                        result = await TranslationClient.Instance.TranslateAsync(key);
+                        if (result.IsSuccess)
                         {
-                            GeneralAnnotationData.Instance.Add(recv);
+                            GeneralTranslationData.Instance.AddTranslationEntry(key, result.TargetText);
                         }
-
-                        recvs.Add(recv);
                     }
-                    else
+                    if (result != null)
                     {
-                        var recv = new ApiRecvFormat()
-                        {
-                            Message = "buf",
-                            TargetText = r,
-                        };
-                        recvs.Add(recv);
+                        results.Add(result);
                     }
                 }
-                CreateClassifiedTextRun(recvs, out var runs);
+                CreateClassifiedTextRun(results, out var runs);
                 classifieds.AddRange(runs);
             }
             return await Task.FromResult(classifieds);
@@ -202,7 +182,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                 if (formats[i].IsSuccess)
                 {
                     runs.Add(new ClassifiedTextRun(
-                        PredefinedClassificationTypeNames.Keyword, $"[ok]"));
+                        PredefinedClassificationTypeNames.Keyword, $"[Internet]"));
                     runs.Add(new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.Comment, $"{formats[i].TargetText}{temp}"));
                 }
@@ -216,43 +196,77 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                 else
                 {
                     runs.Add(new ClassifiedTextRun(
-                        PredefinedClassificationTypeNames.Keyword, $"[{formats[i].Message}]"));
+                        PredefinedClassificationTypeNames.Keyword, $"[Buffer]"));
                     runs.Add(new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.Comment, $"{formats[i].TargetText}{temp}"));
                 }
             }
         }
 
-        /// <summary>
-        /// 使用字典查询传入的字符串
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static ClassifiedTextRun QueryDictionary(string str)
+        public static async Task<IEnumerable<ClassifiedTextRun>> FetchDictionaryEntriesAsync(string str)
         {
             if (Regex.IsMatch(str, @"^[A-Za-z]+$"))
             {
                 var words = GetWords(str);
                 if (words != null)
                 {
-                    var result = "";
+                    var runs = new List<ClassifiedTextRun>()
+                    {
+                        new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.Keyword, "[SimpleDictionary]")
+                    };
                     foreach (var word in words)
                     {
-                        str = word.ToString();
-                        var temp = Dictionary.Dictionary.Instance.IndexOf(str);
-                        if (temp != null)
-                        {
-                            result += $"{str}  {GetDictionaryLanguageItem(temp)}\n";
-                        }
-                        else
-                        {
-                            result += $"{str}\n";
-                        }
+                        var text = word.ToString();
+                        var temp = Dictionary.Dictionary.Instance.IndexOf(text);
+                        runs.Add(new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.ExcludedCode, text));
+                        runs.Add(new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.Comment, $"[{(temp == null ? "??" : GetDictionaryLanguageItem(temp))}]"));
                     }
-                    if (result != "")
+                    return await Task.FromResult(runs);
+                }
+            }
+            return null;
+        }
+
+        public static async Task<IEnumerable<ClassifiedTextRun>> TranslateWordsAsync(string str)
+        {
+            if (Regex.IsMatch(str, @"^[A-Za-z]+$"))
+            {
+                var words = GetWords(str);
+                if (words == null || words.Count() < 2)
+                {
+                    return null;
+                }
+                var phrase = new StringBuilder();
+                foreach (var word in words)
+                {
+                    phrase.Append(word.ToString() + " ");
+                }
+
+                var key = phrase.ToString().TrimEnd();
+                var local = PhraseTranslationData.Instance.GetTranslationResult(key);
+                if (local == null)
+                {
+                    local = await TranslationClient.Instance.TranslateAsync(key);
+                    if (local.IsSuccess)
                     {
-                        return new ClassifiedTextRun(PredefinedClassificationTypeNames.Comment, result.TrimEnd('\n'));
+                        PhraseTranslationData.Instance.AddTranslationEntry(key, local.TargetText);
                     }
+                }
+                if (local != null)
+                {
+                    var runs = new List<ClassifiedTextRun>()
+                    {
+                        new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.Keyword, local.IsSuccess ? "[Internet]" : "[Buffer]"),
+                        new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.ExcludedCode, phrase.ToString()),
+                        new ClassifiedTextRun(
+                            PredefinedClassificationTypeNames.Comment, $"[{local.TargetText}]")
+                    };
+                    return runs;
                 }
             }
             return null;
@@ -316,6 +330,5 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             }
             return strList;
         }
-
     }
 }

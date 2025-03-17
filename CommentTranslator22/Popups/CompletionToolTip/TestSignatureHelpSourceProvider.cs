@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Language.Intellisense;
+﻿using CommentTranslator22.Popups.CompletionToolTip.View;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
             var point = session.GetTriggerPoint(textBuffer).GetPoint(textBuffer.CurrentSnapshot);
             var span = session.TextView.GetTextElementSpan(point);
             var view = session.TextView;
-            TestAdornmentLayer.AdjustViewPosition<TestCompletionItemView>(view, span);
+            TestAdornmentLayer.AdjustViewPosition<CompletionView>(view, span);
         }
 
         private void Session_Dismissed(object sender, System.EventArgs e)
@@ -42,7 +43,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
             if (sender is ISignatureHelpSession session)
             {
                 var view = session.TextView;
-                TestAdornmentLayer.AdjustViewPositionEnd<TestCompletionItemView>(view);
+                TestAdornmentLayer.AdjustViewPositionEnd<CompletionView>(view);
             }
         }
 

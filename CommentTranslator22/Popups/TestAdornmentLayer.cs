@@ -1,47 +1,32 @@
-﻿using CommentTranslator22.Popups.Command;
-using CommentTranslator22.Popups.CompletionToolTip;
+﻿using CommentTranslator22.Popups.CompletionToolTip.View;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using System;
 using System.Collections.Generic;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 
 namespace CommentTranslator22.Popups
 {
     internal class TestAdornmentLayer
     {
-        class WindowState
+        class ViewState
         {
-            public bool IsLimit { get; set; }
-
-            public bool IsShow { get; set; }
-
-            public WindowState(bool limit, bool display)
-            {
-                IsLimit = limit;
-                IsShow = display;
-            }
+            public bool IsAdjustPosition { get; set; } = false;
+            public bool IsViewVisible { get; set; } = false;
+            public object View { get; set; }
         }
 
         private readonly IWpfTextView view;
         private readonly IAdornmentLayer layer;
-        private readonly Dictionary<object, object> views = new Dictionary<object, object>()
+        private readonly Dictionary<Type, ViewState> viewStateDictionary = new Dictionary<Type, ViewState>()
         {
-            [typeof(Command1View)] = new Command1View(),
-            [typeof(TestCompletionItemView)] = new TestCompletionItemView(),
-        };
-        private readonly Dictionary<object, WindowState> state = new Dictionary<object, WindowState>()
-        {
-            [typeof(Command1View)] = new WindowState(false, false),
-            [typeof(TestCompletionItemView)] = new WindowState(false, false),
+            [typeof(CompletionView)] = new ViewState() { View = new CompletionView() },
         };
 
         public TestAdornmentLayer(IWpfTextView view)
         {
-            this.view = view;
+            this.view = view ?? throw new ArgumentNullException(nameof(view));
             this.view.Selection.SelectionChanged += Selection_SelectionChanged;
             this.view.Closed += View_Closed;
 
@@ -54,41 +39,39 @@ namespace CommentTranslator22.Popups
 
         private void TestAdornmentLayer_LayoutUpdated(object sender, EventArgs e)
         {
-            if (CommentTranslator22Package.Config.UseUiLimit == false)
+            // 此事件用于缓解UI关闭的问题，在布局更新时，总是去检查控件的显示状态
+            // 如果有更好的方法，以后会进行更改
+            if (view == null)
             {
-                // 此事件用于缓解UI关闭的问题，在布局更新时，总是去检查控件的显示状态
-                // 如果有更好的方法，以后会进行更改
-                if (view == null)
+                return;
+            }
+            foreach (var vsp in viewStateDictionary)
+            {
+                if (vsp.Value.IsViewVisible)
                 {
-                    return;
+                    AddAdornment(vsp.Value.View as UIElement, view.Selection.SelectedSpans[0]);
+                    vsp.Value.View.GetType().GetMethod("AdornmentLayerUpdate")?.Invoke(vsp.Value.View, null);
                 }
-                foreach (var w in views)
+                else if (layer.Elements.Count > 0)
                 {
-                    if (state[w.Key].IsShow == true)
-                    {
-                        AddAdornment(w.Value as UIElement, view.Selection.SelectedSpans[0]);
-                    }
-                    else if (layer.Elements.Count > 0)
-                    {
-                        RemoveAdornment(w.Value as UIElement);
-                    }
+                    RemoveAdornment(vsp.Value.View as UIElement);
                 }
             }
         }
 
         private void View_Closed(object sender, EventArgs e)
         {
-            foreach (var i in views)
+            foreach (var vsp in viewStateDictionary)
             {
-                i.Value.GetType().GetMethod("Close")?.Invoke(i.Value, null);
+                vsp.Value.View.GetType().GetMethod("AdornmentLayerClose")?.Invoke(vsp.Value.View, null);
             }
         }
 
         private void Selection_SelectionChanged(object sender, EventArgs e)
         {
-            foreach (var i in views)
+            foreach (var vsp in viewStateDictionary)
             {
-                i.Value.GetType().GetMethod("Close")?.Invoke(i.Value, null);
+                vsp.Value.View.GetType().GetMethod("AdornmentLayerClose")?.Invoke(vsp.Value.View, null);
             }
         }
 
@@ -111,7 +94,7 @@ namespace CommentTranslator22.Popups
 
         private T GetView<T>(SnapshotSpan span)
         {
-            if (views.TryGetValue(typeof(T), out var value))
+            if (viewStateDictionary.TryGetValue(typeof(T), out var vsp))
             {
                 EventHandler handler = null;
                 handler = (sender, e) =>
@@ -120,10 +103,10 @@ namespace CommentTranslator22.Popups
                     RemoveAdornment(sender as UIElement);
                 };
 
-                value.GetType().GetEvent("OnClosed")?.AddEventHandler(value, handler);
-                PopupPosition(value as UIElement, span);
-                AddAdornment(value as UIElement, span);
-                return (T)value;
+                vsp.View.GetType().GetEvent("OnClosed")?.AddEventHandler(vsp.View, handler);
+                PopupPosition(vsp.View as UIElement, span);
+                AddAdornment(vsp.View as UIElement, span);
+                return (T)vsp.View;
             }
             return default;
         }
@@ -133,9 +116,9 @@ namespace CommentTranslator22.Popups
             var bounds = view.TextViewLines.GetCharacterBounds(span.Start);
             if (bounds != null)
             {
-                if (state.TryGetValue(window.GetType(), out var value))
+                if (viewStateDictionary.TryGetValue(window.GetType(), out var vsp))
                 {
-                    if (value.IsLimit == false)
+                    if (!vsp.IsAdjustPosition)
                     {
                         Canvas.SetLeft(window, bounds.Left);
                         Canvas.SetTop(window, bounds.Bottom);
@@ -154,13 +137,13 @@ namespace CommentTranslator22.Popups
                 }
             }
             layer.AddAdornment(span, null, window);
-            state[window.GetType()].IsShow = true;
+            viewStateDictionary[window.GetType()].IsViewVisible = true;
         }
 
         private void RemoveAdornment(UIElement window)
         {
             layer.RemoveAdornment(window);
-            state[window.GetType()].IsShow = false;
+            viewStateDictionary[window.GetType()].IsViewVisible = false;
         }
 
         public static void HideView<T>(ITextView view)
@@ -170,10 +153,10 @@ namespace CommentTranslator22.Popups
 
         private void HideView<T>()
         {
-            if (views.TryGetValue(typeof(T), out var value))
+            if (viewStateDictionary.TryGetValue(typeof(T), out var vsp))
             {
-                value.GetType().GetMethod("Close")?.Invoke(value, null);
-                RemoveAdornment(value as UIElement);
+                vsp.View.GetType().GetMethod("Close")?.Invoke(vsp.View, null);
+                RemoveAdornment(vsp.View as UIElement);
             }
         }
 
@@ -184,13 +167,13 @@ namespace CommentTranslator22.Popups
 
         private void AdjustViewPosition<T>(SnapshotSpan span)
         {
-            if (views.TryGetValue(typeof(T), out var value))
+            if (viewStateDictionary.TryGetValue(typeof(T), out var vsp))
             {
                 var bounds = view.TextViewLines.GetCharacterBounds(span.Start);
-                var ui = value as UserControl;
+                var ui = vsp.View as UserControl;
                 Canvas.SetLeft(ui, bounds.Left);
                 Canvas.SetTop(ui, bounds.Top - ui.ActualHeight);
-                state[typeof(T)].IsLimit = true;
+                vsp.IsAdjustPosition = true;
             }
         }
 
@@ -201,7 +184,10 @@ namespace CommentTranslator22.Popups
 
         private void AdjustViewPositionEnd<T>()
         {
-            state[typeof(T)].IsLimit = false;
+            if (viewStateDictionary.TryGetValue(typeof(T), out var vsp))
+            {
+                vsp.IsAdjustPosition = false;
+            }
         }
     }
 }

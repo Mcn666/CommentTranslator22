@@ -75,7 +75,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
                 lengthText += temp.Length;
                 lineList.Add(temp);
             }
-            if (lengthText > TranslateClient.Instance.MaxTranslateLength)
+            if (lengthText > TranslationClient.Instance.MaxTranslateLength)
             {
                 return null;
             }
@@ -87,10 +87,10 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment.Support
         {
             if (ls.Count > 1)
             {
-                if (ls.Last().Length < TranslateClient.Instance.MinTranslateLength)
+                if (ls.Last().Length < TranslationClient.Instance.MinTranslateLength)
                 {
                     var temp = ls.Count - 2;
-                    if (ls[temp].Length > TranslateClient.Instance.MinTranslateLength)
+                    if (ls[temp].Length > TranslationClient.Instance.MinTranslateLength)
                     {
                         ls[temp] = ls[temp] + " " + ls.Last();
                         ls.RemoveAt(temp + 1);

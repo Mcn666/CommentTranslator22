@@ -1,12 +1,10 @@
-﻿using CommentTranslator22.Popups.Command;
+﻿using CommentTranslator22.Popups.CompletionToolTip.View;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion.Data;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using System;
 using System.ComponentModel.Composition;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CommentTranslator22.Popups.CompletionToolTip
 {
@@ -40,12 +38,12 @@ namespace CommentTranslator22.Popups.CompletionToolTip
         public void Close()
         {
             CompletionClosed?.Invoke(this, new CompletionClosedEventArgs(view));
-            TestAdornmentLayer.HideView<TestCompletionItemView>(view);
+            TestAdornmentLayer.HideView<CompletionView>(view);
         }
 
         public void Dispose()
         {
-            
+
         }
 
         public void Open(IAsyncCompletionSession session, CompletionPresentationViewModel model)
@@ -67,14 +65,14 @@ namespace CommentTranslator22.Popups.CompletionToolTip
             //  输入字符"."获取成员时，会导致UI关闭，原因未知，但我发现添加到IAdornmentLayer图层的UI被移除了
 
             var span = session.ApplicableToSpan.GetSpan(this.view.TextSnapshot);
-            var view = TestAdornmentLayer.GetView<TestCompletionItemView>(this.view, span);
+            var view = TestAdornmentLayer.GetView<CompletionView>(this.view, span);
             if (view == default)
             {
                 session.Dismiss();
                 return;
             }
 
-            view.SetCompletionCollection(session, model);
+            view.SetCompletionItems(session, model);
             view.CommitRequested += View_CommitRequested;
             view.CompletionItemSelected += View_CompletionItemSelected;
         }
@@ -83,7 +81,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
         {
             // 通过引发此事件来更改UI中的选择项，问题点：
             //  触发此事件会导致多次循环
-            if (sender is TestCompletionItemView window)
+            if (sender is CompletionView window)
             {
                 window.CompletionItemSelected -= View_CompletionItemSelected;
                 CompletionItemSelected?.Invoke(this, e);
@@ -94,7 +92,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
         {
             // 通过引发此事件来提交完成项，问题点：
             //  提交后编辑器视图没有获得焦点，需要鼠标点击编辑器视图。可能的原因：使用鼠标双击提交完成项时，焦点在UI上
-            if (sender is TestCompletionItemView window)
+            if (sender is CompletionView window)
             {
                 window.CommitRequested -= View_CommitRequested;
                 CommitRequested?.Invoke(this, e);

@@ -6,35 +6,24 @@ using System.Threading.Tasks;
 
 namespace CommentTranslator22.Translate
 {
-    public class TranslateClient
+    public class TranslationClient
     {
-        public static TranslateClient Instance
-        {
-            get
-            {
-                return Nested.instance;
-            }
-        }
+        public static TranslationClient Instance => Nested.instance;
 
-        class Nested
+        private class Nested
         {
-            internal static TranslateClient instance = new TranslateClient();
-
+            internal static readonly TranslationClient instance = new TranslationClient();
             static Nested() { }
         }
 
-        TranslateClient()
-        {
+        private TranslationClient() { }
 
-        }
-
-        public int MaxTranslateLength { get; } = 300;
-
+        public int MaxTranslateLength { get; } = 500;
         public int MinTranslateLength { get; } = 10;
 
         public async Task<ApiRecvFormat> TranslateAsync(string str)
         {
-            var res = Preprocessing(str);
+            var res = PreprocessText(str);
             if (res != null)
             {
                 return new ApiRecvFormat
@@ -51,10 +40,10 @@ namespace CommentTranslator22.Translate
                 SourceText = str
             };
 
-            return await ExecuteAsync(request);
+            return await SendRequestAsync(request);
         }
 
-        public async Task<ApiRecvFormat> ExecuteAsync(ApiSendFormat apiRequest)
+        public async Task<ApiRecvFormat> SendRequestAsync(ApiSendFormat apiRequest)
         {
             switch (CommentTranslator22Package.Config.TranslationServer)
             {
@@ -72,26 +61,22 @@ namespace CommentTranslator22.Translate
                         }
                         return await TranslateServer.BaiduAsync(apiRequest, i, k);
                     }
-                default:
-                    return new ApiRecvFormat();
+                default: return new ApiRecvFormat();
             }
         }
 
-        public string Preprocessing(string text)
+        public string PreprocessText(string text)
         {
             switch (CommentTranslator22Package.Config.TargetLanguage)
             {
                 case LanguageEnum.English:
-                    if (LanguageProportion.English(text) > 0.4f)
-                        return "EN?";
+                    if (LanguageProportion.English(text) > 0.4f) return "EN?";
                     break;
                 case LanguageEnum.简体中文:
-                    if (LanguageProportion.Chinese(text) > 0.4f)
-                        return "CN?";
+                    if (LanguageProportion.Chinese(text) > 0.4f) return "CN?";
                     break;
                 case LanguageEnum.日本語:
-                    if (LanguageProportion.Japanese(text) > 0.4f)
-                        return "JA?";
+                    if (LanguageProportion.Japanese(text) > 0.4f) return "JA?";
                     break;
             }
 
@@ -125,7 +110,6 @@ namespace CommentTranslator22.Translate
                         var g = match.Groups[0].Value;
                         sb.Append(g + " ");
                     }
-
                     result += sb.ToString().TrimEnd() + " ";
                 }
                 else

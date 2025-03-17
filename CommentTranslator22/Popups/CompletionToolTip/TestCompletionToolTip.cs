@@ -15,7 +15,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
             if (string.IsNullOrEmpty(completion.Description))
             {
                 var str = "";
-                var strings = TranslateClient.Instance.HumpUnfold(completion.DisplayText).Split(' ');
+                var strings = TranslationClient.Instance.HumpUnfold(completion.DisplayText).Split(' ');
                 foreach (var s in strings)
                 {
                     var r = Dictionary.Dictionary.Instance.IndexOf(s);

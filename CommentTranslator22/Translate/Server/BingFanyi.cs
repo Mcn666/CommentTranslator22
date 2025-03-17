@@ -66,7 +66,6 @@ namespace CommentTranslator22.Translate.Server
         public static async Task<ApiRecvFormat> BingAsync(ApiSendFormat format)
         {
             var client = new HttpClient();
-            string r = "";
             string url = "https://cn.bing.com/translator";
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri(url));
             HttpResponseMessage response = await client.SendAsync(request);
@@ -96,26 +95,33 @@ namespace CommentTranslator22.Translate.Server
             request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
             response = await client.SendAsync(request);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var bytes = await response.Content.ReadAsByteArrayAsync();
-                html = Encoding.UTF8.GetString(bytes);
+                if (response.IsSuccessStatusCode)
+                {
+                    var bytes = await response.Content.ReadAsByteArrayAsync();
+                    html = Encoding.UTF8.GetString(bytes);
 
-                // 这是扩展 CommentTranslator64 的原代码
-                var doc = Newtonsoft.Json.Linq.JArray.Parse(html);
-                r = doc[0]["translations"][0]["text"].ToString();
+                    // 这是扩展 CommentTranslator64 的原代码
+                    //var doc = Newtonsoft.Json.Linq.JArray.Parse(html);
+                    //r = doc[0]["translations"][0]["text"].ToString();
 
-                // Json 反序列化
-                //var bingRecv = JsonConvert.DeserializeObject<TranslationResponse[]>(html);
+                    // Json 反序列化
+                    var bingRecv = JsonConvert.DeserializeObject<TranslationResponse[]>(html);
+                    return new ApiRecvFormat()
+                    {
+                        IsSuccess = true,
+                        Code = response.StatusCode,
+                        SourceText = format.SourceText,
+                        TargetText = bingRecv[0].Translations[0].Text
+                    };
+                }
             }
-
-            return new ApiRecvFormat()
+            catch (Exception)
             {
-                IsSuccess = true,
-                Code = response.StatusCode,
-                SourceText = format.SourceText,
-                TargetText = r
-            };
+                //r = ex.Message;
+            }
+            return new ApiRecvFormat();
         }
     }
 }
