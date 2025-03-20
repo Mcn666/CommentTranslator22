@@ -153,37 +153,38 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                     textBlock.Inlines.Remove(element);
                 }
 
-                if (container.Elements.Count() > 1 && container.Elements.ElementAt(1) is ClassifiedTextElement element1)
-                {
-                    _ = SetDescriptionTranslationResultAsync(element1);
-                }
+                _ = SetDescriptionTranslationResultAsync(container);
             }
+
             ViewModel.Description = textBlock;
         }
 
-        private async Task SetDescriptionTranslationResultAsync(ClassifiedTextElement element)
+        private async Task SetDescriptionTranslationResultAsync(ContainerElement container)
         {
             ViewModel.DescriptionTranslationResult = string.Empty;
 
-            var sb = new System.Text.StringBuilder();
-            foreach (var run in element.Runs)
+            if (container.Elements.Count() > 1 && container.Elements.ElementAt(1) is ClassifiedTextElement element)
             {
-                sb.Append(run.Text);
-            }
-            var text = sb.ToString();
-
-            var result = MethodTranslationData.Instance.GetTranslationResult(text);
-            if (result == null)
-            {
-                result = await TranslationClient.Instance.TranslateAsync(text);
-                if (result.IsSuccess)
+                var sb = new System.Text.StringBuilder();
+                foreach (var run in element.Runs)
                 {
-                    MethodTranslationData.Instance.AddTranslationEntry(result.SourceText, result.TargetText);
+                    sb.Append(run.Text);
                 }
-            }
-            if (result != null)
-            {
-                ViewModel.DescriptionTranslationResult = result.TargetText;
+                var text = sb.ToString();
+
+                var result = MethodTranslationData.Instance.GetTranslationResult(text);
+                if (result == null)
+                {
+                    result = await TranslationClient.Instance.TranslateAsync(text);
+                    if (result.IsSuccess)
+                    {
+                        MethodTranslationData.Instance.AddTranslationEntry(result.SourceText, result.TargetText);
+                    }
+                }
+                if (result != null)
+                {
+                    ViewModel.DescriptionTranslationResult = result.TargetText;
+                }
             }
         }
 
