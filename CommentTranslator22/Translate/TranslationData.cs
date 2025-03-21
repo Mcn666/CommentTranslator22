@@ -125,16 +125,16 @@ namespace CommentTranslator22.Translate
 
         protected abstract void LoadData();
 
-        protected void SaveData(string fileName)
+        protected void SaveTranslationData()
         {
-            var filePath = Path.Combine(MainFolder, $"{fileName}.json");
+            var filePath = Path.Combine(MainFolder, $"{GetType().Name}.json");
             var json = JsonConvert.SerializeObject(StorageData, Formatting.Indented);
             File.WriteAllText(filePath, json);
         }
 
-        protected void LoadData(string fileName)
+        protected void LoadTranslationData()
         {
-            var filePath = Path.Combine(MainFolder, $"{fileName}.json");
+            var filePath = Path.Combine(MainFolder, $"{GetType().Name}.json");
             if (!File.Exists(filePath))
             {
                 return;

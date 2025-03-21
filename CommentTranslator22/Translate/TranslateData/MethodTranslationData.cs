@@ -32,12 +32,12 @@ namespace CommentTranslator22.Translate.TranslateData
 
         protected override void LoadData()
         {
-            base.LoadData(nameof(MethodTranslationData));
+            base.LoadTranslationData();
         }
 
         protected override void SaveData()
         {
-            base.SaveData(nameof(MethodTranslationData));
+            base.SaveTranslationData();
         }
     }
 }
