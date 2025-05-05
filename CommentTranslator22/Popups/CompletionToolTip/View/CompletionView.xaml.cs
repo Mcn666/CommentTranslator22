@@ -119,6 +119,8 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
         private async Task SetDescriptionAsync(CompletionItem item)
         {
+            ViewModel.DescriptionTranslationResult = string.Empty;
+
             var textBlock = new TextBlock() { TextWrapping = System.Windows.TextWrapping.Wrap };
             var description = await item.Source.GetDescriptionAsync(session, item, default);
             if (description is ClassifiedTextElement classified && classified.Runs.Count() > 0)
@@ -158,8 +160,6 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
         private async Task SetDescriptionTranslationResultAsync(ContainerElement container)
         {
-            ViewModel.DescriptionTranslationResult = string.Empty;
-
             if (container.Elements.Count() > 1 && container.Elements.ElementAt(1) is ClassifiedTextElement element)
             {
                 var sb = new System.Text.StringBuilder();
