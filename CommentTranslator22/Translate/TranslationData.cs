@@ -128,6 +128,53 @@ namespace CommentTranslator22.Translate
         protected void SaveTranslationData()
         {
             var filePath = Path.Combine(MainFolder, $"{GetType().Name}.json");
+            if (File.Exists(filePath))
+            {
+                var oldJson = File.ReadAllText(filePath);
+                var oldData = JsonConvert.DeserializeObject<ConcurrentDictionary<ServerEnum, TranslationServerData>>(oldJson);
+
+                // 拼合数据
+                foreach (var serverData in StorageData)
+                {
+                    if (oldData.TryGetValue(serverData.Key, out var oldServerData))
+                    {
+                        foreach (var languagePair in serverData.Value.LanguagePairs)
+                        {
+                            if (oldServerData.LanguagePairs.TryGetValue(languagePair.Key, out var oldLanguagePair))
+                            {
+                                foreach (var entry in languagePair.Value.TranslationEntries)
+                                {
+                                    if (oldLanguagePair.TranslationEntries.TryGetValue(entry.Key, out var oldEntries))
+                                    {
+                                        foreach (var translationEntry in entry.Value)
+                                        {
+                                            oldEntries.AddOrUpdate(translationEntry.Key, translationEntry.Value, (k, existingEntry) =>
+                                            {
+                                                existingEntry.Count += translationEntry.Value.Count;
+                                                return existingEntry;
+                                            });
+                                        }
+                                    }
+                                    else
+                                    {
+                                        oldLanguagePair.TranslationEntries.TryAdd(entry.Key, entry.Value);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                oldServerData.LanguagePairs.TryAdd(languagePair.Key, languagePair.Value);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        oldData.TryAdd(serverData.Key, serverData.Value);
+                    }
+                }
+                StorageData = oldData;
+            }
+            // 保存数据
             var json = JsonConvert.SerializeObject(StorageData, Formatting.Indented);
             File.WriteAllText(filePath, json);
         }

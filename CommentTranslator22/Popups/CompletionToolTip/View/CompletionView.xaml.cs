@@ -49,10 +49,12 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
         public void SetCompletionItems(IAsyncCompletionSession session, CompletionPresentationViewModel completionPresentationViewModel)
         {
+            var index = completionPresentationViewModel.SelectedItemIndex;
+
             if (this.completionPresentationViewModel != null
                 && this.completionPresentationViewModel.SuggestionItem == completionPresentationViewModel.SuggestionItem)
             {
-                ChangeSelectedIndex(completionPresentationViewModel.SelectedItemIndex);
+                ChangeSelectedIndex(index);
                 return;
             }
 
@@ -60,7 +62,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
             this.completionPresentationViewModel = completionPresentationViewModel;
             this.ViewModel.CompletionItems.Clear();
             PopulateCompletionList();
-            ChangeSelectedIndex(completionPresentationViewModel.SelectedItemIndex);
+            ChangeSelectedIndex(index);
         }
 
         private CompletionViewModel ViewModel => DataContext as CompletionViewModel;
@@ -86,24 +88,13 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                 if (item.CompletionItem != null)
                 {
                     var ci = item.CompletionItem;
-                    var block = new TextBlock();
-                    var brush = CompletionResources.GetBrush(ci.Filters);
-                    block.Inlines.Add(new Run(ci.DisplayText) { Foreground = brush });
-
-                    var image = new Image()
+                    var tp = new CompletionItemModel()
                     {
-                        Source = CompletionResources.GetCompletionImage(ci.Filters),
-                        Width = 16,
-                        Height = 16,
+                        Icon = CompletionResources.GetCompletionImage(ci.Filters),
+                        Text = ci.DisplayText,
+                        Foreground = CompletionResources.GetBrush(ci.Filters),
                     };
-                    var stack = new StackPanel()
-                    {
-                        Orientation = Orientation.Horizontal,
-                    };
-                    stack.Children.Add(image);
-                    stack.Children.Add(block);
-
-                    ViewModel.CompletionItems.Add(stack);
+                    ViewModel.CompletionItems.Add(tp);
                 }
             }
         }
@@ -112,8 +103,14 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
         {
             if (this.completionPresentationViewModel != null && this.completionPresentationViewModel.ItemList != null)
             {
-                if (ViewModel.SelectedIndex != index && index > -1 && index < this.completionPresentationViewModel.ItemList.Count)
+                if (ViewModel.SelectedIndex != index && index > -1 && index <= this.completionPresentationViewModel.ItemList.Count)
                 {
+                    if (index > ViewModel.CompletionItems.Count)
+                    {
+                        var count = index - ViewModel.CompletionItems.Count + 5;
+                        PopulateCompletionList(count);
+                    }
+
                     ViewModel.SelectedIndex = index;
                     isNoViewOperationChangingSelectedIndex = true;
                 }
@@ -155,7 +152,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
                 _ = SetDescriptionTranslationResultAsync(container);
             }
-
+            
             ViewModel.Description = textBlock;
         }
 

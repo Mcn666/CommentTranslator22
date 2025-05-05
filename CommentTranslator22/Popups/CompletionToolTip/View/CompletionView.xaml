@@ -24,9 +24,25 @@
                      Background="#FF383838"
                      MinWidth="100"
                      Height="160"
+                     VirtualizingStackPanel.VirtualizationMode="Recycling"
+                     VirtualizingStackPanel.IsVirtualizing="True"
                      ScrollViewer.ScrollChanged="ListBox_ScrollChanged"
                      PreviewMouseDoubleClick="ListBox_PreviewMouseDoubleClick"
                      SelectionChanged="ListBox_SelectionChanged">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate >
+                        <VirtualizingStackPanel  Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="local:CompletionItemModel">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Icon}" Width="16" Height="16"/>
+                            <TextBlock Text="{Binding Text}"
+                                       Foreground="{Binding Foreground}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
 

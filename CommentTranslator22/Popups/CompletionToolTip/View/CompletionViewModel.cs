@@ -1,11 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace CommentTranslator22.Popups.CompletionToolTip.View
 {
     public class CompletionViewModel : ViewModelBase
     {
-        public ObservableCollection<StackPanel> CompletionItems { get; set; } = new ObservableCollection<StackPanel>();
+        public ObservableCollection<CompletionItemModel> CompletionItems { get; set; } = new ObservableCollection<CompletionItemModel>();
 
         public int SelectedIndex
         {
@@ -30,5 +31,15 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
             set => SetProperty(ref descriptionTranslationResult, value);
         }
         private string descriptionTranslationResult;
+    }
+
+    public class CompletionItemModel
+    {
+        public string Text { get; set; }
+        //public string Description { get; set; }
+        //public string DescriptionTranslationResult { get; set; }
+        public ImageSource Icon { get; set; }
+        //public Brush Background { get; set; }
+        public Brush Foreground { get; set; }
     }
 }
