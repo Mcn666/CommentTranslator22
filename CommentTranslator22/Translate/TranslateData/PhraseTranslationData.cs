@@ -1,43 +1,22 @@
-﻿using CommentTranslator22.Translate.Format;
-
+﻿// PhraseTranslationData.cs
 namespace CommentTranslator22.Translate.TranslateData
 {
-    internal class PhraseTranslationData : TranslationData
+    internal class PhraseTranslationData : BaseTranslationData
     {
         internal static PhraseTranslationData Instance => Nested.instance;
 
-        class Nested
+        private class Nested
         {
-            internal static PhraseTranslationData instance = new PhraseTranslationData();
+            internal static readonly PhraseTranslationData instance = CreateInstance<PhraseTranslationData>();
             static Nested() { }
         }
 
-        internal PhraseTranslationData() : base()
+        // 短语翻译数据可以选择性地从旧数据中迁移
+        protected override bool ShouldMigrateOldData()
         {
-        }
-
-        internal ApiRecvFormat GetTranslationResult(string key)
-        {
-            var entry = GetTranslationEntry(key);
-            if (entry != null)
-            {
-                return new ApiRecvFormat()
-                {
-                    SourceText = key,
-                    TargetText = entry.TargetText
-                };
-            }
-            return null;
-        }
-
-        protected override void LoadData()
-        {
-            base.LoadTranslationData();
-        }
-
-        protected override void SaveData()
-        {
-            base.SaveTranslationData();
+            // 这里可以添加特定逻辑来筛选只与短语相关的数据
+            // 目前返回false，不从旧数据迁移
+            return false;
         }
     }
 }

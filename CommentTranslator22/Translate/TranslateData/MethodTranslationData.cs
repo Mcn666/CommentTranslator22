@@ -1,43 +1,17 @@
-﻿using CommentTranslator22.Translate.Format;
-
+﻿// MethodTranslationData.cs
 namespace CommentTranslator22.Translate.TranslateData
 {
-    internal class MethodTranslationData : TranslationData
+    internal class MethodTranslationData : BaseTranslationData
     {
         internal static MethodTranslationData Instance => Nested.instance;
 
-        class Nested
+        private class Nested
         {
-            internal static MethodTranslationData instance = new MethodTranslationData();
+            internal static readonly MethodTranslationData instance = CreateInstance<MethodTranslationData>();
             static Nested() { }
         }
 
-        internal MethodTranslationData() : base()
-        {
-        }
-
-        internal ApiRecvFormat GetTranslationResult(string key)
-        {
-            var entry = GetTranslationEntry(key);
-            if (entry != null)
-            {
-                return new ApiRecvFormat()
-                {
-                    SourceText = key,
-                    TargetText = entry.TargetText
-                };
-            }
-            return null;
-        }
-
-        protected override void LoadData()
-        {
-            base.LoadTranslationData();
-        }
-
-        protected override void SaveData()
-        {
-            base.SaveTranslationData();
-        }
+        // 方法翻译数据继承所有旧数据
+        protected override bool ShouldMigrateOldData() => true;
     }
 }

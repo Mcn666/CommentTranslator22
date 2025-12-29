@@ -1,5 +1,6 @@
 ﻿using CommentTranslator22.Popups.QuickInfo.Comment;
 using CommentTranslator22.Translate;
+using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
@@ -55,7 +56,7 @@ namespace CommentTranslator22.Popups.QuickInfo
 
                 var snapshotPoint = triggerPoint.Value;
                 var applicableToSpan = CreateTrackingSpan(snapshotPoint);
-                var containerElement = await BuildQuickInfoContentAsync(session, snapshotPoint);
+                var containerElement = await BuildQuickInfoContentAsync(session, snapshotPoint, token);
 
                 return new QuickInfoItem(applicableToSpan, containerElement);
             }
@@ -73,14 +74,14 @@ namespace CommentTranslator22.Popups.QuickInfo
             return snapshotPoint.Snapshot.CreateTrackingSpan(querySpan, SpanTrackingMode.EdgeInclusive);
         }
 
-        private async Task<ContainerElement> BuildQuickInfoContentAsync(IAsyncQuickInfoSession session, SnapshotPoint snapshotPoint)
+        private async Task<ContainerElement> BuildQuickInfoContentAsync(IAsyncQuickInfoSession session, SnapshotPoint snapshotPoint, CancellationToken token)
         {
             var tasks = new List<Task<ContainerElement>>();
-            var timeout = TimeSpan.FromSeconds(1); // Timeout for each task
+            var timeout = TimeSpan.FromSeconds(0.8); // Timeout for each task
 
             if (CommentTranslator22Package.Config.UseDefaultTranslation)
             {
-                tasks.Add(TaskExecutor.RunWithTimeoutAsync(() => GetMethodInformationAsync(session), timeout));
+                tasks.Add(TaskExecutor.RunWithTimeoutAsync(() => GetMethodInformationAsync(session, token), timeout));
                 tasks.Add(TaskExecutor.RunWithTimeoutAsync(() => GetGeneralCommentAsync(snapshotPoint), timeout));
             }
 
@@ -101,9 +102,9 @@ namespace CommentTranslator22.Popups.QuickInfo
             return new ContainerElement(ContainerElementStyle.Stacked, elements);
         }
 
-        private async Task<ContainerElement> GetMethodInformationAsync(IAsyncQuickInfoSession session)
+        private async Task<ContainerElement> GetMethodInformationAsync(IAsyncQuickInfoSession session, CancellationToken token)
         {
-            var methodInfo = await CommentTranslate.TryTranslateMethodInformationAsync(session, _subjectBuffer.ContentType.TypeName);
+            var methodInfo = await CommentTranslate.GetMethodExplanationAsync(session, token) ?? await CommentTranslate.TryTranslateMethodInformationAsync(session, _subjectBuffer.ContentType.TypeName);
             return methodInfo != null && methodInfo.Any()
                 ? CreateContainerElement(methodInfo)
                 : null;

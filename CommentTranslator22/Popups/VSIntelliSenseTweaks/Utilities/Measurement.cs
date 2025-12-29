@@ -3,8 +3,8 @@
 #endif
 
 using System;
-using System.Text;
 using System.Diagnostics;
+using System.Text;
 
 namespace CommentTranslator22.Popups.VSIntelliSenseTweaks.Utilities
 {

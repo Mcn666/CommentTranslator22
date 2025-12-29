@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace CommentTranslator22.Popups.CompletionToolTip.View

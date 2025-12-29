@@ -14,25 +14,22 @@
     limitations under the License.
 */
 
+using CommentTranslator22.Popups.VSIntelliSenseTweaks.Utilities;
 using Microsoft;
 using Microsoft.CodeAnalysis.Completion;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
 using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion.Data;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-
 using RoslynCompletionItem = Microsoft.CodeAnalysis.Completion.CompletionItem;
 using VSCompletionItem = Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion.Data.CompletionItem;
-using CommentTranslator22.Popups.VSIntelliSenseTweaks.Utilities;
 
 namespace VSIntelliSenseTweaks
 {

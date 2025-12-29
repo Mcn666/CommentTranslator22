@@ -154,7 +154,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
                 _ = SetDescriptionTranslationResultAsync(container);
             }
-            
+
             ViewModel.Description = textBlock;
         }
 

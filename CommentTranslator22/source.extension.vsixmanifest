@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" ?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="CommentTranslator22.f33792df-6136-403f-aee2-7e70b3657187" Version="1.3.9256.1" Language="en-US" Publisher="McnF" />
+        <Identity Id="CommentTranslator22.f33792df-6136-403f-aee2-7e70b3657187" Version="1.3.9494" Language="en-US" Publisher="McnF" />
         <DisplayName>CommentTranslator22</DisplayName>
-        <Description xml:space="preserve">.</Description>
+        <Description xml:space="preserve">..</Description>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
