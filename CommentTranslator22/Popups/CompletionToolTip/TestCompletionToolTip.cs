@@ -42,7 +42,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip
                 else
                 {
                     var phraseResult = PhraseTranslationData.Instance.GetTranslationEntry(unfolded);
-                    if (phraseResult != null)
+                    if (phraseResult != null && phraseResult.TargetText.Trim() != string.Empty)
                     {
                         resultText = $"{unfolded}  {phraseResult.TargetText}";
                     }
@@ -106,7 +106,15 @@ namespace CommentTranslator22.Popups.CompletionToolTip
         {
             if (elementType == UIElementType.Tooltip)
             {
-                return new TestCompletionToolTip(itemToRender);
+                try
+                {
+                    return new TestCompletionToolTip(itemToRender);
+                }
+                catch
+                {
+
+                }
+                
             }
 
             return null;
