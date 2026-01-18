@@ -1,8 +1,11 @@
 ﻿using CommentTranslator22.Translate;
 using CommentTranslator22.Translate.TranslateData;
+using EnvDTE;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
+using System;
+using System.Collections.Concurrent;
 using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,17 +18,36 @@ namespace CommentTranslator22.Popups.CompletionToolTip
     /// </summary>
     internal class TestCompletionToolTip : TextBlock
     {
+        // 静态缓存，记录正在翻译或已翻译的短语，避免重复请求
+        private static readonly ConcurrentDictionary<string, bool> _translationRequestCache =
+            new ConcurrentDictionary<string, bool>();
+
+        // 用于标识当前短语翻译是否进行中
+        private readonly string _currentPhrase;
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="completion">补全项</param>
         public TestCompletionToolTip(Completion completion)
         {
+            // 记录当前短语
+            var unfolded = TranslationClient.Instance.HumpUnfold(completion.DisplayText).Trim();
+            _currentPhrase = unfolded;
+
+            InitializeToolTip(completion);
+        }
+
+        /// <summary>
+        /// 初始化工具提示内容
+        /// </summary>
+        private void InitializeToolTip(Completion completion)
+        {
             // 如果补全项没有描述信息，则进行翻译处理
             if (string.IsNullOrEmpty(completion.Description))
             {
                 var resultText = string.Empty;
-                var unfolded = TranslationClient.Instance.HumpUnfold(completion.DisplayText).Trim();
+                var unfolded = _currentPhrase;
                 var split = unfolded.Split(' ');
 
                 // 处理单个单词
@@ -48,15 +70,15 @@ namespace CommentTranslator22.Popups.CompletionToolTip
                     }
                     else
                     {
-                        // 异步翻译短语
-                        TranslatePhrase(unfolded);
-
                         // 临时显示单词级翻译结果
                         foreach (var word in split)
                         {
                             var wordResult = Dictionary.Dictionary.Instance.IndexOf(word);
                             resultText += $"{word}  {(wordResult == null ? "??" : wordResult.zh)}\n";
                         }
+
+                        // 异步翻译短语（后台执行，不阻塞UI）
+                        StartBackgroundTranslation(unfolded);
                     }
                 }
 
@@ -67,17 +89,63 @@ namespace CommentTranslator22.Popups.CompletionToolTip
         }
 
         /// <summary>
-        /// 异步翻译短语并缓存结果
+        /// 启动后台翻译任务
         /// </summary>
-        /// <param name="phrase">需要翻译的短语</param>
-        private void TranslatePhrase(string phrase)
+        private void StartBackgroundTranslation(string phrase)
         {
-            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            // 跳过空值或已经在翻译的短语
+            if (string.IsNullOrWhiteSpace(phrase) || _translationRequestCache.ContainsKey(phrase))
+                return;
+
+            // 标记该短语正在翻译中
+            if (!_translationRequestCache.TryAdd(phrase, true))
+                return; // 添加失败，说明已经在翻译中
+
+            // 使用后台任务处理翻译，避免阻塞UI线程
+            _ = System.Threading.Tasks.Task.Run(async () =>
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                var translationResult = await TranslationClient.Instance.TranslateAsync(phrase);
-                PhraseTranslationData.Instance.AddTranslationEntry(phrase, translationResult.TargetText);
-            });
+                try
+                {
+                    // 在后台线程执行翻译
+                    var translationResult = await TranslationClient.Instance.TranslateAsync(phrase);
+
+                    // 切换到主线程更新缓存（如果需要线程安全访问共享资源）
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                    // 缓存翻译结果
+                    PhraseTranslationData.Instance.AddTranslationEntry(phrase, translationResult.TargetText);
+
+                    // 可选：如果希望工具提示能自动更新，可以在这里触发UI更新事件
+                    // 但由于VS工具提示通常不会动态更新，这里只缓存结果供下次使用
+                }
+                catch (Exception ex)
+                {
+                    // 从缓存中移除，允许重试
+                    _translationRequestCache.TryRemove(phrase, out _);
+
+                    // 记录错误但不影响UI
+                    System.Diagnostics.Debug.WriteLine($"翻译失败 '{phrase}': {ex.Message}");
+
+                    // 可以在这里实现重试逻辑，例如延迟后重试
+                    // 但当前实现简单起见，只记录错误
+                }
+                finally
+                {
+                    // 翻译完成后，保留缓存标记一段时间（比如5分钟），防止频繁请求
+                    // 可以在这里添加定时器来清理过期缓存
+                }
+            }).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 清理翻译缓存（可选方法，可用于内存管理）
+        /// </summary>
+        /// <param name="olderThanMinutes">清理指定分钟前的缓存</param>
+        public static void ClearTranslationCache(int olderThanMinutes = 10)
+        {
+            // 在实际应用中，可以实现更复杂的缓存清理策略
+            // 这里简单清理所有缓存
+            _translationRequestCache.Clear();
         }
     }
 
@@ -106,51 +174,41 @@ namespace CommentTranslator22.Popups.CompletionToolTip
         {
             if (elementType == UIElementType.Tooltip)
             {
-                try
-                {
-                    return new TestCompletionToolTip(itemToRender);
-                }
-                catch
-                {
-
-                }
-                
+                return new TestCompletionToolTip(itemToRender);
             }
 
             return null;
         }
     }
 
-    //internal class TestCPPCompletionToolTip : TextBlock
-    //{
+    // 可选：定时清理翻译缓存的辅助类
+    // 可以在应用程序启动或关闭时调用清理方法
+    internal static class TranslationCacheManager
+    {
+        private static System.Threading.Timer _cacheCleanupTimer;
 
-    //    public TestCPPCompletionToolTip(Completion completion)
-    //    {
-    //        var strins = completion.Description.Split('\n');
-    //    }
+        /// <summary>
+        /// 启动定时清理缓存
+        /// </summary>
+        /// <param name="cleanupIntervalMinutes">清理间隔（分钟）</param>
+        public static void StartCacheCleanup(int cleanupIntervalMinutes = 30)
+        {
+            // 每30分钟清理一次缓存
+            _cacheCleanupTimer = new System.Threading.Timer(
+                _ => TestCompletionToolTip.ClearTranslationCache(),
+                null,
+                TimeSpan.FromMinutes(cleanupIntervalMinutes),
+                TimeSpan.FromMinutes(cleanupIntervalMinutes)
+            );
+        }
 
-    //    void Func(string str)
-    //    {
-
-    //    }
-
-    //    [Export(typeof(IUIElementProvider<Completion, ICompletionSession>))]
-    //    [Name(nameof(TestCompletionToolTipProvider))]
-    //    [Order(Before = "RoslynToolTipProvider")] // Roslyn 是默认的提示提供程序，使用自定义提示，需要覆盖 Roslyn 提示提供程序
-    //    [ContentType("C/C++")]
-    //    internal class TestCompletionToolTipProvider : IUIElementProvider<Completion, ICompletionSession>
-    //    {
-    //        public UIElement GetUIElement(Completion itemToRender, ICompletionSession context, UIElementType elementType)
-    //        {
-    //            if (elementType == UIElementType.Tooltip)
-    //            {
-    //                return new TestCPPCompletionToolTip(itemToRender);
-    //            }
-    //            else
-    //            {
-    //                return null;
-    //            }
-    //        }
-    //    }
-    //}
+        /// <summary>
+        /// 停止定时清理
+        /// </summary>
+        public static void StopCacheCleanup()
+        {
+            _cacheCleanupTimer?.Dispose();
+            _cacheCleanupTimer = null;
+        }
+    }
 }
