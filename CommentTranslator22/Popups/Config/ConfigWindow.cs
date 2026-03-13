@@ -113,7 +113,7 @@ namespace CommentTranslator22.Popups.Config
                 case "en-US":
                     return LanguageEnum.English;
                 default:
-                    return LanguageEnum.简体中文;
+                    return LanguageEnum.English;
             }
         }
 

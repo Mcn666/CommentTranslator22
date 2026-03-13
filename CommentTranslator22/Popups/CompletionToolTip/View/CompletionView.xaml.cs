@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion.Data;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Adornments;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,27 +24,38 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
         private IAsyncCompletionSession session;
         private CompletionPresentationViewModel completionPresentationViewModel;
         private bool isNoViewOperationChangingSelectedIndex;
-        private CancellationTokenSource _descriptionCts; // 用于取消描述加载任务
+        private CancellationTokenSource _descriptionCts;
+        private ListBox _listBox; // 缓存 ListBox 引用
 
         public CompletionView()
         {
             InitializeComponent();
+            _listBox = ControlFinder.FindByType<ListBox>(this);
+            this.Unloaded += CompletionView_Unloaded;
+        }
+
+        private void CompletionView_Unloaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            AdornmentLayerClose();
         }
 
         #region 装饰层反射调用
 
         public void AdornmentLayerClose()
         {
-            // 可在此释放资源或取消任务
-            _descriptionCts?.Cancel();
+            if (_descriptionCts != null)
+            {
+                _descriptionCts.Cancel();
+                _descriptionCts.Dispose();
+                _descriptionCts = null;
+            }
         }
 
         public void AdornmentLayerUpdate()
         {
-            var listBox = ControlFinder.FindByType<ListBox>(this);
-            if (listBox != null && listBox.SelectedItem != null)
+            if (_listBox?.SelectedItem != null)
             {
-                listBox.ScrollIntoView(listBox.SelectedItem);
+                _listBox.ScrollIntoView(_listBox.SelectedItem);
             }
         }
 
@@ -72,13 +85,18 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
         private void PopulateCompletionList(int count = 10)
         {
-            if (completionPresentationViewModel == null || completionPresentationViewModel.ItemList.Any() == false)
+            if (completionPresentationViewModel == null || !completionPresentationViewModel.ItemList.Any())
                 return;
 
             if (ViewModel.CompletionItems.Count >= completionPresentationViewModel.ItemList.Count)
                 return;
 
-            var items = completionPresentationViewModel.ItemList.Skip(ViewModel.CompletionItems.Count).Take(count).ToList();
+            var items = completionPresentationViewModel.ItemList
+                .Skip(ViewModel.CompletionItems.Count)
+                .Take(count)
+                .ToList();
+
+            var newItems = new List<CompletionItemModel>();
             foreach (var item in items)
             {
                 if (item.CompletionItem != null)
@@ -90,9 +108,12 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                         Text = ci.DisplayText,
                         Foreground = CompletionResources.GetBrush(ci.Filters),
                     };
-                    ViewModel.CompletionItems.Add(tp);
+                    newItems.Add(tp);
                 }
             }
+
+            // 批量添加（使用扩展方法）
+            ViewModel.CompletionItems.AddRange(newItems);
         }
 
         private void ChangeSelectedIndex(int index)
@@ -113,7 +134,6 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
             }
         }
 
-        // 修改为接受 CancellationToken
         private async Task SetDescriptionAsync(CompletionItem item, CancellationToken cancellationToken)
         {
             ViewModel.DescriptionTranslationResult = string.Empty;
@@ -124,7 +144,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (description is ClassifiedTextElement classified && classified.Runs.Count() > 0)
+            if (description is ClassifiedTextElement classified && classified.Runs.Any())
             {
                 foreach (var run in classified.Runs)
                 {
@@ -132,7 +152,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                     textBlock.Inlines.Add(new Run(run.Text) { Foreground = brush });
                 }
             }
-            else if (description is ContainerElement container && container.Elements.Count() > 0)
+            else if (description is ContainerElement container && container.Elements.Any())
             {
                 foreach (var element in container.Elements)
                 {
@@ -149,22 +169,18 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
                 if (textBlock.Inlines.Count > 0)
                 {
-                    var element = textBlock.Inlines.ElementAt(textBlock.Inlines.Count - 1);
-                    textBlock.Inlines.Remove(element);
+                    var lastInline = textBlock.Inlines.ElementAt(textBlock.Inlines.Count - 1);
+                    textBlock.Inlines.Remove(lastInline);
                 }
 
-                // 启动翻译任务（注意传递 cancellationToken）
                 _ = SetDescriptionTranslationResultAsync(container, cancellationToken);
             }
 
-            // 回到 UI 线程更新 Description
-            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            if (!cancellationToken.IsCancellationRequested)
             {
-                if (!cancellationToken.IsCancellationRequested)
-                {
-                    ViewModel.Description = textBlock;
-                }
-            });
+                ViewModel.Description = textBlock;
+            }
         }
 
         private async Task SetDescriptionTranslationResultAsync(ContainerElement container, CancellationToken cancellationToken)
@@ -181,7 +197,6 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                 var result = MethodTranslationData.Instance.GetTranslationResult(text);
                 if (result == null)
                 {
-                    // 翻译可能耗时，检查取消令牌
                     cancellationToken.ThrowIfCancellationRequested();
                     result = await TranslationClient.Instance.TranslateAsync(text)
                                                       .ConfigureAwait(false);
@@ -192,11 +207,9 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                 }
                 if (result != null && !cancellationToken.IsCancellationRequested)
                 {
-                    await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
-                    {
-                        if (!cancellationToken.IsCancellationRequested)
-                            ViewModel.DescriptionTranslationResult = result.TargetText;
-                    });
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+                    if (!cancellationToken.IsCancellationRequested)
+                        ViewModel.DescriptionTranslationResult = result.TargetText;
                 }
             }
         }
@@ -246,17 +259,16 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                 {
                     var item = completionPresentationViewModel.ItemList.ElementAt(ViewModel.SelectedIndex).CompletionItem;
 
-                    // 取消之前的任务，创建新的 CancellationTokenSource
                     _descriptionCts?.Cancel();
+                    _descriptionCts?.Dispose();
                     _descriptionCts = new CancellationTokenSource();
                     var token = _descriptionCts.Token;
 
-                    // 启动新任务，不等待
                     _ = SetDescriptionAsync(item, token).ContinueWith(t =>
                     {
                         if (t.IsFaulted && !(t.Exception?.InnerException is OperationCanceledException))
                         {
-                            // 记录异常（可选）
+                            // 可记录日志
                         }
                     }, TaskScheduler.Default);
                 }
@@ -276,5 +288,17 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
         }
 
         #endregion
+    }
+
+    // ObservableCollection 扩展方法，实现批量添加（仍触发逐个添加，但代码更清晰）
+    public static class ObservableCollectionExtensions
+    {
+        public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                collection.Add(item);
+            }
+        }
     }
 }

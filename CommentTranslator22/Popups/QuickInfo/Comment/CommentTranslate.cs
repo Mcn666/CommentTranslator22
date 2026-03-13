@@ -119,7 +119,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
 
             var runs = new List<ClassifiedTextRun>
             {
-                new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, "[SimpleDictionary]")
+                new ClassifiedTextRun(PredefinedClassificationTypeNames.Keyword, $"[{LanguageResources.GetLocalizedString("SimpleDictionary")}]")
             };
 
             foreach (var word in words)
@@ -159,7 +159,9 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                 {
                     new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.Keyword,
-                        translationResult.IsSuccess ? "[Internet]" : "[Buffer]"),
+                        translationResult.IsSuccess
+                            ? $"[{LanguageResources.GetLocalizedString("Internet")}]"
+                            : $"[{LanguageResources.GetLocalizedString("Buffer")}]"),
                     new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.ExcludedCode,
                         phrase + " "),
@@ -227,7 +229,9 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
             {
                 if (results[i] == null) continue;
 
-                var memberName = i == 0 ? "Summary" : "Returns";
+                var memberName = i == 0
+                    ? $"{LanguageResources.GetLocalizedString("Summary")}"
+                    : $"{LanguageResources.GetLocalizedString("Returns")}";
                 CreateClassifiedTextRun(new[] { results[i] }, ref classifieds, memberName);
 
                 if (i == 0 && results.Count > 1 && results[1] != null)
@@ -276,7 +280,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                 {
                     runs.Add(new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.Keyword,
-                        $"[{memberDoc ?? "Internet"}]"));
+                        $"[{memberDoc ?? LanguageResources.GetLocalizedString("Internet")}]"));
                     runs.Add(new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.Comment,
                         $"{format.TargetText}{separator}"));
@@ -294,7 +298,7 @@ namespace CommentTranslator22.Popups.QuickInfo.Comment
                 {
                     runs.Add(new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.Keyword,
-                        $"[{memberDoc ?? "Buffer"}]"));
+                        $"[{memberDoc ?? LanguageResources.GetLocalizedString("Buffer")}]"));
                     runs.Add(new ClassifiedTextRun(
                         PredefinedClassificationTypeNames.Comment,
                         $"{format.TargetText}{separator}"));

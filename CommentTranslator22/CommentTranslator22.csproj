@@ -71,6 +71,7 @@
     <Compile Include="Popups\Config\ConfigWindowModel.cs" />
     <Compile Include="Popups\QuickInfo\Comment\CommentTranslate.cs" />
     <Compile Include="Popups\QuickInfo\Comment\CommentTranslateInterrupt.cs" />
+    <Compile Include="Popups\QuickInfo\Comment\LanguageResources.cs" />
     <Compile Include="Popups\QuickInfo\Comment\Support\CommentHelp.cs" />
     <Compile Include="Popups\QuickInfo\Comment\Support\CSharp.cs" />
     <Compile Include="Popups\QuickInfo\Comment\Support\XAML.cs" />
