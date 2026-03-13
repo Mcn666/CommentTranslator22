@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text.Adornments;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -16,11 +17,12 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
     /// <summary>
     /// CompletionView.xaml 的交互逻辑
     /// </summary>
-    public partial class CompletionView : UserControl
+    public partial class CompletionView : UserControl, IAdornmentLayerView
     {
         private IAsyncCompletionSession session;
         private CompletionPresentationViewModel completionPresentationViewModel;
         private bool isNoViewOperationChangingSelectedIndex;
+        private CancellationTokenSource _descriptionCts; // 用于取消描述加载任务
 
         public CompletionView()
         {
@@ -31,7 +33,8 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
         public void AdornmentLayerClose()
         {
-
+            // 可在此释放资源或取消任务
+            _descriptionCts?.Cancel();
         }
 
         public void AdornmentLayerUpdate()
@@ -67,20 +70,13 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
 
         private CompletionViewModel ViewModel => DataContext as CompletionViewModel;
 
-        /// <summary>
-        /// 填充完成列表
-        /// </summary>
         private void PopulateCompletionList(int count = 10)
         {
             if (completionPresentationViewModel == null || completionPresentationViewModel.ItemList.Any() == false)
-            {
                 return;
-            }
 
             if (ViewModel.CompletionItems.Count >= completionPresentationViewModel.ItemList.Count)
-            {
                 return;
-            }
 
             var items = completionPresentationViewModel.ItemList.Skip(ViewModel.CompletionItems.Count).Take(count).ToList();
             foreach (var item in items)
@@ -117,12 +113,17 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
             }
         }
 
-        private async Task SetDescriptionAsync(CompletionItem item)
+        // 修改为接受 CancellationToken
+        private async Task SetDescriptionAsync(CompletionItem item, CancellationToken cancellationToken)
         {
             ViewModel.DescriptionTranslationResult = string.Empty;
 
             var textBlock = new TextBlock() { TextWrapping = System.Windows.TextWrapping.Wrap };
-            var description = await item.Source.GetDescriptionAsync(session, item, default);
+            var description = await item.Source.GetDescriptionAsync(session, item, cancellationToken)
+                                         .ConfigureAwait(false);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (description is ClassifiedTextElement classified && classified.Runs.Count() > 0)
             {
                 foreach (var run in classified.Runs)
@@ -146,19 +147,27 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                     textBlock.Inlines.Add(new LineBreak());
                 }
 
-                if (textBlock.Inlines.Count > 0) // 移除最后一个换行符
+                if (textBlock.Inlines.Count > 0)
                 {
                     var element = textBlock.Inlines.ElementAt(textBlock.Inlines.Count - 1);
                     textBlock.Inlines.Remove(element);
                 }
 
-                _ = SetDescriptionTranslationResultAsync(container);
+                // 启动翻译任务（注意传递 cancellationToken）
+                _ = SetDescriptionTranslationResultAsync(container, cancellationToken);
             }
 
-            ViewModel.Description = textBlock;
+            // 回到 UI 线程更新 Description
+            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    ViewModel.Description = textBlock;
+                }
+            });
         }
 
-        private async Task SetDescriptionTranslationResultAsync(ContainerElement container)
+        private async Task SetDescriptionTranslationResultAsync(ContainerElement container, CancellationToken cancellationToken)
         {
             if (container.Elements.Count() > 1 && container.Elements.ElementAt(1) is ClassifiedTextElement element)
             {
@@ -172,15 +181,22 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                 var result = MethodTranslationData.Instance.GetTranslationResult(text);
                 if (result == null)
                 {
-                    result = await TranslationClient.Instance.TranslateAsync(text);
+                    // 翻译可能耗时，检查取消令牌
+                    cancellationToken.ThrowIfCancellationRequested();
+                    result = await TranslationClient.Instance.TranslateAsync(text)
+                                                      .ConfigureAwait(false);
                     if (result.IsSuccess)
                     {
                         MethodTranslationData.Instance.AddTranslationEntry(result.SourceText, result.TargetText);
                     }
                 }
-                if (result != null)
+                if (result != null && !cancellationToken.IsCancellationRequested)
                 {
-                    ViewModel.DescriptionTranslationResult = result.TargetText;
+                    await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        if (!cancellationToken.IsCancellationRequested)
+                            ViewModel.DescriptionTranslationResult = result.TargetText;
+                    });
                 }
             }
         }
@@ -198,7 +214,7 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
             {
                 var vo = scrollViewer.VerticalOffset;
                 var sh = scrollViewer.ScrollableHeight;
-                if (vo == sh) // 如果已经滑动到底部
+                if (vo == sh)
                 {
                     PopulateCompletionList();
                     scrollViewer.ScrollToVerticalOffset(vo);
@@ -229,7 +245,20 @@ namespace CommentTranslator22.Popups.CompletionToolTip.View
                 if (ViewModel.SelectedIndex > -1 && ViewModel.SelectedIndex < completionPresentationViewModel.ItemList.Count)
                 {
                     var item = completionPresentationViewModel.ItemList.ElementAt(ViewModel.SelectedIndex).CompletionItem;
-                    _ = SetDescriptionAsync(item);
+
+                    // 取消之前的任务，创建新的 CancellationTokenSource
+                    _descriptionCts?.Cancel();
+                    _descriptionCts = new CancellationTokenSource();
+                    var token = _descriptionCts.Token;
+
+                    // 启动新任务，不等待
+                    _ = SetDescriptionAsync(item, token).ContinueWith(t =>
+                    {
+                        if (t.IsFaulted && !(t.Exception?.InnerException is OperationCanceledException))
+                        {
+                            // 记录异常（可选）
+                        }
+                    }, TaskScheduler.Default);
                 }
 
                 if (isNoViewOperationChangingSelectedIndex)

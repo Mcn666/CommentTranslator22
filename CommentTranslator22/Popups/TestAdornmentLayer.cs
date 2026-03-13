@@ -8,6 +8,13 @@ using System.Windows.Controls;
 
 namespace CommentTranslator22.Popups
 {
+    // 定义接口，让装饰层视图实现此接口以直接调用
+    internal interface IAdornmentLayerView
+    {
+        void AdornmentLayerUpdate();
+        void AdornmentLayerClose();
+    }
+
     internal class TestAdornmentLayer
     {
         class ViewState
@@ -39,18 +46,24 @@ namespace CommentTranslator22.Popups
 
         private void TestAdornmentLayer_LayoutUpdated(object sender, EventArgs e)
         {
-            // 此事件用于缓解UI关闭的问题，在布局更新时，总是去检查控件的显示状态
-            // 如果有更好的方法，以后会进行更改
             if (view == null)
-            {
                 return;
-            }
+
             foreach (var vsp in viewStateDictionary)
             {
                 if (vsp.Value.IsViewVisible)
                 {
                     AddAdornment(vsp.Value.View as UIElement, view.Selection.SelectedSpans[0]);
-                    vsp.Value.View.GetType().GetMethod("AdornmentLayerUpdate")?.Invoke(vsp.Value.View, null);
+
+                    // 优先通过接口调用，避免反射
+                    if (vsp.Value.View is IAdornmentLayerView layerView)
+                    {
+                        layerView.AdornmentLayerUpdate();
+                    }
+                    else
+                    {
+                        vsp.Value.View.GetType().GetMethod("AdornmentLayerUpdate")?.Invoke(vsp.Value.View, null);
+                    }
                 }
                 else if (layer.Elements.Count > 0)
                 {
@@ -63,7 +76,14 @@ namespace CommentTranslator22.Popups
         {
             foreach (var vsp in viewStateDictionary)
             {
-                vsp.Value.View.GetType().GetMethod("AdornmentLayerClose")?.Invoke(vsp.Value.View, null);
+                if (vsp.Value.View is IAdornmentLayerView layerView)
+                {
+                    layerView.AdornmentLayerClose();
+                }
+                else
+                {
+                    vsp.Value.View.GetType().GetMethod("AdornmentLayerClose")?.Invoke(vsp.Value.View, null);
+                }
             }
         }
 
@@ -71,7 +91,14 @@ namespace CommentTranslator22.Popups
         {
             foreach (var vsp in viewStateDictionary)
             {
-                vsp.Value.View.GetType().GetMethod("AdornmentLayerClose")?.Invoke(vsp.Value.View, null);
+                if (vsp.Value.View is IAdornmentLayerView layerView)
+                {
+                    layerView.AdornmentLayerClose();
+                }
+                else
+                {
+                    vsp.Value.View.GetType().GetMethod("AdornmentLayerClose")?.Invoke(vsp.Value.View, null);
+                }
             }
         }
 
@@ -99,11 +126,25 @@ namespace CommentTranslator22.Popups
                 EventHandler handler = null;
                 handler = (sender, e) =>
                 {
-                    sender.GetType().GetEvent("OnClosed")?.RemoveEventHandler(sender, handler);
+                    // 尝试通过接口移除，若不行则反射
+                    if (sender is IAdornmentLayerView layerView)
+                    {
+                        layerView.AdornmentLayerClose();
+                    }
+                    else
+                    {
+                        sender.GetType().GetEvent("OnClosed")?.RemoveEventHandler(sender, handler);
+                    }
                     RemoveAdornment(sender as UIElement);
                 };
 
-                vsp.View.GetType().GetEvent("OnClosed")?.AddEventHandler(vsp.View, handler);
+                // 尝试添加事件（保留原反射方式）
+                var eventInfo = vsp.View.GetType().GetEvent("OnClosed");
+                if (eventInfo != null)
+                {
+                    eventInfo.AddEventHandler(vsp.View, handler);
+                }
+
                 PopupPosition(vsp.View as UIElement, span);
                 AddAdornment(vsp.View as UIElement, span);
                 return (T)vsp.View;
@@ -155,7 +196,14 @@ namespace CommentTranslator22.Popups
         {
             if (viewStateDictionary.TryGetValue(typeof(T), out var vsp))
             {
-                vsp.View.GetType().GetMethod("Close")?.Invoke(vsp.View, null);
+                if (vsp.View is IAdornmentLayerView layerView)
+                {
+                    layerView.AdornmentLayerClose();
+                }
+                else
+                {
+                    vsp.View.GetType().GetMethod("Close")?.Invoke(vsp.View, null);
+                }
                 RemoveAdornment(vsp.View as UIElement);
             }
         }
